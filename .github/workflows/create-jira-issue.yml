@@ -54,9 +54,8 @@ jobs:
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |
             {
-              "parent": {
-                "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}"  # 상위 작업이 있는 경우만 추가
-              }
+              "parent": ${{ steps.issue-parser.outputs.issueparser_parentKey && 
+                            "{ \"key\": \"${{ steps.issue-parser.outputs.issueparser_parentKey }}\" }" || "null" }}
             }
 
       - name: Log created issue
@@ -67,18 +66,9 @@ jobs:
         with:
           ref: develop
 
-      # - name: Create branch with 
-      #   run: |
-      #     ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
-      #     ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
-      #     BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
-      #     git checkout -b "${BRANCH_NAME}"
-      #     git push origin "${BRANCH_NAME}"
-
       - name: Get GitHub issue labels
         id: get_labels
         run: |
-          # GitHub 이슈 번호 추출
           ISSUE_NUMBER="${{ github.event.issue.number }}"
 
           # GitHub API를 통해 이슈의 레이블을 가져옵니다
@@ -86,9 +76,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}" | jq -r '.labels | map(.name) | join(",")')
 
           # 이모지를 제거하고 첫 번째 레이블을 가져오기
-          LABEL=$(echo "$LABELS" | awk -F, '{print $1}' | sed 's/[^\w-]//g' | tr '[:upper:]' '[:lower:]')
+          LABEL=$(echo "$LABELS" | sed 's/[^\w, -]//g' | tr '[:upper:]' '[:lower:]')
 
-          # GitHub 이슈 번호와 Jira 이슈 키 결합하여 브랜치명 생성
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           JIRA_ISSUE_KEY="CHAEUM-${ISSUE_NUMBER}"
 

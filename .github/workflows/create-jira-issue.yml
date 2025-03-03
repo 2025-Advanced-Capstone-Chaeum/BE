@@ -41,9 +41,15 @@ jobs:
           input-text: |
             ### Github Issue Link
             - ${{ github.event.issue.html_url }}
-            ${{ github.event.issue.body | replace("\n", "<br>") }}
+            ${{ github.event.issue.body }}
           mode: md2jira
 
+      - name: Convert new lines to <br>
+        run: |
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          ISSUE_BODY_WITH_BR=$(echo "$ISSUE_BODY" | sed 's/\n/<br>/g')
+          echo "ISSUE_BODY_WITH_BR=$ISSUE_BODY_WITH_BR" >> $GITHUB_ENV
+          
       - name: Create Issue
         id: create
         uses: atlassian/gajira-create@v3

@@ -41,7 +41,7 @@ jobs:
           input-text: |
             ### Github Issue Link
             - ${{ github.event.issue.html_url }}
-            ${{ github.event.issue.body }}
+            ${{ github.event.issue.body | replace("\n", "<br>") }}
           mode: md2jira
 
       - name: Create Issue

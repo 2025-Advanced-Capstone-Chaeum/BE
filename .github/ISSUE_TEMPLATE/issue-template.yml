@@ -35,8 +35,8 @@ body:
         - [ ] Task2
     validations:
       required: true
-  - type: note
+  - type: markdown
     id: labelSelection
     attributes:
       label: '⚠️ 라벨 선택'
-      description: '이 이슈에 적합한 라벨을 수동으로 선택해주세요. (예: feat, bug, enhancement 등)'
+      description: '이 이슈에 적합한 라벨을 수동으로 선택해주세요. (예: feat, bug, chore 등)'

@@ -7,6 +7,9 @@ jobs:
   create-issue:
     name: Create Jira Issue
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
 
     steps:
       - name: Login

@@ -67,13 +67,41 @@ jobs:
         with:
           ref: develop
 
+      # - name: Create branch with 
+      #   run: |
+      #     ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
+      #     ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
+      #     BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
+      #     git checkout -b "${BRANCH_NAME}"
+      #     git push origin "${BRANCH_NAME}"
+
+      - name: Get GitHub issue labels
+        id: get_labels
+        run: |
+          # GitHub 이슈 번호 추출
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+
+          # GitHub API를 통해 이슈의 레이블을 가져옵니다
+          LABELS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}" | jq -r '.labels | map(.name) | join(",")')
+
+          # 이모지를 제거하고 첫 번째 레이블을 가져오기
+          LABEL=$(echo "$LABELS" | awk -F, '{print $1}' | sed 's/[^\w-]//g' | tr '[:upper:]' '[:lower:]')
+
+          # GitHub 이슈 번호와 Jira 이슈 키 결합하여 브랜치명 생성
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          JIRA_ISSUE_KEY="CHAEUM-${ISSUE_NUMBER}"
+
+          # 브랜치명 생성
+          BRANCH_NAME="${LABEL}/#${ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
+          echo "Generated Branch Name: $BRANCH_NAME"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
       - name: Create branch with Ticket number
         run: |
-          ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
-          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
-          BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
-          git checkout -b "${BRANCH_NAME}"
-          git push origin "${BRANCH_NAME}"
+          # 브랜치 생성 및 푸시
+          git checkout -b "${{ env.BRANCH_NAME }}"
+          git push origin "${{ env.BRANCH_NAME }}"
 
       - name: Update issue title
         uses: actions-cool/issues-helper@v3

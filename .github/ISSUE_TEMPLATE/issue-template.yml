@@ -1,6 +1,6 @@
 name: '이슈 생성'
 description: 'Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다. 아래의 라벨을 선택해주세요.'
-labels: [] 
+labels: [bug, feature]  # 기본 라벨을 추가할 수 있음
 title: '이슈 이름을 작성해주세요'
 body:
   - type: input
@@ -38,5 +38,4 @@ body:
   - type: markdown
     id: labelSelection
     attributes:
-      label: '⚠️ 라벨 선택'
-      description: '이 이슈에 적합한 라벨을 수동으로 선택해주세요. (예: feat, bug, chore 등)'
+      value: '⚠️ 라벨 선택: 이 이슈에 적합한 라벨을 수동으로 선택해주세요. (예: feat, bug, enhancement 등)'

@@ -71,7 +71,7 @@ jobs:
 
       - name: Create branch with Ticket number
         run: |
-          GITHUB_ISSUE_NUMBER="${{ github.event.issue.number }}"
+          GITHUB_ISSUE_NUMBER="#${{ github.event.issue.number }}"
           JIRA_ISSUE_KEY="${{ steps.create.outputs.issue }}"
           BRANCH_NAME="${GITHUB_ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
           git checkout -b "${BRANCH_NAME}"

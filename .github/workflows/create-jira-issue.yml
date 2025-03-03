@@ -74,7 +74,6 @@ jobs:
           GITHUB_ISSUE_NUMBER="${{ github.event.issue.number }}"
           JIRA_ISSUE_KEY="${{ steps.create.outputs.issue }}"
           BRANCH_NAME="${GITHUB_ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
-          BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's/ /-/g')
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 

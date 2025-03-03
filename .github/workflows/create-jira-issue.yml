@@ -26,7 +26,7 @@ jobs:
         uses: stefanbuck/github-issue-praser@v3
         id: issue-parser
         with:
-          template-path: .github/ISSUE_TEMPLATE/issue-template.yml  # 템플릿 경로 수정
+          template-path: .github/ISSUE_TEMPLATE/issue-template.yml
 
       - name: Log Issue Parser
         run: |
@@ -48,14 +48,17 @@ jobs:
         id: create
         uses: atlassian/gajira-create@v3
         with:
-          project: CHAEUM  # Jira 프로젝트 키 확인
+          project: CHAEUM
           issuetype: Task
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |
             {
-              "parent": ${{ steps.issue-parser.outputs.issueparser_parentKey && 
-                            "{ \"key\": \"${{ steps.issue-parser.outputs.issueparser_parentKey }}\" }" || "null" }}
+              "parent": {
+                "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}"
+              },
+              "summary": "${{ github.event.issue.title }}",
+              "description": "${{ steps.md2jira.outputs.output-text }}"
             }
 
       - name: Log created issue
@@ -70,25 +73,17 @@ jobs:
         id: get_labels
         run: |
           ISSUE_NUMBER="${{ github.event.issue.number }}"
-
-          # GitHub API를 통해 이슈의 레이블을 가져옵니다
           LABELS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}" | jq -r '.labels | map(.name) | join(",")')
-
-          # 이모지를 제거하고 첫 번째 레이블을 가져오기
           LABEL=$(echo "$LABELS" | sed 's/[^\w, -]//g' | tr '[:upper:]' '[:lower:]')
-
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           JIRA_ISSUE_KEY="CHAEUM-${ISSUE_NUMBER}"
-
-          # 브랜치명 생성
           BRANCH_NAME="${LABEL}/#${ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
           echo "Generated Branch Name: $BRANCH_NAME"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Create branch with Ticket number
         run: |
-          # 브랜치 생성 및 푸시
           git checkout -b "${{ env.BRANCH_NAME }}"
           git push origin "${{ env.BRANCH_NAME }}"
 

@@ -73,7 +73,8 @@ jobs:
         run: |
           GITHUB_ISSUE_NUMBER="#${{ github.event.issue.number }}"
           JIRA_ISSUE_KEY="${{ steps.create.outputs.issue }}"
-          BRANCH_NAME="${GITHUB_ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
+          LABEL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}" | jq -r '.labels | map(.name) | join(",")')
+          BRANCH_NAME="${LABEL}/${GITHUB_ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 

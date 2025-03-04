@@ -31,11 +31,11 @@ body:
     validations:
       required: true
 
-  - type: radio
+  - type: checkbox
     id: issueType
     attributes:
       label: '이슈 유형 선택'
-      description: '디폴트로 Task가 선택됩니다. 필요에 따라 Story를 선택해 주세요.'
+      description: '필요에 따라 Story 또는 Task중 하나만 선택해 주세요.'
       options:
         - label: 'Task'
           value: 'Task'

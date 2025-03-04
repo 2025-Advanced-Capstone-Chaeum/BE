@@ -34,7 +34,6 @@ jobs:
         run: |
           echo "Parent Key: ${{ steps.issue-parser.outputs.issueparser_parentKey }}"
           echo "Ticket Number: ${{ steps.issue-parser.outputs.__ticket_number }}"
-          echo "Issue Type: ${{ steps.issue-parser.outputs.issueType }}"
           echo "Parsed JSON: ${{ steps.issue-parser.outputs.jsonString }}"
 
       - name: Convert Markdown to Jira Syntax
@@ -52,7 +51,7 @@ jobs:
         uses: atlassian/gajira-create@v3
         with:
           project: CHAEUM
-          issuetype: ${{ steps.issue-parser.outputs.issueType || 'Task' }}
+          issuetype: Task
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |

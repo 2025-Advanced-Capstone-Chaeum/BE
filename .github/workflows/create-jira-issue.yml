@@ -52,7 +52,7 @@ jobs:
         uses: atlassian/gajira-create@v3
         with:
           project: CHAEUM
-          issuetype: ${{ steps.issue-parser.outputs.issueType || 'Task' }}
+          issuetype: ${{ steps.issue-parser.outputs.issueType && 'Sub-task' || 'Task' }}
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |

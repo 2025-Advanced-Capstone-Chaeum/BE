@@ -36,6 +36,10 @@ jobs:
           echo "Ticket Number: ${{ steps.issue-parser.outputs.__ticket_number }}"
           echo "Parsed JSON: ${{ steps.issue-parser.outputs.jsonString }}"
 
+      - name: Debug Assignee
+        run: |
+          echo "GitHub Assignee: ${{ github.event.issue.assignee.login }}"
+          
       - name: Convert Markdown to Jira Syntax
         uses: peter-evans/jira2md@v1
         id: md2jira
@@ -56,8 +60,10 @@ jobs:
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |
             {
-              "parent": { "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}" },
-              "assignee": { "name": "${{ github.event.issue.assignee.login }}" }
+              "parent": { "key": "${{ steps.issue-parser.outputs.issueparser_parentKey || '' }}" },
+              "assignee": ${{
+                github.event.issue.assignee && format('{{ "name": "{0}" }}', github.event.issue.assignee.login) || '{"name": "defaultAssignee"}'
+              }}
             }
 
       - name: Log Created Jira Issue

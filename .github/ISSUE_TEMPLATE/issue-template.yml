@@ -11,7 +11,7 @@ body:
       placeholder: 'CHAEUM-00'
     validations:
       required: true
-      
+
   - type: input
     id: description
     attributes:
@@ -28,5 +28,19 @@ body:
       value: |
         - [ ] Task1
         - [ ] Task2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issueType
+    attributes:
+      label: '이슈 유형 선택'
+      description: '이슈 유형을 선택하세요'
+      options:
+        - label: 'Story'
+          value: 'Story'
+        - label: 'Task'
+          value: 'Task'
+      default: 'Task'
     validations:
       required: true

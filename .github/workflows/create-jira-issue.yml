@@ -12,14 +12,14 @@ jobs:
       issues: write
 
     steps:
-      - name: Login
+      - name: Login to Jira
         uses: atlassian/gajira-login@v3
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
 
-      - name: Checkout main code
+      - name: Checkout Main Branch
         uses: actions/checkout@v4
         with:
           ref: main
@@ -36,7 +36,7 @@ jobs:
           echo "${{ steps.issue-parser.outputs.__ticket_number }}"
           echo "${{ steps.issue-parser.outputs.jsonString }}"
 
-      - name: Convert markdown to Jira Syntax
+      - name: Convert Markdown to Jira Syntax
         uses: peter-evans/jira2md@v1
         id: md2jira
         with:
@@ -46,53 +46,49 @@ jobs:
             ${{ github.event.issue.body }}
           mode: md2jira
 
-      - name: Create Issue
-        id: create
+      - name: Create Jira Issue
+        id: create-jira
         uses: atlassian/gajira-create@v3
         with:
           project: CHAEUM
-          issuetype: Task
+          issuetype: ${{ steps.issue-parser.outputs.issueType }}
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |
             {
-              "parent": {
-                "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}"
-              },
-              "assignee": {
-                "name": "${{ github.event.issue.assignee.login }}"
-              }
+              "parent": { "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}" },
+              "assignee": { "name": "${{ github.event.issue.assignee.login }}" }
             }
 
-      - name: Log created issue
-        run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create.outputs.issue }} was created"
+      - name: Log Created Jira Issue
+        run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create-jira.outputs.issue }} was created"
 
-      - name: Checkout develop code
+      - name: Checkout Develop Branch
         uses: actions/checkout@v4
         with:
           ref: develop
 
-      - name: Create branch with Ticket number
+      - name: Create Branch with Jira Ticket Number
         run: |
           GITHUB_ISSUE_NUMBER="#${{ github.event.issue.number }}"
-          JIRA_ISSUE_KEY="${{ steps.create.outputs.issue }}"
+          JIRA_ISSUE_KEY="${{ steps.create-jira.outputs.issue }}"
           LABEL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}" | jq -r '.labels | map(.name) | join(",")')
           CLEAN_LABEL=$(echo "$LABEL" | sed 's/[^a-zA-Z0-9]//g' | tr '[:upper:]' '[:lower:]')
           BRANCH_NAME="${CLEAN_LABEL}/${GITHUB_ISSUE_NUMBER}/${JIRA_ISSUE_KEY}"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 
-      - name: Update issue title
+      - name: Update Issue Title with Jira Key
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'update-issue'
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}"
+          title: "[${{ steps.create-jira.outputs.issue }}] ${{ github.event.issue.title }}"
 
-      - name: Add comment with Jira issue link
+      - name: Add Comment with Jira Issue Link
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'create-comment'
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
-          body: "Jira Issue Created: [${{ steps.create.outputs.issue }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ steps.create.outputs.issue }})"
+          body: "Jira Issue Created: [${{ steps.create-jira.outputs.issue }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ steps.create-jira.outputs.issue }})"

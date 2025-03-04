@@ -58,6 +58,9 @@ jobs:
             {
               "parent": {
                 "key": "${{ steps.issue-parser.outputs.issueparser_parentKey }}"
+              },
+              "assignee": {
+                "name": "${{ github.event.issue.assignee.login }}"
               }
             }
 

@@ -47,3 +47,6 @@ out/
 ### 🔐 환경 변수 및 설정 파일 ###
 .env
 /src/main/resources/*.yml
+
+### 테스트 코드 제외 ###
+/src/test/

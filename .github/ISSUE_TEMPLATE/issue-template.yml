@@ -1,34 +1,33 @@
-name: "이슈 생성"
-description: "Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다."
+name: '이슈 생성'
+description: 'Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다.'
 labels: [feat]
-title: '이슈명을 작성해주세요'
+title: '이슈 이름을 작성해주세요'
 body:
   - type: input
     id: parentKey
     attributes:
-      label: "🎟️ 상위 작업 (Ticket Number)"
-      description: "상위 작업의 Ticket Number를 기입해주세요"
-      placeholder: "CHAEUM-00"
+      label: '🎟️ 상위 작업 (Ticket Number)'
+      description: '상위 작업의 Ticket Number를 기입해주세요 (예: CHAEUM-00)'
+      placeholder: 'CHAEUM-00'
     validations:
       required: true
 
   - type: input
-    id: description
+    id: summary
     attributes:
-      label: "📝 상세 내용(Description)"
-      description: "이슈에 대한 간략한 설명을 작성해주세요"
-      placeholder: "카카오, 네이버 소셜 로그인 기능을 추가합니다."
+      label: '📝 이슈 요약 (Summary)'
+      description: '이슈에 대한 간략한 설명을 입력해주세요'
+      placeholder: '예: 사용자 로그인 기능 구현'
     validations:
       required: true
 
   - type: textarea
     id: tasks
     attributes:
-      label: "✅ 체크리스트(Tasks)"
-      description: "이 이슈에 대해 필요한 작업 목록을 작성해주세요"
+      label: '✅ 체크리스트(Tasks)'
+      description: '이슈를 완료하기 위해 필요한 작업 목록을 작성해주세요'
       value: |
-        - [ ] 카카오 소셜 로그인 기능 개발
-        - [ ] 로그인 API 연동 및 테스트
-      placeholder: "카카오 소셜 로그인 기능 개발, 네이버 소셜 로그인 기능 개발"
+        - [ ] Task1
+        - [ ] Task2
     validations:
       required: true

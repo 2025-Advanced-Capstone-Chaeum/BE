@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/review")
 @RequiredArgsConstructor
-@Tag(name = "Review", description = "알림 관리")
+@Tag(name = "Review", description = " 펀딩 후기 관리")
 public class ReviewController {
 }

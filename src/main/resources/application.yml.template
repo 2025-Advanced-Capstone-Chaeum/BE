@@ -60,7 +60,7 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     enabled: true
-    path: /swagger-ui.html
+    path: /chaeum/docs
     operations-sorter: alpha
     tags-sorter: alpha
   packages-to-scan: com.chaeum.api

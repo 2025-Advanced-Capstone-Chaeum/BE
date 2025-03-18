@@ -53,3 +53,14 @@ cors:
 logging:
   level:
     org.springframework.security.web.FilterChainProxy: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /chaeum/docs
+    operations-sorter: alpha
+    tags-sorter: alpha
+  packages-to-scan: com.chaeum.api

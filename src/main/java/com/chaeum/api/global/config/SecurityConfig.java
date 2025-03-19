@@ -60,8 +60,9 @@ public class SecurityConfig {
                         .successHandler(customOAuth2LoginHandler)
                 )
 
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                // 커스텀 필터 적용
+                .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         return http.build();
     }

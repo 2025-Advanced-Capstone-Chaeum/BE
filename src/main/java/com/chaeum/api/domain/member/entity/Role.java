@@ -1,10 +1,9 @@
 package com.chaeum.api.domain.member.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import java.util.EnumSet;
 
-@Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum Role {
 
     DONOR("ROLE_DONOR", "Donor (기부자)"),
@@ -14,31 +13,39 @@ public enum Role {
     private final String key;
     private final String description;
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     public Long toRoleLevel() {
-        return switch (this) {
-            case DONOR -> 0L;
-            case RECIPIENT -> 1L;
-            case ADMIN -> 2L;
-        };
+        return (long) this.ordinal();
     }
 
     public boolean isHigherThan(Role role) {
-        return this.toRoleLevel() > role.toRoleLevel();
+        return this.compareTo(role) > 0;
     }
 
     public boolean isHigherThanOrEqual(Role role) {
-        return this.toRoleLevel() >= role.toRoleLevel();
+        return this.compareTo(role) >= 0;
     }
 
+    private static final EnumSet<Role> DONOR_ROLES = EnumSet.of(DONOR);
+    private static final EnumSet<Role> RECIPIENT_ROLES = EnumSet.of(RECIPIENT);
+    private static final EnumSet<Role> ADMIN_ROLES = EnumSet.of(ADMIN);
+
     public boolean isDonorRole() {
-        return this == DONOR;
+        return DONOR_ROLES.contains(this);
     }
 
     public boolean isRecipientRole() {
-        return this == RECIPIENT;
+        return RECIPIENT_ROLES.contains(this);
     }
 
     public boolean isAdminRole() {
-        return this == ADMIN;
+        return ADMIN_ROLES.contains(this);
     }
 }

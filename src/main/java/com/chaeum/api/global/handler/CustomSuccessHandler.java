@@ -1,7 +1,7 @@
 package com.chaeum.api.global.handler;
 
 import com.chaeum.api.global.auth.domain.CustomOAuth2User;
-import com.chaeum.api.global.util.JwtUtil;
+import com.chaeum.api.global.utils.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
-        //OAuth2User
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
         String username = customUserDetails.getEmail();

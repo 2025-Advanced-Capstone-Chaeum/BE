@@ -40,7 +40,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 3. OAuth2Member 인가된 정보 반환
         OAuth2MemberDto oAuth2MemberDto = new OAuth2MemberDto(member.getEmail(), member.getName());
-        return new CustomOAuth2Member(oAuth2MemberDto);
+        return new CustomOAuth2Member(oAuth2MemberDto, memberRepository);
     }
 
     // 기존 회원의 이름을 업데이트하고 저장

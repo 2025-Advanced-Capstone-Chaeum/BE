@@ -1,6 +1,10 @@
 package com.chaeum.api.global.auth.domain;
 
+import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.dto.OAuth2MemberDto;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +18,7 @@ import java.util.Map;
 public class CustomOAuth2Member implements OAuth2User {
 
     private final OAuth2MemberDto oAuth2MemberDto;
+    private final MemberRepository memberRepository;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -22,7 +27,9 @@ public class CustomOAuth2Member implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(oAuth2MemberDto.getRole().getKey()));
+        Member member = memberRepository.findByEmail(oAuth2MemberDto.getEmail())
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
+        return List.of(new SimpleGrantedAuthority(member.getRole().getKey()));
     }
 
     @Override

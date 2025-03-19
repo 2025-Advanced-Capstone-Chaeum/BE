@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   mvc:
@@ -32,6 +32,8 @@ spring:
 
   jwt:
     secret-key: ${JWT_SECRET}
+    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
   security:
     oauth2:

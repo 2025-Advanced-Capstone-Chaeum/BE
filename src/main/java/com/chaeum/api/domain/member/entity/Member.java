@@ -38,7 +38,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
-    private boolean isBeneficiary;
+    @Column(nullable = false)
+    private boolean isBeneficiary = false;
 
     private String profileImage;
 

@@ -4,14 +4,21 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum ErrorCode {
-    // 2xx: 성공 응답
+
+    // 200: 성공 응답
     REQUEST_OK(HttpStatus.OK, "요청이 성공적으로 처리되었습니다."),
 
-    // 4xx: 클라이언트 오류
+    // 400: BAD REQUEST (잘못된 요청)
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    EMPTY_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다."),
+    UNSUPPORTED_IMAGE_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 형식입니다."),
+    IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 제한을 초과했습니다."),
+    UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
+    PAY_FAILURE(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
+    PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -40,14 +47,6 @@ public enum ErrorCode {
     // 409: CONFLICT (중복된 요청)
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
     DUPLICATE_MEMBER_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
-
-    // 400: BAD REQUEST (잘못된 요청)
-    EMPTY_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다."),
-    UNSUPPORTED_IMAGE_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 형식입니다."),
-    IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 제한을 초과했습니다."),
-
-    PAY_FAILURE(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
-    PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
 
     // 500: INTERNAL SERVER ERROR (서버 내부 오류)
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류가 발생했습니다."),

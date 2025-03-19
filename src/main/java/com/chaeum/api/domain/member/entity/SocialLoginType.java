@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SocialLoginType {
+
     NAVER("NAVER", "네이버 로그인"),
     KAKAO("KAKAO", "카카오 로그인");
 

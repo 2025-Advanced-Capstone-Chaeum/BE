@@ -1,17 +1,21 @@
 package com.chaeum.api.global.filter;
 
-import com.chaeum.api.global.auth.domain.CustomOAuth2User;
-import com.chaeum.api.global.auth.dto.MemberDTO;
-import com.chaeum.api.global.util.JwtUtil;
+import com.chaeum.api.domain.member.repository.MemberRepository;
+import com.chaeum.api.global.auth.dto.CustomMemberDetails;
+import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.response.ApiResponse;
+import com.chaeum.api.global.utils.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,61 +24,86 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        // cookie들을 불러온 뒤 Authorization Key에 담긴 쿠키를 찾음
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-
-            System.out.println(cookie.getName());
-            if (cookie.getName().equals("Authorization")) {
-
-                authorization = cookie.getValue();
-            }
-        }
-
-        // Authorization 헤더 검증
-        if (authorization == null) {
-
-            System.out.println("token null");
+        // 1. 헤더에서 Access Token 추출
+        String accessToken = getAccessTokenFromHeader(request);
+        if (!StringUtils.hasText(accessToken)) {
             filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
-        //토큰
-        String token = authorization;
-
-        //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
-
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
+        // 2. 토큰 검증
+        if (!validateAndParseToken(accessToken, response)) {
             return;
         }
 
-        //토큰에서 username과 role 획득
-        String username = jwtUtil.getEmail(token);
-        String role = jwtUtil.getRole(token);
+        // 3. 토큰에서 유저 이메일 정보 추출
+        String email = jwtUtil.getEmail(accessToken);
 
-        //userDTO를 생성하여 값 set
-        MemberDTO memberDTO = new MemberDTO(username, role);
+        // 4. 이메일 기반 사용자 조회
+        CustomMemberDetails customMemberDetails = loadUserByEmail(email, response);
+        if (customMemberDetails == null) {
+            return;
+        }
 
-        //UserDetails에 회원 정보 객체 담기
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(memberDTO);
-
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        //세션에 사용자 등록
+        // 5. Spring Security Context에 사용자 등록
+        Authentication authToken = new UsernamePasswordAuthenticationToken(
+                customMemberDetails,
+                null,
+                customMemberDetails.getAuthorities()
+        );
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    // 헤더에서 Access Token 추출
+    private String getAccessTokenFromHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
+    }
+
+    // 토큰 검증 및 파싱
+    private boolean validateAndParseToken(String accessToken, HttpServletResponse response) throws IOException {
+        if (!jwtUtil.validateToken(accessToken)) {
+            createAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+            return false;
+        }
+        if (jwtUtil.isExpired(accessToken)) {
+            createAPIResponse(response, ErrorCode.EXPIRED_AUTH_TOKEN);
+            return false;
+        }
+        if (!"access".equals(jwtUtil.getCategory(accessToken))) {
+            createAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+            return false;
+        }
+        return true;
+    }
+
+    // 이메일로 사용자 조회
+    private CustomMemberDetails loadUserByEmail(String email, HttpServletResponse response) throws IOException {
+        return memberRepository.findByEmail(email)
+                .map(CustomMemberDetails::new)
+                .orElse(null);
+    }
+
+    // API 응답 생성
+    private void createAPIResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        ApiResponse<Object> apiResponse = new ApiResponse<>(errorCode);
+        response.setStatus(errorCode.getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
     }
 }

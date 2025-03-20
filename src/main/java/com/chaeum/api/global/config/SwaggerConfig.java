@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         servers = {
-                @Server(url = "http://localhost:8080", description = "로컬 서버"),
-                @Server(url = "https://api.example.com", description = "운영 서버")
+                @Server(url = "http://localhost:8081", description = "로컬 서버"),
+                @Server(url = "https://api.chaeum.site", description = "운영 서버")
         }
 )
 public class SwaggerConfig {

@@ -37,6 +37,7 @@ spring:
     secret-key: ${JWT_SECRET}
     access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
     refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+    cookie-domain: ${JWT_COOKIE_DOMAIN}
 
   security:
     oauth2:
@@ -93,6 +94,9 @@ cors:
   allowed-headers: ${CORS_ALLOWED_HEADERS}
   allow-credentials: ${CORS_ALLOW_CREDENTIALS}
   max-age: ${CORS_MAX_AGE}
+
+frontend:
+  home-url: ${FRONTEND_HOME_URL}
 
 logging:
   level:

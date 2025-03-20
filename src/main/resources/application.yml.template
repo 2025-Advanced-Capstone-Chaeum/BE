@@ -52,6 +52,7 @@ spring:
             scope:
               - name
               - email
+              - profile_image
           kakao:
             client-name: kakao
             client-id: ${KAKAO_CLIENT_ID}

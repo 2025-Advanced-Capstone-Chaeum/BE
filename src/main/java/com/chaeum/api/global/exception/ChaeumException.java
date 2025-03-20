@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ChaeumException extends RuntimeException {
+
     private final ErrorCode errorCode;
     private String message;
 

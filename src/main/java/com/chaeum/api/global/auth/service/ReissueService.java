@@ -5,12 +5,12 @@ import com.chaeum.api.global.auth.domain.RefreshToken;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.properties.JwtProperties;
 import com.chaeum.api.global.utils.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +23,10 @@ public class ReissueService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
-    @Value("${spring.jwt.access-token-expiration}")
-    private long ACCESS_TOKEN_TTL;
-
-    @Value("${spring.jwt.refresh-token-expiration}")
-    private long REFRESH_TOKEN_TTL;
-
-    // Refresh Token이 유효하면 새로운 Access Token 및 Refresh Token을 발급
     public void reissueAccessToken(String loginId, HttpServletRequest request, HttpServletResponse response) {
+
         // 1. Refresh Token 추출 및 유효성 검사
         String refreshToken = getRefreshToken(request);
 
@@ -42,8 +37,8 @@ public class ReissueService {
         refreshTokenRepository.deleteById(refreshToken);
 
         // 4. 새로운 Access Token 및 Refresh Token 발급
-        String newAccessToken = jwtUtil.createJwt("access", loginId, role, ACCESS_TOKEN_TTL);
-        String newRefreshToken = jwtUtil.createJwt("refresh", loginId, role, REFRESH_TOKEN_TTL);
+        String newAccessToken = jwtUtil.createJwt("access", loginId, role, jwtProperties.getAccessTokenExpiration());
+        String newRefreshToken = jwtUtil.createJwt("refresh", loginId, role, jwtProperties.getRefreshTokenExpiration());
 
         // 5. 새로운 Refresh Token을 Redis에 저장
         RefreshToken refreshEntity = new RefreshToken(newRefreshToken, loginId);
@@ -69,6 +64,7 @@ public class ReissueService {
         if (!jwtUtil.validateToken(refreshToken)) {
             throw ChaeumException.from(ErrorCode.INVALID_REFRESH_TOKEN);
         }
+
         if (jwtUtil.isExpired(refreshToken)) {
             throw ChaeumException.from(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
@@ -89,7 +85,8 @@ public class ReissueService {
                 .sameSite("None")
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(REFRESH_TOKEN_TTL)
+                .domain(jwtProperties.getCookieDomain())
+                .maxAge(jwtProperties.getRefreshTokenExpiration())
                 .build();
     }
 }

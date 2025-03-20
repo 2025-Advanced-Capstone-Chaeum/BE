@@ -2,11 +2,12 @@ package com.chaeum.api.global.config;
 
 import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
-import com.chaeum.api.global.auth.service.CustomOAuth2UserService;
+import com.chaeum.api.global.auth.service.CustomOAuth2MemberService;
 import com.chaeum.api.global.filter.CustomEntryPoint;
 import com.chaeum.api.global.filter.CustomLogoutFilter;
 import com.chaeum.api.global.filter.JwtFilter;
 import com.chaeum.api.global.handler.CustomOAuth2LoginHandler;
+import com.chaeum.api.global.properties.CorsProperties;
 import com.chaeum.api.global.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,9 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
-import java.util.Collections;
-import java.util.List;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -32,9 +31,24 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2MemberService customOAuth2MemberService;
     private final CustomOAuth2LoginHandler customOAuth2LoginHandler;
     private final CustomEntryPoint customEntryPoint;
+    private final CorsProperties corsProperties;
+
+
+    private static final String[] PUBLIC_URLS = {
+            "/oauth2/**",
+            "/login/oauth2/**",
+            "/reissue",
+            "/v3/**",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/chaeum/docs/**",
+            "/error",
+            "/favicon.ico",
+            "/"
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,7 +70,7 @@ public class SecurityConfig {
 
                 // OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2MemberService))
                         .successHandler(customOAuth2LoginHandler)
                 )
 
@@ -68,24 +82,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://chaeum.site", "http://localhost:8081", "http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.setMaxAge(3600L);
-        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        configuration.setAllowedMethods(corsProperties.getAllowedMethods());
+        configuration.setAllowedHeaders(corsProperties.getAllowedHeaders());
+        configuration.setAllowCredentials(corsProperties.getAllowCredentials());
+        configuration.setMaxAge(corsProperties.getMaxAge());
+        configuration.setExposedHeaders(corsProperties.getAllowedHeaders());
 
-        return request -> configuration;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
-
-    private static final String[] PUBLIC_URLS = {
-            "/oauth2/**",
-            "/reissue",
-            "/v3/**",
-            "/swagger-ui/**",
-            "/error",
-            "/"
-    };
 }

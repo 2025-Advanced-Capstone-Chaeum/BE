@@ -7,16 +7,20 @@ import com.chaeum.api.global.auth.dto.KakaoResponse;
 import com.chaeum.api.global.auth.dto.NaverResponse;
 import com.chaeum.api.global.auth.dto.OAuth2MemberDto;
 import com.chaeum.api.global.auth.dto.OAuth2Response;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
 
@@ -30,13 +34,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2Response oAuth2Response = switch (registrationId) {
             case "naver" -> new NaverResponse(oAuth2User.getAttributes());
             case "kakao" -> new KakaoResponse(oAuth2User.getAttributes());
-            default -> throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 제공자: " + registrationId);
+            default -> throw ChaeumException.from(ErrorCode.UNSUPPORTED_OAUTH2_PROVIDER);
         };
 
         // 2. 기존 회원 조회 및 존재 여부 확인 (존재: 이름 갱신, 없음: 새로 생성)
         Member member = memberRepository.findByEmail(oAuth2Response.getEmail())
                 .map(existingMember -> updateMemberName(existingMember, oAuth2Response.getName()))
                 .orElseGet(() -> joinMember(oAuth2Response));
+
+        log.info("OAuth2 로그인 요청: {}", oAuth2Response.getEmail());
 
         // 3. OAuth2Member 인가된 정보 반환
         OAuth2MemberDto oAuth2MemberDto = new OAuth2MemberDto(member.getEmail(), member.getName());

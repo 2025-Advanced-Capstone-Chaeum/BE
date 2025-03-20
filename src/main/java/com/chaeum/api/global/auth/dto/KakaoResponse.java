@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class KakaoResponse implements OAuth2Response {
+public class KakaoResponse implements OAuth2Response{
 
     private final Map<String, Object> attribute;
 
@@ -26,6 +26,11 @@ public class KakaoResponse implements OAuth2Response {
 
     @Override
     public String getName() {
-        return attribute.get("name").toString();
+        return attribute.get("nickname").toString();
+    }
+
+    @Override
+    public String getProfileImage(){
+        return attribute.get("profile_image").toString();
     }
 }

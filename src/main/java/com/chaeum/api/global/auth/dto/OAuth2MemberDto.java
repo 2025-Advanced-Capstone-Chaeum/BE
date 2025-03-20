@@ -9,4 +9,5 @@ public class OAuth2MemberDto {
 
     private final String email;
     private final String name;
+    private final String profileImage;
 }

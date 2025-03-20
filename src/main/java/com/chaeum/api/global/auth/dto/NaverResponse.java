@@ -28,4 +28,9 @@ public class NaverResponse implements OAuth2Response {
     public String getName() {
         return attribute.get("name").toString();
     }
+
+    @Override
+    public String getProfileImage(){
+        return attribute.get("profile_image").toString();
+    }
 }

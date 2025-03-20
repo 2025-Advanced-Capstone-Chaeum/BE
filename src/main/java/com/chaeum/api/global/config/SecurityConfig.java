@@ -36,8 +36,8 @@ public class SecurityConfig {
     private final CustomEntryPoint customEntryPoint;
     private final CorsProperties corsProperties;
 
-
     private static final String[] PUBLIC_URLS = {
+            "/actuator/health",
             "/oauth2/**",
             "/login/oauth2/**",
             "/reissue",
@@ -52,6 +52,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 // CORS 설정
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -65,14 +66,16 @@ public class SecurityConfig {
                 // 경로별 접근 제어
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
+
+                // 커스텀 엔드포인트
+                .exceptionHandling((exceptionHandling) -> exceptionHandling
+                        .authenticationEntryPoint(customEntryPoint))
 
                 // OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2MemberService))
-                        .successHandler(customOAuth2LoginHandler)
-                )
+                        .successHandler(customOAuth2LoginHandler))
 
                 // 커스텀 필터 적용
                 .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class)

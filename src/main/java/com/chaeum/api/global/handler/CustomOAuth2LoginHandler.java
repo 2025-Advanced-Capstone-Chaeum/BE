@@ -3,6 +3,7 @@ package com.chaeum.api.global.handler;
 import com.chaeum.api.domain.member.entity.Role;
 import com.chaeum.api.global.auth.domain.CustomOAuth2Member;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.global.properties.JwtProperties;
 import com.chaeum.api.global.utils.JwtUtil;
 import com.chaeum.api.global.auth.domain.RefreshToken;
 import jakarta.servlet.ServletException;
@@ -24,12 +25,10 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
-    @Value("${spring.jwt.access-token-expiration}")
-    private long ACCESS_TOKEN_TTL;
-
-    @Value("${spring.jwt.refresh-token-expiration}")
-    private long REFRESH_TOKEN_TTL;
+    @Value("${frontend.home-url}")
+    private String homeUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -52,8 +51,8 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         Role memberRole = Role.valueOf(role);
 
         // 3. Access Token & Refresh Token 생성
-        String accessToken = jwtUtil.createJwt("access", email, memberRole, ACCESS_TOKEN_TTL);
-        String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole, REFRESH_TOKEN_TTL);
+        String accessToken = jwtUtil.createJwt("access", email, memberRole, jwtProperties.getAccessTokenExpiration());
+        String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole, jwtProperties.getRefreshTokenExpiration());
 
         // 4. Redis에 Refresh Token 저장
         RefreshToken refreshToken = new RefreshToken(refreshTokenValue, email);
@@ -61,9 +60,8 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
 
         // 5. JWT를 응답 헤더에 추가
         response.setHeader("Authorization", "Bearer " + accessToken);
-        response.setHeader("Refresh-Token", refreshTokenValue);
 
         // 6. 클라이언트 리다이렉트
-        response.sendRedirect("https://chaeum.site/api/v1/reissue");
+        response.sendRedirect(homeUrl);
     }
 }

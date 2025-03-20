@@ -92,6 +92,7 @@ cors:
   allowed-methods: ${CORS_ALLOWED_METHODS}
   allowed-headers: ${CORS_ALLOWED_HEADERS}
   allow-credentials: ${CORS_ALLOW_CREDENTIALS}
+  max-age: ${CORS_MAX_AGE}
 
 logging:
   level:

@@ -16,7 +16,7 @@ public enum ErrorCode {
     EMPTY_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다."),
     UNSUPPORTED_IMAGE_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 형식입니다."),
     IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 제한을 초과했습니다."),
-    UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
+    UNSUPPORTED_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
     PAY_FAILURE(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
     PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
 

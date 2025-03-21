@@ -16,21 +16,25 @@ public class NaverResponse implements OAuth2Response {
 
     @Override
     public String getProviderId() {
-        return attribute.get("id").toString();
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response != null ? response.get("id").toString() : null;
     }
 
     @Override
     public String getEmail() {
-        return attribute.get("email").toString();
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response != null ? response.get("email").toString() : null;
     }
 
     @Override
     public String getName() {
-        return attribute.get("name").toString();
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response != null ? response.get("name").toString() : null;
     }
 
     @Override
-    public String getProfileImage(){
-        return attribute.get("profile_image").toString();
+    public String getProfileImage() {
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response != null ? response.get("profile_image").toString() : null;
     }
 }

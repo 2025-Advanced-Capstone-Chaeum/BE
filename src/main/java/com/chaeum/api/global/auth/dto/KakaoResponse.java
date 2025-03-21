@@ -21,16 +21,34 @@ public class KakaoResponse implements OAuth2Response{
 
     @Override
     public String getEmail() {
-        return attribute.get("email").toString();
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
+        if (kakaoAccount != null && kakaoAccount.containsKey("email")) {
+            return kakaoAccount.get("email").toString();
+        }
+        return "no_email";  // 이메일이 없는 경우 기본값 설정
     }
 
     @Override
     public String getName() {
-        return attribute.get("nickname").toString();
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
+        if (kakaoAccount != null) {
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+            if (profile != null && profile.containsKey("nickname")) {
+                return profile.get("nickname").toString();
+            }
+        }
+        return "unknown";  // 기본값 설정
     }
 
     @Override
     public String getProfileImage(){
-        return attribute.get("profile_image").toString();
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
+        if (kakaoAccount != null) {
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+            if (profile != null && profile.containsKey("profile_image_url")) {
+                return profile.get("profile_image_url").toString();
+            }
+        }
+        return null; // 프로필 이미지가 없을 경우 null 반환
     }
 }

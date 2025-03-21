@@ -1,8 +1,12 @@
 package com.chaeum.api.global.handler;
 
+import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.entity.Role;
+import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.domain.CustomOAuth2Member;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.properties.JwtProperties;
 import com.chaeum.api.global.utils.JwtUtil;
 import com.chaeum.api.global.auth.domain.RefreshToken;
@@ -24,6 +28,7 @@ import java.util.Collection;
 public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
 
@@ -40,6 +45,9 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         // 1. 로그인한 사용자 정보 가져오기
         CustomOAuth2Member customUserDetails = (CustomOAuth2Member) authentication.getPrincipal();
         String email = customUserDetails.getEmail();
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
+        Long memberId = member.getId();
 
         // 2. 사용자 Role 가져오기 (없으면 기본값 "ROLE_DONOR")
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -55,7 +63,7 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole, jwtProperties.getRefreshTokenExpiration());
 
         // 4. Redis에 Refresh Token 저장
-        RefreshToken refreshToken = new RefreshToken(refreshTokenValue, email);
+        RefreshToken refreshToken = new RefreshToken(memberId, email, refreshTokenValue);
         refreshTokenRepository.save(refreshToken);
 
         // 5. JWT를 응답 헤더에 추가

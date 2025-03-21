@@ -1,0 +1,75 @@
+package com.chaeum.api.global.handler;
+
+import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.entity.Role;
+import com.chaeum.api.domain.member.repository.MemberRepository;
+import com.chaeum.api.global.auth.domain.CustomOAuth2Member;
+import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.properties.JwtProperties;
+import com.chaeum.api.global.utils.JwtUtil;
+import com.chaeum.api.global.auth.domain.RefreshToken;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Collection;
+
+@Component
+@RequiredArgsConstructor
+public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
+
+    @Value("${frontend.home-url}")
+    private String homeUrl;
+
+    @Override
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) throws IOException, ServletException {
+
+        // 1. 로그인한 사용자 정보 가져오기
+        CustomOAuth2Member customUserDetails = (CustomOAuth2Member) authentication.getPrincipal();
+        String email = customUserDetails.getEmail();
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
+        Long memberId = member.getId();
+
+        // 2. 사용자 Role 가져오기 (없으면 기본값 "ROLE_DONOR")
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String role = authorities.stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("ROLE_DONOR")
+                .replace("ROLE_", ""); // "ROLE_DONOR" -> "DONOR"
+        Role memberRole = Role.valueOf(role);
+
+        // 3. Access Token & Refresh Token 생성
+        String accessToken = jwtUtil.createJwt("access", email, memberRole, jwtProperties.getAccessTokenExpiration());
+        String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole, jwtProperties.getRefreshTokenExpiration());
+
+        // 4. Redis에 Refresh Token 저장
+        RefreshToken refreshToken = new RefreshToken(memberId, email, refreshTokenValue);
+        refreshTokenRepository.save(refreshToken);
+
+        // 5. JWT를 응답 헤더에 추가
+        response.setHeader("Authorization", "Bearer " + accessToken);
+
+        // 6. 클라이언트 리다이렉트
+        response.sendRedirect(homeUrl);
+    }
+}

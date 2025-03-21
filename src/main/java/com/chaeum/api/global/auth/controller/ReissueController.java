@@ -29,7 +29,7 @@ public class ReissueController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        reissueService.reissueAccessToken(member.getMember().getEmail(), request, response);
+        reissueService.reissueAccessToken(member, request, response);
         return new ApiResponse<>(ErrorCode.REQUEST_OK);
     }
 }

@@ -2,6 +2,7 @@ package com.chaeum.api.global.auth.service;
 
 import com.chaeum.api.domain.member.entity.Role;
 import com.chaeum.api.global.auth.domain.RefreshToken;
+import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -25,33 +26,32 @@ public class ReissueService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
 
-    public void reissueAccessToken(String loginId, HttpServletRequest request, HttpServletResponse response) {
+    public void reissueAccessToken(CustomMemberDetails member, HttpServletRequest request, HttpServletResponse response) {
+        // 1. 쿠키에서 Refresh Token 추출 및 유효성 검사
+        String refreshToken = extractValidRefreshToken(request);
 
-        // 1. Refresh Token 추출 및 유효성 검사
-        String refreshToken = getRefreshToken(request);
+        // 2. 사용자 정보 추출
+        Long memberId = member.getMember().getId();
+        String email = jwtUtil.getEmail(refreshToken);
+        Role role = Role.valueOf(String.valueOf(jwtUtil.getRole(refreshToken)));
 
-        // 2. Refresh Token에서 사용자 Role 가져오기
-        Role role = getRoleFromRefreshToken(refreshToken);
+        // 3. 기존 Refresh Token 삭제
+        refreshTokenRepository.deleteById(String.valueOf(memberId));
 
-        // 3. 기존 Refresh Token 삭제 (재사용 방지 목적)
-        refreshTokenRepository.deleteById(refreshToken);
+        // 4. 새로운 토큰 발급
+        String newAccessToken = jwtUtil.createJwt("access", email, role, jwtProperties.getAccessTokenExpiration());
+        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, jwtProperties.getRefreshTokenExpiration());
 
-        // 4. 새로운 Access Token 및 Refresh Token 발급
-        String newAccessToken = jwtUtil.createJwt("access", loginId, role, jwtProperties.getAccessTokenExpiration());
-        String newRefreshToken = jwtUtil.createJwt("refresh", loginId, role, jwtProperties.getRefreshTokenExpiration());
-
-        // 5. 새로운 Refresh Token을 Redis에 저장
-        RefreshToken refreshEntity = new RefreshToken(newRefreshToken, loginId);
+        // 5. Redis에 새로운 Refresh Token 저장
+        RefreshToken refreshEntity = new RefreshToken(memberId, email, newRefreshToken);
         refreshTokenRepository.save(refreshEntity);
 
-        // 6. 새로운 토큰을 응답 헤더 및 쿠키에 저장
+        // 6. 응답에 토큰 세팅
         response.addHeader("Authorization", "Bearer " + newAccessToken);
-        response.addHeader("Set-Cookie", createCookie("refresh", newRefreshToken).toString());
+        response.addHeader("Set-Cookie", createRefreshCookie(newRefreshToken).toString());
     }
 
-    // 쿠키에서 Refresh Token을 추출하고 유효성 검사를 수행
-    private String getRefreshToken(HttpServletRequest request) {
-
+    private String extractValidRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
 
         String refreshToken = Arrays.stream(cookies)
@@ -60,7 +60,6 @@ public class ReissueService {
                 .findFirst()
                 .orElseThrow(() -> ChaeumException.from(ErrorCode.TOKEN_NOT_FOUND));
 
-        // 토큰이 유효한지 확인
         if (!jwtUtil.validateToken(refreshToken)) {
             throw ChaeumException.from(ErrorCode.INVALID_REFRESH_TOKEN);
         }
@@ -72,15 +71,8 @@ public class ReissueService {
         return refreshToken;
     }
 
-    // Refresh Token에서 사용자 Role 추출
-    private Role getRoleFromRefreshToken(String refreshToken) {
-        String roleName = String.valueOf(jwtUtil.getRole(refreshToken));
-        return Role.valueOf(roleName);
-    }
-
-    // 새로운 Refresh Token을 쿠키로 반환
-    private ResponseCookie createCookie(String key, String value) {
-        return ResponseCookie.from(key, value)
+    private ResponseCookie createRefreshCookie(String value) {
+        return ResponseCookie.from("refresh", value)
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)

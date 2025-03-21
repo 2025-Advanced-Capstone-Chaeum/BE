@@ -19,6 +19,7 @@ public enum ErrorCode {
     UNSUPPORTED_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
     PAY_FAILURE(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
     PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
+    INVALID_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 로그인 타입입니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

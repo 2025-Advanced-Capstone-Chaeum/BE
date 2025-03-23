@@ -11,9 +11,13 @@ import lombok.Getter;
 public class ItemResponseDto {
 
     private Long id;
+
     private String name;
+
     private String itemImageUrl;
+
     private ItemCategory category;
+
     private ItemGrade grade;
 
     public static ItemResponseDto toDto(Item item) {

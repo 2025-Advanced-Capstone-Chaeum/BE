@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class InventoryResponseDto {
+public class InventoryResponse {
 
     private Long itemId;
 
@@ -14,8 +14,8 @@ public class InventoryResponseDto {
 
     private int quantity;
 
-    public static InventoryResponseDto toDto(Inventory inventory) {
-        return InventoryResponseDto.builder()
+    public static InventoryResponse toDto(Inventory inventory) {
+        return InventoryResponse.builder()
             .itemId(inventory.getItem().getId())
             .isWearing(inventory.getIsWearing())
             .quantity(inventory.getQuantity())

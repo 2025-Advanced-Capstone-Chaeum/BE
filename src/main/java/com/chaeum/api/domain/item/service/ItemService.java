@@ -1,8 +1,8 @@
 package com.chaeum.api.domain.item.service;
 
-import com.chaeum.api.domain.item.dto.request.ItemRequestDto;
-import com.chaeum.api.domain.item.dto.request.ItemUpdateRequestDto;
-import com.chaeum.api.domain.item.dto.response.ItemResponseDto;
+import com.chaeum.api.domain.item.dto.request.ItemCreateRequest;
+import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
+import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.repository.ItemRepository;
@@ -20,20 +20,20 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     @Transactional
-    public Long save(ItemRequestDto itemRequestDto) {
-        Item item = Item.toEntity(itemRequestDto);
+    public Long save(ItemCreateRequest itemCreateRequest) {
+        Item item = Item.toEntity(itemCreateRequest);
         itemRepository.save(item);
         return item.getId();
     }
 
     @Transactional(readOnly = true)
-    public ItemResponseDto getItem(Long itemId) {
+    public ItemResponse getItem(Long itemId) {
         Item item = findById(itemId);
-        return ItemResponseDto.toDto(item);
+        return ItemResponse.toDto(item);
     }
 
     @Transactional(readOnly = true)
-    public List<ItemResponseDto> getItemsByCondition(ItemCategory category, String itemName) {
+    public List<ItemResponse> getItemsByCondition(ItemCategory category, String itemName) {
         List<Item> items = itemRepository.findAll();
 
         return items.stream()
@@ -43,14 +43,14 @@ public class ItemService {
                     item.getName().toLowerCase().contains(itemName.toLowerCase());
                 return matchesCategory && matchesName;
             })
-            .map(ItemResponseDto::toDto)
+            .map(ItemResponse::toDto)
             .toList();
     }
 
     @Transactional
-    public Long update(Long itemId, ItemUpdateRequestDto itemUpdateRequestDto) {
+    public Long update(Long itemId, ItemUpdateRequest itemUpdateRequest) {
         Item item = findById(itemId);
-        item.update(itemUpdateRequestDto);
+        item.update(itemUpdateRequest);
         return item.getId();
     }
 

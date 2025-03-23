@@ -1,8 +1,8 @@
 package com.chaeum.api.domain.item.controller;
 
-import com.chaeum.api.domain.item.dto.request.ItemRequestDto;
-import com.chaeum.api.domain.item.dto.request.ItemUpdateRequestDto;
-import com.chaeum.api.domain.item.dto.response.ItemResponseDto;
+import com.chaeum.api.domain.item.dto.request.ItemCreateRequest;
+import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
+import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.global.response.ApiResponse;
@@ -34,31 +34,31 @@ public class ItemController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ApiResponse<Long> save(
-        @Valid @RequestBody ItemRequestDto itemRequestDto
+        @Valid @RequestBody ItemCreateRequest itemCreateRequest
     ) {
-        Long id = itemService.save(itemRequestDto);
+        Long id = itemService.save(itemCreateRequest);
         return ApiResponse.success(id);
     }
 
     @Operation(summary = "아이템 개별 조회", description = "모든 Role 조회 가능")
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("")
-    public ApiResponse<ItemResponseDto> getItem(
+    public ApiResponse<ItemResponse> getItem(
         @RequestParam(name = "itemId") Long itemId
     ) {
-        ItemResponseDto itemResponseDto = itemService.getItem(itemId);
-        return ApiResponse.success(itemResponseDto);
+        ItemResponse itemResponse = itemService.getItem(itemId);
+        return ApiResponse.success(itemResponse);
     }
 
     @Operation(summary = "조건별 아이템 조회", description = "모든 Role 조회 가능</br>"
         + "조건을 하나라도 입력하지 않으면 전체 조회됨</br>")
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
-    public ApiResponse<List<ItemResponseDto>> getItemsByCondition(
+    public ApiResponse<List<ItemResponse>> getItemsByCondition(
         @RequestParam(name = "category", required = false) ItemCategory category,
         @RequestParam(name = "itemName", required = false) String itemName
     ) {
-        List<ItemResponseDto> items = itemService.getItemsByCondition(category, itemName);
+        List<ItemResponse> items = itemService.getItemsByCondition(category, itemName);
         return ApiResponse.success(items);
     }
 
@@ -67,9 +67,9 @@ public class ItemController {
     @PatchMapping("")
     public ApiResponse<Long> update(
         @RequestParam(name = "itemId") Long itemId,
-        @Valid @RequestBody ItemUpdateRequestDto itemUpdateRequestDto
+        @Valid @RequestBody ItemUpdateRequest itemUpdateRequest
     ) {
-        Long id = itemService.update(itemId, itemUpdateRequestDto);
+        Long id = itemService.update(itemId, itemUpdateRequest);
         return ApiResponse.success(id);
     }
 

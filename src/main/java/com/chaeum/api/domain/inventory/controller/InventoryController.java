@@ -1,6 +1,6 @@
 package com.chaeum.api.domain.inventory.controller;
 
-import com.chaeum.api.domain.inventory.dto.response.InventoryResponseDto;
+import com.chaeum.api.domain.inventory.dto.response.InventoryResponse;
 import com.chaeum.api.domain.inventory.service.InventoryService;
 import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,8 +27,8 @@ public class InventoryController {
     @Operation(summary = "인벤토리 목록 조회", description = "모든 Role 조회 가능")
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("")
-    public ApiResponse<List<InventoryResponseDto>> getInventories() {
-        List<InventoryResponseDto> inventories = inventoryService.getInventories();
+    public ApiResponse<List<InventoryResponse>> getInventories() {
+        List<InventoryResponse> inventories = inventoryService.getInventories();
         return ApiResponse.success(inventories);
     }
 

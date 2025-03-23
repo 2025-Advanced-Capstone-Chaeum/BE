@@ -1,9 +1,9 @@
 package com.chaeum.api.domain.inventory.service;
 
-import com.chaeum.api.domain.inventory.dto.response.InventoryResponseDto;
+import com.chaeum.api.domain.inventory.dto.response.InventoryResponse;
 import com.chaeum.api.domain.inventory.entity.Inventory;
 import com.chaeum.api.domain.inventory.repository.InventoryRepository;
-import com.chaeum.api.domain.item.dto.response.ItemResponseDto;
+import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.repository.ItemRepository;
 import com.chaeum.api.domain.item.service.ItemService;
@@ -27,8 +27,8 @@ public class InventoryService {
 
     @Transactional
     public Long save(Long itemId) {
-        ItemResponseDto itemResponseDto = itemService.getItem(itemId);
-        Item item = Item.toEntity(itemResponseDto);
+        ItemResponse itemResponse = itemService.getItem(itemId);
+        Item item = Item.toEntity(itemResponse);
         Member member = memberService.getCurrentLoginMember();
 
         Inventory inventory = inventoryRepository.findByItemId(itemId)
@@ -46,11 +46,11 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<InventoryResponseDto> getInventories() {
+    public List<InventoryResponse> getInventories() {
         Member member = memberService.getCurrentLoginMember();
         List<Inventory> inventories = inventoryRepository.findByMemberId(member.getId());
         return inventories.stream()
-            .map(InventoryResponseDto::toDto)
+            .map(InventoryResponse::toDto)
             .toList();
     }
 

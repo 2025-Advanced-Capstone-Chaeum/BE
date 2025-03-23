@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ItemResponseDto {
+public class ItemResponse {
 
     private Long id;
 
@@ -20,8 +20,8 @@ public class ItemResponseDto {
 
     private ItemGrade grade;
 
-    public static ItemResponseDto toDto(Item item) {
-        return ItemResponseDto.builder()
+    public static ItemResponse toDto(Item item) {
+        return ItemResponse.builder()
             .id(item.getId())
             .name(item.getName())
             .itemImageUrl(item.getItemImageUrl())

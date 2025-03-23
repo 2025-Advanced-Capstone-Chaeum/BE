@@ -10,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,7 +36,7 @@ public class InventoryController {
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     public ApiResponse<Long> saveInventory(
-        @RequestParam(name = "itemId") Long itemId
+        @RequestBody Long itemId
     ) {
         Long id = inventoryService.save(itemId);
         return ApiResponse.success(id);
@@ -43,9 +44,9 @@ public class InventoryController {
 
     @Operation(summary = "인벤토리 삭제", description = "모든 Role 삭제 가능")
     @PreAuthorize("hasRole('DONOR')")
-    @DeleteMapping("")
+    @DeleteMapping("/{itemId}")
     public ApiResponse<Long> deleteInventory(
-        @RequestParam(name = "itemId") Long itemId
+        @PathVariable(name = "itemId") Long itemId
     ) {
         Long id = inventoryService.delete(itemId);
         return ApiResponse.success(id);

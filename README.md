@@ -36,32 +36,37 @@ Chaeum은 **기부의 새로운 패러다임을 제시하는 플랫폼**입니�
 ## 📂 프로젝트 구조
 ```plaintext
 chaeum-api
- ├── .github/                   # GitHub 관련 설정
- ├── .gradle/                   # Gradle 빌드 관련 파일
- ├── .idea/                     # IntelliJ 프로젝트 설정 파일
- ├── build/                     # 빌드된 파일
- ├── gradle/                    # Gradle 래퍼 관련 파일
- ├── out/                       # 컴파일된 클래스 파일
+ ├── .github/                     # GitHub 관련 설정
+ ├── .gradle/                     # Gradle 빌드 관련 파일
+ ├── .idea/                       # IntelliJ 프로젝트 설정 파일
+ ├── build/                       # 빌드된 파일
+ ├── docs/                        # 문서에 사용되는 자료
+ ├── gradle/                      # Gradle 래퍼 관련 파일
+ ├── out/                         # 컴파일된 클래스 파일
  ├── src/
  │   ├── main/
  │   │   ├── java/com/chaeum/api/
- │   │   │   ├── domain/         # 도메인별 계층 구조
- │   │   │   │   ├── controller/ # API 컨트롤러
- │   │   │   │   ├── dto/        # 데이터 전송 객체
- │   │   │   │   ├── entity/     # JPA 엔티티
- │   │   │   │   ├── repository/ # 데이터베이스 인터페이스
- │   │   │   │   ├── service/    # 비즈니스 로직
- │   │   │   ├── global/         # 공통 모듈
- │   │   │   │   ├── config/     # 설정 파일 관리
- │   │   │   │   ├── entity/     # 공통 엔티티
- │   │   │   │   ├── exception/  # 예외 처리
- │   │   │   │   ├── handler/    # 예외 핸들러
- │   │   │   ├── ChaeumApiApplication.java
+ │   │   │   ├── domain/             # 도메인별 계층 구조
+ │   │   │   │   ├── controller/     # API 컨트롤러
+ │   │   │   │   ├── dto/            # 데이터 전송 객체
+ │   │   │   │   ├── entity/         # JPA 엔티티 클래스
+ │   │   │   │   ├── repository/     # 데이터베이스 인터페이스
+ │   │   │   │   ├── service/        # 비즈니스 로직 처리
+ │   │   │   ├── global/             # 공통 모듈 및 전역 설정
+ │   │   │   │   ├── auth/           # JWT 인증/인가 관련 로직
+ │   │   │   │   ├── config/         # 스프링 설정 클래스
+ │   │   │   │   ├── entity/         # 공통 엔티티 클래스
+ │   │   │   │   ├── exception/      # 전역 예외 처리 클래스
+ │   │   │   │   ├── filter/         # 인증/로깅 등 서블릿 필터
+ │   │   │   │   ├── handler/        # 전역 예외 핸들러
+ │   │   │   │   ├── properties/     # 커스텀 application.yml 설정 매핑
+ │   │   │   │   ├── response/       # 표준 API 응답 포맷 클래스
+ │   │   │   │   ├── utils/          # 공통 유틸리티 클래스
+ │   │   │   ├── ChaeumApiApplication.java     # 메인 애플리케이션 실행 파일
  │   │   ├── resources/
- │   │   │   ├── static/
- │   │   │   ├── templates/
- │   │   │   ├── application.yml.template
- │   ├── test/
+ │   │   │   ├── static/             # 정적 리소스
+ │   │   │   ├── templates/          # 템플릿 파일
+ │   │   │   ├── application.yml.template       # 환경 설정 템플릿
  ├── .gitattributes
  ├── .gitignore
  ├── build.gradle
@@ -76,18 +81,19 @@ chaeum-api
 
 ## 🖥️ 시스템 아키텍처 다이어그램
 
-(추후 추가 예정)
+![architecture.png](./docs/chaeum_architecture.png)
 
 ---
 
 ## 🗂️ ERD (Entity Relationship Diagram)
 
-(추후 추가 예정)
+![erd.webp](./docs/chaeum_erdv2.png)
 
 ---
 
 ## 👥 기여자
 
-| **Minsang22Kim** | **SongJaeHoonn** |
-|:--:|:--:|
+|                     **Minsang22Kim**                     |                     **SongJaeHoonn**                     |
+|:--------------------------------------------------------:|:--------------------------------------------------------:|
 | ![Minsang](https://github.com/Minsang22Kim.png?size=100) | ![JaeHoon](https://github.com/SongJaeHoonn.png?size=100) |
+|                         **김민상**                          |                         **송재훈**                          |

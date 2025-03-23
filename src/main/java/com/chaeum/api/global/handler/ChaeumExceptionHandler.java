@@ -2,6 +2,7 @@ package com.chaeum.api.global.handler;
 
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.response.ApiResponse;
+import com.chaeum.api.global.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,9 @@ public class ChaeumExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String LOG_FORMAT_ERROR = "\n[🔴ERROR] - ({} {})\n(id: {}, role: {})";
 
     @ExceptionHandler(ChaeumException.class)
-    public ApiResponse handle(ChaeumException exception, HttpServletRequest request) {
+    public ErrorResponse handle(ChaeumException exception, HttpServletRequest request) {
         logInfo(exception, request);
-        return new ApiResponse<>(exception.getErrorCode());
+        return ErrorResponse.error(exception.getErrorCode());
     }
 
     private void logInfo(ChaeumException e, HttpServletRequest request) {

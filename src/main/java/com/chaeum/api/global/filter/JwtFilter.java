@@ -4,6 +4,7 @@ import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.response.ApiResponse;
+import com.chaeum.api.global.response.ErrorResponse;
 import com.chaeum.api.global.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -77,15 +78,15 @@ public class JwtFilter extends OncePerRequestFilter {
     // 토큰 검증 및 파싱
     private boolean validateAndParseToken(String accessToken, HttpServletResponse response) throws IOException {
         if (!jwtUtil.validateToken(accessToken)) {
-            createAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+            createErrorAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;
         }
         if (jwtUtil.isExpired(accessToken)) {
-            createAPIResponse(response, ErrorCode.EXPIRED_AUTH_TOKEN);
+            createErrorAPIResponse(response, ErrorCode.EXPIRED_AUTH_TOKEN);
             return false;
         }
         if (!"access".equals(jwtUtil.getCategory(accessToken))) {
-            createAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+            createErrorAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;
         }
         return true;
@@ -99,11 +100,10 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     // API 응답 생성
-    private void createAPIResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
-        ApiResponse<Object> apiResponse = new ApiResponse<>(errorCode);
+    private void createErrorAPIResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
+        new ObjectMapper().writeValue(response.getWriter(), ErrorResponse.error(errorCode));
     }
 }

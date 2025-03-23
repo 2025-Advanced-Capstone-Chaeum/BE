@@ -10,14 +10,14 @@ public class InventoryResponseDto {
 
     private Long itemId;
 
-    private boolean isWearing;
+    private Boolean isWearing;
 
     private int quantity;
 
     public static InventoryResponseDto toDto(Inventory inventory) {
         return InventoryResponseDto.builder()
             .itemId(inventory.getItem().getId())
-            .isWearing(inventory.isWearing())
+            .isWearing(inventory.getIsWearing())
             .quantity(inventory.getQuantity())
             .build();
     }

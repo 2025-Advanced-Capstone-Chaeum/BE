@@ -3,6 +3,8 @@ package com.chaeum.api.domain.inventory.entity;
 import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -61,6 +63,7 @@ public class Inventory extends BaseEntity {
     }
 
     public void removeQuantity() {
+        validateQuantity();
         this.quantity -= 1;
     }
 
@@ -70,5 +73,11 @@ public class Inventory extends BaseEntity {
 
     public void unwear() {
         this.isWearing = false;
+    }
+
+    private void validateQuantity() {
+        if (this.quantity <= 0) {
+            throw ChaeumException.from(ErrorCode.INVENTORY_QUANTITY_INSUFFICIENT);
+        }
     }
 }

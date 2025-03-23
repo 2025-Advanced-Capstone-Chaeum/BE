@@ -20,6 +20,7 @@ public enum ErrorCode {
     PAY_FAILURE(HttpStatus.BAD_REQUEST, "결제에 실패했습니다."),
     PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
     INVALID_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 로그인 타입입니다."),
+    INVENTORY_QUANTITY_INSUFFICIENT(HttpStatus.BAD_REQUEST, "재고 수량이 0 이하로 감소할 수 없습니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

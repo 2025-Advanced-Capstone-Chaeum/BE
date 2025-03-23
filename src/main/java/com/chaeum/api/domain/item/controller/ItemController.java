@@ -65,7 +65,7 @@ public class ItemController {
     @Operation(summary = "아이템 변경", description = "ADMIN 이상 변경 가능")
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("")
-    public ApiResponse<Long> save(
+    public ApiResponse<Long> update(
         @RequestParam(name = "itemId") Long itemId,
         @Valid @RequestBody ItemUpdateRequestDto itemUpdateRequestDto
     ) {

@@ -42,7 +42,7 @@ public class Inventory extends BaseEntity {
     private Item item;
 
     @Column(name = "is_wearing", nullable = false)
-    private boolean isWearing;
+    private Boolean isWearing;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;

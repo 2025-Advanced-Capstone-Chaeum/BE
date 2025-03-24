@@ -1,17 +1,22 @@
 package com.chaeum.api.domain.inventory.service;
 
+import com.chaeum.api.domain.inventory.dto.request.InventoryCreateRequest;
 import com.chaeum.api.domain.inventory.dto.response.InventoryResponse;
 import com.chaeum.api.domain.inventory.entity.Inventory;
 import com.chaeum.api.domain.inventory.repository.InventoryRepository;
-import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.Item;
+import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.repository.ItemRepository;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +28,11 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final ItemService itemService;
     private final MemberService memberService;
-    private final ItemRepository itemRepository;
 
     @Transactional
-    public Long save(Long itemId) {
-        ItemResponse itemResponse = itemService.getItem(itemId);
-        Item item = Item.toEntity(itemResponse);
+    public Long save(InventoryCreateRequest inventoryCreateRequest) {
+        Long itemId = inventoryCreateRequest.getItemId();
+        Item item = itemService.findById(itemId);
         Member member = memberService.getCurrentLoginMember();
 
         Inventory inventory = inventoryRepository.findByItemId(itemId)
@@ -46,12 +50,20 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<InventoryResponse> getInventories() {
+    public CreatedAtCursorResult<InventoryResponse> getInventoriesByCategory(
+        ItemCategory category, LocalDateTime cursor, int limit
+    ) {
         Member member = memberService.getCurrentLoginMember();
         List<Inventory> inventories = inventoryRepository.findByMemberId(member.getId());
-        return inventories.stream()
+
+        List<InventoryResponse> filteredInventories = inventories.stream()
+            .filter(inventory -> inventory.getItem().getCategory() == category)
+            .filter(inventory -> cursor == null || inventory.getCreatedAt().isAfter(cursor))
+            .sorted(Comparator.comparing(Inventory::getCreatedAt))
             .map(InventoryResponse::toDto)
-            .toList();
+            .collect(Collectors.toList());
+
+        return CreatedAtCursorResult.of(filteredInventories, cursor, limit);
     }
 
     @Transactional

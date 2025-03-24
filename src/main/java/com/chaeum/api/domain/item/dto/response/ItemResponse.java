@@ -3,12 +3,13 @@ package com.chaeum.api.domain.item.dto.response;
 import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.entity.ItemGrade;
+import com.chaeum.api.global.pagination.provider.IdProvider;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class ItemResponse {
+public class ItemResponse implements IdProvider {
 
     private Long id;
 

@@ -8,7 +8,10 @@ import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.repository.ItemRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,18 +36,22 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemResponse> getItemsByCondition(ItemCategory category, String itemName) {
+    public IdCursorResult<ItemResponse> getItemsByCondition(ItemCategory category, String itemName, Long cursor,
+        int limit) {
         List<Item> items = itemRepository.findAll();
+        List<Item> filteredItems = items.stream()
+            .filter(item -> (category == null || item.getCategory() == category) &&
+                (itemName == null || itemName.trim().isEmpty() ||
+                    item.getName().toLowerCase().contains(itemName.toLowerCase())))
+            .filter(item -> cursor == null || item.getId() > cursor)
+            .sorted(Comparator.comparingLong(Item::getId))
+            .collect(Collectors.toList());
 
-        return items.stream()
-            .filter(item -> {
-                boolean matchesCategory = (category == null) || item.getCategory() == category;
-                boolean matchesName = (itemName == null || itemName.trim().isEmpty()) ||
-                    item.getName().toLowerCase().contains(itemName.toLowerCase());
-                return matchesCategory && matchesName;
-            })
+        List<ItemResponse> itemsByCondition = filteredItems.stream()
             .map(ItemResponse::toDto)
-            .toList();
+            .collect(Collectors.toList());
+
+        return IdCursorResult.of(itemsByCondition, cursor, limit);
     }
 
     @Transactional
@@ -60,7 +67,7 @@ public class ItemService {
         return itemId;
     }
 
-    private Item findById(Long itemId) {
+    public Item findById(Long itemId) {
         return itemRepository.findById(itemId)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.ITEM_NOT_FOUND));
     }

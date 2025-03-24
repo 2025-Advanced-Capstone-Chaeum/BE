@@ -48,5 +48,8 @@ out/
 .env
 /src/main/resources/*.yml
 
-### 테스트 코드 제외 ###
+### ✅ 테스트 코드 제외 ###
 /src/test/
+
+### 🧬 Generated Sources ###
+/src/main/generated/

@@ -8,9 +8,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    // 200: 성공 응답
-    REQUEST_OK(HttpStatus.OK, "요청이 성공적으로 처리되었습니다."),
-
     // 400: BAD REQUEST (잘못된 요청)
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     EMPTY_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다."),

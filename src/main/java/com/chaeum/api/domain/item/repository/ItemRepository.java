@@ -1,4 +1,9 @@
 package com.chaeum.api.domain.item.repository;
 
-public interface ItemRepository {
+import com.chaeum.api.domain.item.entity.Item;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Long> {
 }

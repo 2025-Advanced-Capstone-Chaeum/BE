@@ -2,6 +2,7 @@ package com.chaeum.api.global.filter;
 
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.response.ApiResponse;
+import com.chaeum.api.global.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), new ApiResponse<>(errorCode));
+        objectMapper.writeValue(response.getWriter(), ErrorResponse.error(errorCode));
     }
 }

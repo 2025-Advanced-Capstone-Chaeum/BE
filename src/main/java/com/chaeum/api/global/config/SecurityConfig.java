@@ -48,6 +48,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/chaeum/docs/**",
+            "/chaeum/swagger-ui/**",
             "/error",
             "/favicon.ico",
             "/"

@@ -30,6 +30,6 @@ public class ReissueController {
             HttpServletResponse response
     ) {
         reissueService.reissueAccessToken(member, request, response);
-        return new ApiResponse<>(ErrorCode.REQUEST_OK);
+        return ApiResponse.success();
     }
 }

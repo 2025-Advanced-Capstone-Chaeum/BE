@@ -4,6 +4,7 @@ import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.response.ApiResponse;
+import com.chaeum.api.global.response.ErrorResponse;
 import com.chaeum.api.global.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -50,7 +52,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 5. Refresh Token 쿠키 제거 후 응답 반환
         removeRefreshTokenCookie(httpResponse);
-        sendApiResponse(httpResponse, ErrorCode.REQUEST_OK);
+        sendSuccessApiResponse(httpResponse);
     }
 
     // 로그아웃 확인
@@ -74,19 +76,19 @@ public class CustomLogoutFilter extends GenericFilterBean {
     // Refresh Token 검증(유효하면 true)
     private boolean validateRefreshToken(String refreshToken, HttpServletResponse response) throws IOException {
         if (!jwtUtil.validateToken(refreshToken)) {
-            sendApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
+            sendErrorApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
             return false;
         }
         if (jwtUtil.isExpired(refreshToken)) {
-            sendApiResponse(response, ErrorCode.EXPIRED_REFRESH_TOKEN);
+            sendErrorApiResponse(response, ErrorCode.EXPIRED_REFRESH_TOKEN);
             return false;
         }
         if (!"refresh".equals(jwtUtil.getCategory(refreshToken))) {
-            sendApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
+            sendErrorApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
             return false;
         }
         if (refreshTokenRepository.findById(jwtUtil.getEmail(refreshToken)).isEmpty()) {
-            sendApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
+            sendErrorApiResponse(response, ErrorCode.INVALID_REFRESH_TOKEN);
             return false;
         }
         return true;
@@ -100,11 +102,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.addCookie(cookie);
     }
 
-    // API 응답 반환
-    private void sendApiResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+    private void sendSuccessApiResponse(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), ApiResponse.success());
+    }
+
+    private void sendErrorApiResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), new ApiResponse<>(errorCode));
+        new ObjectMapper().writeValue(response.getWriter(), ErrorResponse.error(errorCode));
     }
 }

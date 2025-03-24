@@ -1,6 +1,6 @@
 package com.chaeum.api.global.config;
 
-import com.chaeum.api.global.properties.PortOneProperties;
+import com.chaeum.api.global.properties.IamportProperties;
 import com.siot.IamportRestClient.IamportClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class IamportConfig {
 
-    private final PortOneProperties portOneProperties;
+    private final IamportProperties iamportProperties;
 
     @Bean
     public IamportClient iamportClient() {
         return new IamportClient(
-                portOneProperties.getKey(),
-                portOneProperties.getSecretkey()
+                iamportProperties.getKey(),
+                iamportProperties.getSecretkey()
         );
     }
 }

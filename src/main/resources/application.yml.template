@@ -78,8 +78,9 @@ spring:
 
     portone:
       code: ${PORTONE_CODE}
-      key: ${PORTONE_KEY}
-      secretkey: ${PORTONE_SECRETKEY}
+      api:
+        key: ${PORTONE_KEY}
+        secretkey: ${PORTONE_SECRETKEY}
 
 cloud:
   aws:

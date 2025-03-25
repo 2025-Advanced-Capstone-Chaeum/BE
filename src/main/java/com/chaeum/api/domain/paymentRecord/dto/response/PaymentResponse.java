@@ -11,10 +11,15 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class PaymentResponse {
+
     private Long id;
+
     private BigDecimal amount;
+
     private PaymentMethod method;
+
     private PaymentStatus status;
+
     private String transactionId;
 
     public static PaymentResponse toDto(PaymentRecord paymentRecord) {

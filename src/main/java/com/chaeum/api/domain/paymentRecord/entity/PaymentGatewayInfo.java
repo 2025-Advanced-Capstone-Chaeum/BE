@@ -18,8 +18,8 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PaymentGatewayInfo {
 
-    @Column(name = "import_uid", length = 255)
-    private String importUid;
+    @Column(name = "imp_uid", length = 255)
+    private String impUid;
 
     @Column(name = "merchant_uid", length = 255)
     private String merchantUid;
@@ -32,7 +32,7 @@ public class PaymentGatewayInfo {
 
     public static PaymentGatewayInfo create(PaymentGatewayInfoRequest paymentGatewayInfoRequest) {
         return PaymentGatewayInfo.builder()
-                .importUid(paymentGatewayInfoRequest.getImportUid())
+                .impUid(paymentGatewayInfoRequest.getImportUid())
                 .merchantUid(paymentGatewayInfoRequest.getMerchantUid())
                 .gatewayProvider(paymentGatewayInfoRequest.getGatewayProvider())
                 .failReason(paymentGatewayInfoRequest.getFailReason())

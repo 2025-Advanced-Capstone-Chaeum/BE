@@ -1,10 +1,10 @@
-package com.chaeum.api.domain.payment.controller;
+package com.chaeum.api.domain.paymentRecord.controller;
 
-import com.chaeum.api.domain.payment.dto.request.PaymentCreateRequest;
-import com.chaeum.api.domain.payment.dto.response.PaymentResponse;
-import com.chaeum.api.domain.payment.entity.PaymentMethod;
-import com.chaeum.api.domain.payment.entity.PaymentStatus;
-import com.chaeum.api.domain.payment.service.PaymentService;
+import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
+import com.chaeum.api.domain.paymentRecord.dto.response.PaymentResponse;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentMethod;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentStatus;
+import com.chaeum.api.domain.paymentRecord.service.PaymentRecordService;
 import com.chaeum.api.global.response.ApiResponse;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,16 +29,16 @@ import java.util.List;
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 @Tag(name = "Payment", description = "결제 관리")
-public class PaymentController {
+public class PaymentRecordController {
 
-    private final PaymentService paymentService;
+    private final PaymentRecordService paymentRecordService;
 
     @Operation(summary = "결제 생성", description = "결제 요청 정보를 저장합니다.")
     @PostMapping("")
     public ApiResponse<Long> save(
             @Valid @RequestBody PaymentCreateRequest paymentCreateRequest
     ) throws IamportResponseException, IOException {
-        Long id = paymentService.save(paymentCreateRequest);
+        Long id = paymentRecordService.save(paymentCreateRequest);
         return ApiResponse.success(id);
     }
 
@@ -47,7 +47,7 @@ public class PaymentController {
     public ApiResponse<PaymentResponse> getPayment(
             @RequestParam(name = "paymentId") Long paymentId
     ) {
-        PaymentResponse paymentResponse = paymentService.getPayment(paymentId);
+        PaymentResponse paymentResponse = paymentRecordService.getPayment(paymentId);
         return ApiResponse.success(paymentResponse);
     }
 
@@ -66,7 +66,7 @@ public class PaymentController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
-        List<PaymentResponse> payments = paymentService.getPaymentsByCondition(method, status, from, to);
+        List<PaymentResponse> payments = paymentRecordService.getPaymentsByCondition(method, status, from, to);
         return ApiResponse.success(payments);
     }
 
@@ -74,7 +74,7 @@ public class PaymentController {
     @DeleteMapping("/{paymentId}")
     public ApiResponse<Long> delete(
         @PathVariable(name = "paymentId") Long paymentId){
-        Long id = paymentService.delete(paymentId);
+        Long id = paymentRecordService.delete(paymentId);
         return ApiResponse.success(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.chaeum.api.domain.payment.entity;
+package com.chaeum.api.domain.paymentRecord.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

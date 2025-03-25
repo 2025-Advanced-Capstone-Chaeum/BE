@@ -1,6 +1,6 @@
-package com.chaeum.api.domain.payment.entity;
+package com.chaeum.api.domain.paymentRecord.entity;
 
-import com.chaeum.api.domain.payment.dto.request.PaymentGatewayInfoRequest;
+import com.chaeum.api.domain.paymentRecord.dto.request.PaymentGatewayInfoRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

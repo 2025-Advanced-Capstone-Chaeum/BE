@@ -1,8 +1,7 @@
-package com.chaeum.api.domain.payment.dto.request;
+package com.chaeum.api.domain.paymentRecord.dto.request;
 
-import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.payment.entity.PaymentMethod;
-import com.chaeum.api.domain.payment.entity.PaymentStatus;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentMethod;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;

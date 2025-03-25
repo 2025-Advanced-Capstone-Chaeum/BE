@@ -1,14 +1,14 @@
-package com.chaeum.api.domain.payment.service;
+package com.chaeum.api.domain.paymentRecord.service;
 
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
-import com.chaeum.api.domain.payment.dto.request.PaymentCreateRequest;
-import com.chaeum.api.domain.payment.dto.response.PaymentResponse;
-import com.chaeum.api.domain.payment.entity.Payment;
-import com.chaeum.api.domain.payment.entity.PaymentGatewayInfo;
-import com.chaeum.api.domain.payment.entity.PaymentMethod;
-import com.chaeum.api.domain.payment.entity.PaymentStatus;
-import com.chaeum.api.domain.payment.repository.PaymentRepository;
+import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
+import com.chaeum.api.domain.paymentRecord.dto.response.PaymentResponse;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentRecord;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentGatewayInfo;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentMethod;
+import com.chaeum.api.domain.paymentRecord.entity.PaymentStatus;
+import com.chaeum.api.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.siot.IamportRestClient.IamportClient;
@@ -16,7 +16,6 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.siot.IamportRestClient.response.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,23 +25,23 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentService {
+public class PaymentRecordService {
 
-    private final PaymentRepository paymentRepository;
+    private final PaymentRecordRepository paymentRecordRepository;
     private final MemberService memberService;
     private final IamportClient iamportClient;
 
     @Transactional
     public Long save(PaymentCreateRequest paymentCreateRequest) throws IamportResponseException, IOException {
-        Payment payment = validateAndCreatePayment(paymentCreateRequest);
-        paymentRepository.save(payment);
-        return payment.getId();
+        PaymentRecord paymentRecord = validateAndCreatePayment(paymentCreateRequest);
+        paymentRecordRepository.save(paymentRecord);
+        return paymentRecord.getId();
     }
 
     @Transactional(readOnly = true)
     public PaymentResponse getPayment(Long paymentId) {
-        Payment payment = findById(paymentId);
-        return PaymentResponse.toDto(payment);
+        PaymentRecord paymentRecord = findById(paymentId);
+        return PaymentResponse.toDto(paymentRecord);
     }
 
     @Transactional(readOnly = true)
@@ -52,22 +51,22 @@ public class PaymentService {
             LocalDate from,
             LocalDate to
     ) {
-        return paymentRepository.findAll().stream()
-                .filter(payment -> isMethodMatch(payment, method))
-                .filter(payment -> isStatusMatch(payment, status))
-                .filter(payment -> isInDateRange(payment, from, to))
+        return paymentRecordRepository.findAll().stream()
+                .filter(paymentRecord -> isMethodMatch(paymentRecord, method))
+                .filter(paymentRecord -> isStatusMatch(paymentRecord, status))
+                .filter(paymentRecord -> isInDateRange(paymentRecord, from, to))
                 .map(PaymentResponse::toDto)
                 .toList();
     }
 
     @Transactional
     public Long delete(Long paymentId) {
-        paymentRepository.deleteById(paymentId);
+        paymentRecordRepository.deleteById(paymentId);
         return paymentId;
     }
 
     // 결제 생성 및 검즘
-    private Payment validateAndCreatePayment(PaymentCreateRequest paymentCreateRequest)
+    private PaymentRecord validateAndCreatePayment(PaymentCreateRequest paymentCreateRequest)
             throws IamportResponseException, IOException {
         var iamportPayment = verifyIamportPayment(paymentCreateRequest);
 
@@ -76,7 +75,7 @@ public class PaymentService {
         Member member = memberService.getCurrentLoginMember();
         PaymentGatewayInfo gatewayInfo = PaymentGatewayInfo.create(paymentCreateRequest.getPaymentGatewayInfoRequest());
 
-        return Payment.create(member, paymentCreateRequest, gatewayInfo);
+        return PaymentRecord.create(member, paymentCreateRequest, gatewayInfo);
     }
 
     private com.siot.IamportRestClient.response.Payment verifyIamportPayment(PaymentCreateRequest request)
@@ -96,24 +95,24 @@ public class PaymentService {
 
 
     // 조건별 결제 조회 검증
-    private boolean isMethodMatch(Payment payment, PaymentMethod method) {
-        return method == null || payment.getPaymentMethod() == method;
+    private boolean isMethodMatch(PaymentRecord paymentRecord, PaymentMethod method) {
+        return method == null || paymentRecord.getPaymentMethod() == method;
     }
 
-    private boolean isStatusMatch(Payment payment, PaymentStatus status) {
-        return status == null || payment.getStatus() == status;
+    private boolean isStatusMatch(PaymentRecord paymentRecord, PaymentStatus status) {
+        return status == null || paymentRecord.getStatus() == status;
     }
 
-    private boolean isInDateRange(Payment payment, LocalDate from, LocalDate to) {
-        LocalDateTime createdAt = payment.getCreatedAt();
+    private boolean isInDateRange(PaymentRecord paymentRecord, LocalDate from, LocalDate to) {
+        LocalDateTime createdAt = paymentRecord.getCreatedAt();
         boolean afterFrom = from == null || !createdAt.isBefore(from.atStartOfDay());
         boolean beforeTo = to == null || !createdAt.isAfter(to.atStartOfDay());
         return afterFrom && beforeTo;
     }
 
     // Id로 조회
-    private Payment findById(Long paymentId) {
-        return paymentRepository.findById(paymentId)
+    private PaymentRecord findById(Long paymentId) {
+        return paymentRecordRepository.findById(paymentId)
                 .orElseThrow(() -> ChaeumException.from(ErrorCode.PAYMENT_NOT_FOUND));
     }
 }

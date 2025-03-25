@@ -1,7 +1,7 @@
-package com.chaeum.api.domain.payment.entity;
+package com.chaeum.api.domain.paymentRecord.entity;
 
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.payment.dto.request.PaymentCreateRequest;
+import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "payment")
-public class Payment extends BaseEntity {
+public class PaymentRecord extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,12 +59,12 @@ public class Payment extends BaseEntity {
     @Embedded
     private PaymentGatewayInfo gatewayInfo;
 
-    public static Payment create(
+    public static PaymentRecord create(
             Member member,
             PaymentCreateRequest paymentCreateRequest,
             PaymentGatewayInfo paymentGatewayInfo
     ) {
-        return Payment.builder()
+        return PaymentRecord.builder()
                 .member(member)
                 .amount(paymentCreateRequest.getAmount())
                 .paymentMethod(paymentCreateRequest.getPaymentMethod())

@@ -14,15 +14,17 @@ import com.chaeum.api.global.exception.ErrorCode;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.siot.IamportRestClient.response.Payment;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentRecordService {
@@ -33,7 +35,7 @@ public class PaymentRecordService {
 
     @Transactional
     public Long save(PaymentCreateRequest paymentCreateRequest) throws IamportResponseException, IOException {
-        PaymentRecord paymentRecord = validateAndCreatePayment(paymentCreateRequest);
+        PaymentRecord paymentRecord = createValidatedPaymentRecord(paymentCreateRequest);
         paymentRecordRepository.save(paymentRecord);
         return paymentRecord.getId();
     }
@@ -66,33 +68,49 @@ public class PaymentRecordService {
     }
 
     // 결제 생성 및 검즘
-    private PaymentRecord validateAndCreatePayment(PaymentCreateRequest paymentCreateRequest)
+    private PaymentRecord createValidatedPaymentRecord(PaymentCreateRequest request)
             throws IamportResponseException, IOException {
-        var iamportPayment = verifyIamportPayment(paymentCreateRequest);
 
-        validateAmount(iamportPayment.getAmount(), paymentCreateRequest.getAmount());
+        // Payment iamportPayment = fetchAndValidateIamportPayment(request);
 
         Member member = memberService.getCurrentLoginMember();
-        PaymentGatewayInfo gatewayInfo = PaymentGatewayInfo.create(paymentCreateRequest.getPaymentGatewayInfoRequest());
+        PaymentGatewayInfo gatewayInfo = PaymentGatewayInfo.create(request.getPaymentGatewayInfoRequest());
 
-        return PaymentRecord.create(member, paymentCreateRequest, gatewayInfo);
+        return PaymentRecord.create(member, request, gatewayInfo);
     }
 
-    private com.siot.IamportRestClient.response.Payment verifyIamportPayment(PaymentCreateRequest request)
-            throws IamportResponseException, IOException {
-        var response = iamportClient.paymentByImpUid(request.getPaymentGatewayInfoRequest().getImportUid());
-        if (response.getResponse() == null) {
-            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
-        }
-        return response.getResponse();
-    }
-
-    private void validateAmount(BigDecimal actual, BigDecimal expected) {
-        if (actual == null || actual.compareTo(expected) != 0) {
-            throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
-        }
-    }
-
+//    private Payment fetchAndValidateIamportPayment(PaymentCreateRequest request)
+//            throws IamportResponseException, IOException {
+//
+//        String impUid = request.getPaymentGatewayInfoRequest().getImportUid();
+//        Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
+//
+//        if (payment == null) {
+//            log.warn("Iamport payment not found for impUid: {}", impUid);
+//            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
+//        }
+//
+//        BigDecimal actualAmount = payment.getAmount();
+//        BigDecimal requestedAmount = request.getAmount();
+//
+//        if (actualAmount == null || actualAmount.compareTo(requestedAmount) != 0) {
+//            throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+//        }
+//
+//        return payment;
+//    }
+//
+//    private Payment verifyIamportPayment(PaymentCreateRequest request)
+//            throws IamportResponseException, IOException {
+//
+//        var response = iamportClient.paymentByImpUid(request.getPaymentGatewayInfoRequest().getImportUid());
+//
+//        if (response.getResponse() == null) {
+//            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
+//        }
+//
+//        return response.getResponse();
+//    }
 
     // 조건별 결제 조회 검증
     private boolean isMethodMatch(PaymentRecord paymentRecord, PaymentMethod method) {

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,8 @@ public class PaymentRecordController {
 
     private final PaymentRecordService paymentRecordService;
 
-    @Operation(summary = "결제 생성", description = "결제 요청 정보를 저장합니다.")
+    @Operation(summary = "결제 생성", description = "[DONOR or ADMIN만 가능] 결제 요청 정보를 저장합니다.")
+    @PreAuthorize("hasAnyRole('DONOR', 'ADMIN')")
     @PostMapping("")
     public ApiResponse<Long> save(
             @Valid @RequestBody PaymentCreateRequest paymentCreateRequest
@@ -42,10 +44,11 @@ public class PaymentRecordController {
         return ApiResponse.success(id);
     }
 
-    @Operation(summary = "결제 단건 조회", description = "결제 ID로 결제 정보를 조회합니다.")
-    @GetMapping("")
+    @Operation(summary = "결제 단건 조회", description = "[모든 Role 가능] 결제 ID로 결제 정보를 조회합니다.")
+    @PreAuthorize("hasRole('DONOR')")
+    @GetMapping("/{paymentId}")
     public ApiResponse<PaymentResponse> getPayment(
-            @RequestParam(name = "paymentId") Long paymentId
+            @PathVariable(name = "paymentId") Long paymentId
     ) {
         PaymentResponse paymentResponse = paymentRecordService.getPayment(paymentId);
         return ApiResponse.success(paymentResponse);
@@ -54,11 +57,11 @@ public class PaymentRecordController {
     @Operation(
             summary = "조건별 결제 조회",
             description = """
-                    결제 수단, 상태, 시작날짜, 끝날짜를 기준으로 결제 내역을 조회합니다.<br>
-                    조건을 입력하지 않으면 전체 결제를 조회합니다.<br>
-                    날짜는 ISO 형식(예: 2024-03-01)으로 입력하세요.
+                    [모든 Role 가능] 결제 수단, 상태, 시작날짜, 끝날짜를 기준으로 결제 내역을 조회합니다.<br>
+                    조건을 입력하지 않으면 전체 결제를 조회합니다. 날짜는 ISO 형식(예: 2024-03-01)으로 입력하세요.
                     """
     )
+    @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
     public ApiResponse<List<PaymentResponse>> getPaymentsByCondition(
             @RequestParam(required = false) PaymentMethod method,
@@ -70,7 +73,8 @@ public class PaymentRecordController {
         return ApiResponse.success(payments);
     }
 
-    @Operation(summary = "결제 삭제", description = "결제 ID로 결제 정보를 삭제합니다.")
+    @Operation(summary = "결제 삭제", description = "[DONOR or ADMIN만 가능] 결제 ID로 결제 정보를 삭제합니다.")
+    @PreAuthorize("hasAnyRole('DONOR', 'ADMIN')")
     @DeleteMapping("/{paymentId}")
     public ApiResponse<Long> delete(
         @PathVariable(name = "paymentId") Long paymentId){

@@ -24,10 +24,10 @@ public class IdCursorResult<T extends IdProvider> {
     }
 
     private static <T extends IdProvider> boolean checkFirstPageById(Long cursor, List<T> values) {
-        if ((cursor != null) && (cursor > 0) && (!values.isEmpty()) && (values.getFirst().getId() > cursor)) {
-            return true;
-        }
-        return false;
+        return cursor != null
+            && cursor > 0
+            && !values.isEmpty()
+            && values.getFirst().getId() > cursor;
     }
 
     private static <T extends IdProvider> boolean checkLastPageById(int limit, List<T> values) {

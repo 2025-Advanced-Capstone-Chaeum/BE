@@ -29,10 +29,9 @@ public class CreatedAtCursorResult<T extends CreatedAtProvider> {
     private static <T extends CreatedAtProvider> boolean checkFirstPageByCreatedAt(
         LocalDateTime cursor, List<T> values
     ) {
-        if ((cursor != null) && !values.isEmpty() && (values.getFirst().getCreatedAt().isAfter(cursor))) {
-            return true;
-        }
-        return false;
+        return cursor != null
+            && !values.isEmpty()
+            && values.getFirst().getCreatedAt().isAfter(cursor);
     }
 
     private static <T extends CreatedAtProvider> boolean checkLastPageByCreatedAt(int limit, List<T> values) {

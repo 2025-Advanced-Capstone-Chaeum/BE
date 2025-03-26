@@ -10,7 +10,7 @@ import lombok.Setter;
 public class PaymentGatewayInfoRequest {
 
     @NotNull
-    @Schema(description = "아임포트 결제 고유 ID", example = "imp_1234567890")
+    @Schema(description = "아임포트 결제 고유 ID", example = "imp_448280090638")
     private String importUid;
 
     @NotNull

@@ -2,7 +2,6 @@ package com.chaeum.api.domain.item.entity;
 
 import com.chaeum.api.domain.item.dto.request.ItemCreateRequest;
 import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
-import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,15 +46,6 @@ public class Item extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "grade", nullable = false)
     private ItemGrade grade;
-
-    public static Item toEntity(ItemResponse itemResponse) {
-        return Item.builder()
-            .name(itemResponse.getName())
-            .itemImageUrl(itemResponse.getItemImageUrl())
-            .category(itemResponse.getCategory())
-            .grade(itemResponse.getGrade())
-            .build();
-    }
 
     public static Item toEntity(ItemCreateRequest itemCreateRequest) {
         return Item.builder()

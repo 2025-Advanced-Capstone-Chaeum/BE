@@ -54,7 +54,7 @@ public class Inventory extends BaseEntity {
             .member(member)
             .item(item)
             .isWearing(false)
-            .quantity(0)
+            .quantity(1)
             .build();
     }
 

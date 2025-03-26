@@ -5,11 +5,11 @@ import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
 import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.service.ItemService;
+import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,11 +54,13 @@ public class ItemController {
         + "조건을 하나라도 입력하지 않으면 전체 조회됨</br>")
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
-    public ApiResponse<List<ItemResponse>> getItemsByCondition(
+    public ApiResponse<IdCursorResult<ItemResponse>> getItemsByCondition(
         @RequestParam(name = "category", required = false) ItemCategory category,
-        @RequestParam(name = "itemName", required = false) String itemName
+        @RequestParam(name = "itemName", required = false) String itemName,
+        @RequestParam(name = "cursor", required = false) Long cursor,
+        @RequestParam(name = "limit", defaultValue = "3") int limit
     ) {
-        List<ItemResponse> items = itemService.getItemsByCondition(category, itemName);
+        IdCursorResult<ItemResponse> items = itemService.getItemsByCondition(category, itemName, cursor, limit);
         return ApiResponse.success(items);
     }
 

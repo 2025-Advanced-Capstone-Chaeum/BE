@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.siot.IamportRestClient.response.Payment;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,50 +68,49 @@ public class PaymentRecordService {
         return paymentId;
     }
 
-    // 결제 생성 및 검즘
-    private PaymentRecord createValidatedPaymentRecord(PaymentCreateRequest request)
+    // 결제 생성 및 검증
+    private PaymentRecord createValidatedPaymentRecord(PaymentCreateRequest paymentCreateRequest)
             throws IamportResponseException, IOException {
 
-        // Payment iamportPayment = fetchAndValidateIamportPayment(request);
+        log.info("[결제 생성] 결제 검증 시작 - impUid: {}", paymentCreateRequest.getPaymentGatewayInfoRequest().getImportUid());
+
+        Payment iamportPayment = fetchAndValidateIamportPayment(paymentCreateRequest);
+        log.info("[결제 생성] 결제 검증 완료 - 결제 상태: {}, 결제 금액: {}", iamportPayment.getStatus(), iamportPayment.getAmount());
 
         Member member = memberService.getCurrentLoginMember();
-        PaymentGatewayInfo gatewayInfo = PaymentGatewayInfo.create(request.getPaymentGatewayInfoRequest());
+        PaymentGatewayInfo paymentGatewayInfo = PaymentGatewayInfo.create(paymentCreateRequest.getPaymentGatewayInfoRequest());
 
-        return PaymentRecord.create(member, request, gatewayInfo);
+        PaymentRecord paymentRecord = PaymentRecord.create(member, paymentCreateRequest, paymentGatewayInfo);
+        log.info("[결제 생성] PaymentRecord 생성 완료 - memberId: {}, amount: {}", member.getId(), paymentCreateRequest.getAmount());
+
+        return paymentRecord;
     }
 
-//    private Payment fetchAndValidateIamportPayment(PaymentCreateRequest request)
-//            throws IamportResponseException, IOException {
-//
-//        String impUid = request.getPaymentGatewayInfoRequest().getImportUid();
-//        Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
-//
-//        if (payment == null) {
-//            log.warn("Iamport payment not found for impUid: {}", impUid);
-//            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
-//        }
-//
-//        BigDecimal actualAmount = payment.getAmount();
-//        BigDecimal requestedAmount = request.getAmount();
-//
-//        if (actualAmount == null || actualAmount.compareTo(requestedAmount) != 0) {
-//            throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
-//        }
-//
-//        return payment;
-//    }
-//
-//    private Payment verifyIamportPayment(PaymentCreateRequest request)
-//            throws IamportResponseException, IOException {
-//
-//        var response = iamportClient.paymentByImpUid(request.getPaymentGatewayInfoRequest().getImportUid());
-//
-//        if (response.getResponse() == null) {
-//            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
-//        }
-//
-//        return response.getResponse();
-//    }
+    private Payment fetchAndValidateIamportPayment(PaymentCreateRequest paymentCreateRequest)
+            throws IamportResponseException, IOException {
+
+        String impUid = paymentCreateRequest.getPaymentGatewayInfoRequest().getImportUid();
+        log.info("[Iamport 검증] impUid로 결제 조회 요청: {}", impUid);
+
+        Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
+
+        if (payment == null) {
+            log.warn("[Iamport 검증] 결제 정보 없음 - impUid: {}", impUid);
+            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
+        }
+
+        log.info("[Iamport 검증] 결제 정보 조회 성공 - 상태: {}, 금액: {}", payment.getStatus(), payment.getAmount());
+
+        BigDecimal actualAmount = payment.getAmount();
+        BigDecimal requestedAmount = paymentCreateRequest.getAmount();
+
+        if (actualAmount == null || actualAmount.compareTo(requestedAmount) != 0) {
+            log.warn("[Iamport 검증] 금액 불일치 - 요청 금액: {}, 실제 금액: {}", requestedAmount, actualAmount);
+            throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+        }
+
+        return payment;
+    }
 
     // 조건별 결제 조회 검증
     private boolean isMethodMatch(PaymentRecord paymentRecord, PaymentMethod method) {

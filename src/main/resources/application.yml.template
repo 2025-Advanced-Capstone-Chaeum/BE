@@ -76,6 +76,12 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
+    portone:
+      code: ${PORTONE_CODE}
+      api:
+        key: ${PORTONE_KEY}
+        secretkey: ${PORTONE_SECRETKEY}
+
 cloud:
   aws:
     s3:

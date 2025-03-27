@@ -1,5 +1,7 @@
 package com.chaeum.api.domain.funding.entity;
 
+import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
+import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -22,6 +24,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -68,4 +71,31 @@ public class Funding extends BaseEntity {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
+    public static Funding toEntity(FundingCreateRequest fundingCreateRequest, Member member) {
+        return Funding.builder()
+                .member(member)
+                .title(fundingCreateRequest.getTitle())
+                .content(fundingCreateRequest.getContent())
+                .fundingImage(fundingCreateRequest.getFundingImage())
+                .itemLink(fundingCreateRequest.getItemLink())
+                .address(fundingCreateRequest.getAddress())
+                .goalAmount(fundingCreateRequest.getGoalAmount())
+                .currentAmount(fundingCreateRequest.getCurrentAmount())
+                .status(fundingCreateRequest.getStatus())
+                .endDate(fundingCreateRequest.getEndDate())
+                .build();
+    }
+
+    public void update(FundingUpdateRequest fundingUpdateRequest) {
+        Optional.ofNullable(fundingUpdateRequest.getTitle()).ifPresent(this::setTitle);
+        Optional.ofNullable(fundingUpdateRequest.getContent()).ifPresent(this::setContent);
+        Optional.ofNullable(fundingUpdateRequest.getFundingImage()).ifPresent(this::setFundingImage);
+        Optional.ofNullable(fundingUpdateRequest.getItemLink()).ifPresent(this::setItemLink);
+        Optional.ofNullable(fundingUpdateRequest.getAddress()).ifPresent(this::setAddress);
+        Optional.ofNullable(fundingUpdateRequest.getGoalAmount()).ifPresent(this::setGoalAmount);
+        Optional.ofNullable(fundingUpdateRequest.getCurrentAmount()).ifPresent(this::setCurrentAmount);
+        Optional.ofNullable(fundingUpdateRequest.getStatus()).ifPresent(this::setStatus);
+        Optional.ofNullable(fundingUpdateRequest.getEndDate()).ifPresent(this::setEndDate);
+    }
 }

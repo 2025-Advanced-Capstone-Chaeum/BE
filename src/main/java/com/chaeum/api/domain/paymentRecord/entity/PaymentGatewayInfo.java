@@ -25,7 +25,7 @@ public class PaymentGatewayInfo {
     private String merchantUid;
 
     @Column(name = "pg_provider", length = 100)
-    private String PgProvider;
+    private String pgProvider;
 
     @Column(name = "fail_reason")
     private String failReason;
@@ -34,7 +34,7 @@ public class PaymentGatewayInfo {
         return PaymentGatewayInfo.builder()
                 .impUid(paymentGatewayInfoRequest.getImportUid())
                 .merchantUid(paymentGatewayInfoRequest.getMerchantUid())
-                .PgProvider(paymentGatewayInfoRequest.getGatewayProvider())
+                .pgProvider(paymentGatewayInfoRequest.getGatewayProvider())
                 .failReason(paymentGatewayInfoRequest.getFailReason())
                 .build();
     }

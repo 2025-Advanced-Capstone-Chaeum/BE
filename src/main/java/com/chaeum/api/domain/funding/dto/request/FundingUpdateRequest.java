@@ -14,10 +14,12 @@ import java.time.LocalDateTime;
 public class FundingUpdateRequest {
 
     @NotNull
+    @Size(max = 100, message = "펀딩 제목은 최대 100자까지 입력할 수 있습니다.")
     @Schema(description = "펀딩 제목", example = "공부해서 사회에 보답하겠습니다.")
     private String title;
 
     @NotNull
+    @Size(max = 1000, message = "펀딩 내용은 최대 1000자까지 입력할 수 있습니다.")
     @Schema(description = "펀딩 내용", example = "학업에 필요한 교재와 책상을 마련하기 위한 펀딩입니다.")
     private String content;
 

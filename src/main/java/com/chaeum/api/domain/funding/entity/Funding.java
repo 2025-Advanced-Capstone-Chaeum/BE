@@ -81,8 +81,6 @@ public class Funding extends BaseEntity {
                 .itemLink(fundingCreateRequest.getItemLink())
                 .address(fundingCreateRequest.getAddress())
                 .goalAmount(fundingCreateRequest.getGoalAmount())
-                .currentAmount(fundingCreateRequest.getCurrentAmount())
-                .status(fundingCreateRequest.getStatus())
                 .endDate(fundingCreateRequest.getEndDate())
                 .build();
     }
@@ -94,8 +92,12 @@ public class Funding extends BaseEntity {
         Optional.ofNullable(fundingUpdateRequest.getItemLink()).ifPresent(this::setItemLink);
         Optional.ofNullable(fundingUpdateRequest.getAddress()).ifPresent(this::setAddress);
         Optional.ofNullable(fundingUpdateRequest.getGoalAmount()).ifPresent(this::setGoalAmount);
-        Optional.ofNullable(fundingUpdateRequest.getCurrentAmount()).ifPresent(this::setCurrentAmount);
-        Optional.ofNullable(fundingUpdateRequest.getStatus()).ifPresent(this::setStatus);
         Optional.ofNullable(fundingUpdateRequest.getEndDate()).ifPresent(this::setEndDate);
+    }
+
+    public void markAsCompleted() {
+        Optional.ofNullable(this.status)
+                .filter(status -> status == FundingStatus.ONGOING)
+                .ifPresent(status -> this.status = FundingStatus.COMPLETED);
     }
 }

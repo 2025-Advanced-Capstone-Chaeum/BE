@@ -60,4 +60,28 @@ public class InventoryController {
         Long id = inventoryService.delete(inventoryId);
         return ApiResponse.success(id);
     }
+
+    @Operation(summary = "인벤토리 아이템 사용/해제", description = "[모든 Role 사용/해제 가능]<br>"
+        + "아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다."
+    )
+    @PreAuthorize("hasRole('DONOR')")
+    @PostMapping("/{inventoryId}/toggle")
+    public ApiResponse<Void> toggleInventory(
+        @PathVariable(name = "inventoryId") Long inventoryId
+    ) {
+        inventoryService.toggleInventory(inventoryId);
+        return ApiResponse.success();
+    }
+
+    @Operation(summary = "고양이 상호작용 아이템 사용", description = "[모든 Role 사용 가능]<br>"
+        + "아이템 카테고리가 INTERACTION인 경우에만 가능합니다."
+    )
+    @PreAuthorize("hasRole('DONOR')")
+    @PostMapping("/{inventoryId}/use")
+    public ApiResponse<Void> useInteractionItem(
+        @PathVariable(name = "inventoryId") Long inventoryId
+    ) {
+        inventoryService.useInteractionItem(inventoryId);
+        return ApiResponse.success();
+    }
 }

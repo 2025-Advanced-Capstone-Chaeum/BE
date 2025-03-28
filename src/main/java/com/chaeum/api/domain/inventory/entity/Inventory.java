@@ -67,6 +67,14 @@ public class Inventory extends BaseEntity {
         this.quantity -= 1;
     }
 
+    public void toggleWearing() {
+        if (this.getIsWearing()) {
+            unwear();
+        } else {
+            wear();
+        }
+    }
+
     public void wear() {
         this.isWearing = true;
     }

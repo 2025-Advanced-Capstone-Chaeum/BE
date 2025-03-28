@@ -3,6 +3,8 @@ package com.chaeum.api.domain.item.entity;
 import com.chaeum.api.domain.item.dto.request.ItemCreateRequest;
 import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Arrays;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -60,5 +63,11 @@ public class Item extends BaseEntity {
         Optional.ofNullable(itemUpdateRequest.getName()).ifPresent(this::setName);
         Optional.ofNullable(itemUpdateRequest.getCategory()).ifPresent(this::setCategory);
         Optional.ofNullable(itemUpdateRequest.getGrade()).ifPresent(this::setGrade);
+    }
+
+    public void validateCategory(ItemCategory... allowedCategories) {
+        if (!Arrays.asList(allowedCategories).contains(this.category)) {
+            throw ChaeumException.from(ErrorCode.ITEM_CATEGORY_MISMATCH);
+        }
     }
 }

@@ -49,7 +49,10 @@ public class FundingService {
                 .filter(funding -> isStatusMatch(funding, status))
                 .filter(funding -> isTitleMatch(funding, title))
                 .filter(funding -> isCursorAfter(funding, cursor))
-                .sorted(Comparator.comparingLong(Funding::getId))
+                .sorted(Comparator
+                        .comparing(Funding::getCreatedAt, Comparator.reverseOrder())
+                        .thenComparing(Funding::getId, Comparator.reverseOrder())
+                )
                 .limit(limit)
                 .toList();
 

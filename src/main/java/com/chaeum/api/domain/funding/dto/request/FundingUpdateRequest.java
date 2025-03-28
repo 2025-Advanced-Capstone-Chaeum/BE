@@ -1,8 +1,8 @@
 package com.chaeum.api.domain.funding.dto.request;
 
-import com.chaeum.api.domain.funding.entity.FundingStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,14 +36,6 @@ public class FundingUpdateRequest {
     @NotNull
     @Schema(description = "목표 금액", example = "1000000.00")
     private BigDecimal goalAmount;
-
-    @NotNull
-    @Schema(description = "현재 모금액", example = "900000.00")
-    private BigDecimal currentAmount;
-
-    @NotNull
-    @Schema(description = "펀딩 상태", example = "ONGOING")
-    private FundingStatus status;
 
     @NotNull
     @Schema(description = "펀딩 종료일", example = "2025-03-28T23:59:59")

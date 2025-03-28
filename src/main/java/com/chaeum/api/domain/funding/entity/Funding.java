@@ -80,7 +80,8 @@ public class Funding extends BaseEntity {
                 .fundingImage(fundingCreateRequest.getFundingImage())
                 .itemLink(fundingCreateRequest.getItemLink())
                 .address(fundingCreateRequest.getAddress())
-                .goalAmount(fundingCreateRequest.getGoalAmount())
+                .currentAmount(BigDecimal.ZERO)
+                .status(FundingStatus.ONGOING)
                 .endDate(fundingCreateRequest.getEndDate())
                 .build();
     }

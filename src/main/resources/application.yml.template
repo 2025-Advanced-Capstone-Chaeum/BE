@@ -8,6 +8,12 @@ spring:
   mvc:
     log-resolved-exception: true
 
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,28 +22,16 @@ spring:
       hibernate.jdbc.time_zone: UTC
     show-sql: false
 
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
   data:
     redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
       lettuce:
         pool:
           max-active: 10
           max-idle: 10
           min-idle: 2
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-
-  jwt:
-    secret-key: ${JWT_SECRET}
-    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
-    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
-    cookie-domain: ${JWT_COOKIE_DOMAIN}
 
   security:
     oauth2:
@@ -76,11 +70,17 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
-    portone:
-      code: ${PORTONE_CODE}
-      api:
-        key: ${PORTONE_KEY}
-        secretkey: ${PORTONE_SECRETKEY}
+  jwt:
+    secret-key: ${JWT_SECRET}
+    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+    cookie-domain: ${JWT_COOKIE_DOMAIN}
+
+  portone:
+    code: ${PORTONE_CODE}
+    api:
+      key: ${PORTONE_KEY}
+      secretkey: ${PORTONE_SECRETKEY}
 
 cloud:
   aws:

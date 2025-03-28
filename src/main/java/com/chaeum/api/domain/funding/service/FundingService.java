@@ -12,9 +12,11 @@ import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -69,6 +71,13 @@ public class FundingService {
     public Long delete(Long fundingId) {
         fundingRepository.deleteById(fundingId);
         return fundingId;
+    }
+
+    @Scheduled(fixedRate = 60 * 1000) // 1분마다 실행
+    @Transactional
+    public void updateFundingStatusAutomatically() {
+        fundingRepository.findByStatusAndEndDateBefore(FundingStatus.ONGOING, LocalDateTime.now())
+                .forEach(Funding::markAsCompleted);
     }
 
     // 조건별 펀딩 조회 검증

@@ -95,9 +95,10 @@ public class Funding extends BaseEntity {
         Optional.ofNullable(fundingUpdateRequest.getEndDate()).ifPresent(this::setEndDate);
     }
 
+    // 펀딩 완료 처리 메서드
     public void markAsCompleted() {
-        Optional.ofNullable(this.status)
-                .filter(status -> status == FundingStatus.ONGOING)
-                .ifPresent(status -> this.status = FundingStatus.COMPLETED);
+        if (this.status == FundingStatus.ONGOING) {
+            this.status = FundingStatus.COMPLETED;
+        }
     }
 }

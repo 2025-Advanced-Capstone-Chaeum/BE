@@ -21,6 +21,7 @@ public enum ErrorCode {
     PAY_INVALID(HttpStatus.BAD_REQUEST, "잘못된 결제 정보입니다."),
     INVALID_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 로그인 타입입니다."),
     INVENTORY_QUANTITY_INSUFFICIENT(HttpStatus.BAD_REQUEST, "재고 수량이 0 이하로 감소할 수 없습니다."),
+    ITEM_CATEGORY_MISMATCH(HttpStatus.BAD_REQUEST, "아이템 카테고리가 올바르지 않습니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -47,6 +48,7 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
     NOT_FOUND_ACCESS_TOKEN(HttpStatus.NOT_FOUND, "엑세스 토큰을 찾을 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "리프레시 토큰을 찾을 수 없습니다."),
+    CAT_NOT_FOUND(HttpStatus.NOT_FOUND, "고양이를 찾을 수 없습니다."),
 
     // 409: CONFLICT (중복된 요청)
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),

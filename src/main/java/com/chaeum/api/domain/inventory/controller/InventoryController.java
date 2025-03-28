@@ -9,6 +9,7 @@ import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -83,5 +84,15 @@ public class InventoryController {
     ) {
         inventoryService.useInteractionItem(inventoryId);
         return ApiResponse.success();
+    }
+
+    @Operation(summary = "착용중인 인벤토리 아이템 조회", description = "[모든 Role 사용 가능]<br>"
+        + "아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다."
+    )
+    @PreAuthorize("hasRole('DONOR')")
+    @GetMapping("/wearing")
+    public ApiResponse<List<Long>> getWearingInventoryItems() {
+        List<Long> items = inventoryService.getWearingInventoryItems();
+        return ApiResponse.success(items);
     }
 }

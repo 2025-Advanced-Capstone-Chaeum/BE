@@ -65,8 +65,12 @@ public class Item extends BaseEntity {
         Optional.ofNullable(itemUpdateRequest.getGrade()).ifPresent(this::setGrade);
     }
 
+    public boolean isCategoryIn(ItemCategory... allowedCategories) {
+        return Arrays.asList(allowedCategories).contains(this.category);
+    }
+
     public void validateCategory(ItemCategory... allowedCategories) {
-        if (!Arrays.asList(allowedCategories).contains(this.category)) {
+        if (!isCategoryIn(allowedCategories)) {
             throw ChaeumException.from(ErrorCode.ITEM_CATEGORY_MISMATCH);
         }
     }

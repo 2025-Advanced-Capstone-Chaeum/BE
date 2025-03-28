@@ -56,7 +56,7 @@ public class InventoryService {
         ItemCategory category, LocalDateTime cursor, int limit
     ) {
         Member member = memberService.getCurrentLoginMember();
-        List<Inventory> inventories = inventoryRepository.findByMemberId(member.getId());
+        List<Inventory> inventories = findByMemberId(member.getId());
 
         List<InventoryResponse> filteredInventories = inventories.stream()
             .filter(inventory -> inventory.getItem().getCategory() == category)
@@ -66,6 +66,18 @@ public class InventoryService {
             .collect(Collectors.toList());
 
         return CreatedAtCursorResult.of(filteredInventories, cursor, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getWearingInventoryItems() {
+        Member member = memberService.getCurrentLoginMember();
+        List<Inventory> inventories = inventoryRepository.findByMemberIdAndIsWearing(
+            member.getId(), true);
+        return inventories.stream()
+            .map(Inventory::getItem)
+            .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))
+            .map(Item::getId)
+            .toList();
     }
 
     @Transactional
@@ -94,8 +106,12 @@ public class InventoryService {
         catService.addExperience(ExpConstants.INTERACTION);
     }
 
-    private Inventory findByInventoryId(Long inventoryId) {
+    public Inventory findByInventoryId(Long inventoryId) {
         return inventoryRepository.findById(inventoryId)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
+    }
+
+    public List<Inventory> findByMemberId(Long memberId) {
+        return inventoryRepository.findByMemberId(memberId);
     }
 }

@@ -62,8 +62,12 @@ public class InventoryController {
         return ApiResponse.success(id);
     }
 
-    @Operation(summary = "인벤토리 아이템 사용/해제", description = "[모든 Role 사용/해제 가능]<br>"
-        + "아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다."
+    @Operation(
+        summary = "인벤토리 아이템 착용/해제",
+        description = """
+            [모든 Role 사용 가능]<br>
+            아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다.
+            """
     )
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("/{inventoryId}/toggle")
@@ -74,8 +78,12 @@ public class InventoryController {
         return ApiResponse.success();
     }
 
-    @Operation(summary = "고양이 상호작용 아이템 사용", description = "[모든 Role 사용 가능]<br>"
-        + "아이템 카테고리가 INTERACTION인 경우에만 가능합니다."
+    @Operation(
+        summary = "고양이 상호작용 아이템 사용",
+        description = """
+            [모든 Role 사용 가능]<br>
+            아이템 카테고리가 INTERACTION인 경우에만 가능합니다
+            """
     )
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("/{inventoryId}/use")
@@ -86,8 +94,12 @@ public class InventoryController {
         return ApiResponse.success();
     }
 
-    @Operation(summary = "착용중인 인벤토리 아이템 조회", description = "[모든 Role 사용 가능]<br>"
-        + "아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다."
+    @Operation(
+        summary = "착용중인 인벤토리 아이템 조회",
+        description = """
+            [모든 Role 사용 가능]<br>
+            아이템 카테고리가 INTERACTION이 아닌 경우에만 가능합니다.
+            """
     )
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/wearing")

@@ -50,8 +50,13 @@ public class ItemController {
         return ApiResponse.success(itemResponse);
     }
 
-    @Operation(summary = "조건별 아이템 조회", description = "모든 Role 조회 가능</br>"
-        + "조건을 하나라도 입력하지 않으면 전체 조회됨</br>")
+    @Operation(
+        summary = "조건별 아이템 조회",
+        description = """
+            모든 Role 조회 가능<br>
+            조건을 하나라도 입력하지 않으면 전체 조회됨<br>
+            """
+    )
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
     public ApiResponse<IdCursorResult<ItemResponse>> getItemsByCondition(

@@ -1,5 +1,7 @@
 package com.chaeum.api.domain.cat.entity;
 
+import com.chaeum.api.domain.cat.strategy.LevelUpStrategy;
+import com.chaeum.api.domain.cat.strategy.PowerLevelUpStrategy;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -11,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,9 @@ public class Cat extends BaseEntity {
     @Column(name = "experience_point", nullable = false)
     private BigInteger experiencePoint;
 
+    @Transient
+    private static LevelUpStrategy levelUpStrategy = new PowerLevelUpStrategy(100, 1.5);
+
     public List<Integer> addExpAndGetLevelUps(BigInteger gainedExp) {
         this.experiencePoint = this.experiencePoint.add(gainedExp);
         return checkLevelUp();
@@ -66,9 +72,7 @@ public class Cat extends BaseEntity {
     }
 
     private BigInteger getRequiredExpForNextLevel() {
-        // 경험치 요구량 = baseExp * level^1.5
-        double required = 100 * Math.pow(this.level, 1.5);
-        return BigInteger.valueOf((long) required);
+        return levelUpStrategy.getRequiredExp(this.level);
     }
 
     public double getLevelUpPercentage() {

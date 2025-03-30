@@ -55,8 +55,8 @@ public class InventoryService {
     public CreatedAtCursorResult<InventoryResponse> getInventoriesByCategory(
         ItemCategory category, LocalDateTime cursor, int limit
     ) {
-        Member member = memberService.getCurrentLoginMember();
-        List<Inventory> inventories = findByMemberId(member.getId());
+        Long memberId = memberService.getCurrentLoginMemberId();
+        List<Inventory> inventories = findByMemberId(memberId);
 
         List<InventoryResponse> filteredInventories = inventories.stream()
             .filter(inventory -> inventory.getItem().getCategory() == category)
@@ -70,9 +70,9 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public List<Long> getWearingInventoryItems() {
-        Member member = memberService.getCurrentLoginMember();
+        Long memberId = memberService.getCurrentLoginMemberId();
         List<Inventory> inventories = inventoryRepository.findByMemberIdAndIsWearing(
-            member.getId(), true);
+            memberId, true);
         return inventories.stream()
             .map(Inventory::getItem)
             .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))

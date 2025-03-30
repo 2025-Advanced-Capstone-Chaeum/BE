@@ -22,20 +22,20 @@ public class CatService {
 
     @Transactional(readOnly = true)
     public CatInformationResponse getMyCatInformation() {
-        Member member = memberService.getCurrentLoginMember();
-        Cat cat = findByMemberId(member);
+        Long memberId = memberService.getCurrentLoginMemberId();
+        Cat cat = findByMemberId(memberId);
         return CatInformationResponse.toDto(cat);
     }
 
     @Transactional
     public List<Integer> addExperience(BigInteger gainedExp) {
-        Member member = memberService.getCurrentLoginMember();
-        Cat cat = findByMemberId(member);
+        Long memberId = memberService.getCurrentLoginMemberId();
+        Cat cat = findByMemberId(memberId);
         return cat.addExpAndGetLevelUps(gainedExp);
     }
 
-    public Cat findByMemberId(Member member) {
-        return catRepository.findByMemberId(member.getId())
+    public Cat findByMemberId(Long memberId) {
+        return catRepository.findByMemberId(memberId)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.CAT_NOT_FOUND));
     }
 }

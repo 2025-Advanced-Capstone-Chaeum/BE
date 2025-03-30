@@ -26,4 +26,9 @@ public class MemberService {
             return null;
         }
     }
+
+    public Long getCurrentLoginMemberId() {
+        Member member = getCurrentLoginMember();
+        return member != null ? member.getId() : null;
+    }
 }

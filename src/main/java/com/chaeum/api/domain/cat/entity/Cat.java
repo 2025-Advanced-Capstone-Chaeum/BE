@@ -4,6 +4,7 @@ import com.chaeum.api.domain.cat.strategy.LevelUpStrategy;
 import com.chaeum.api.domain.cat.strategy.PowerLevelUpStrategy;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.utils.LevelUpConstants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,7 +50,8 @@ public class Cat extends BaseEntity {
     private BigInteger experiencePoint;
 
     @Transient
-    private static LevelUpStrategy levelUpStrategy = new PowerLevelUpStrategy(100, 1.5);
+    private static LevelUpStrategy levelUpStrategy =
+        new PowerLevelUpStrategy(LevelUpConstants.BASE_EXP, LevelUpConstants.EXPONENT);
 
     public List<Integer> addExpAndGetLevelUps(BigInteger gainedExp) {
         this.experiencePoint = this.experiencePoint.add(gainedExp);

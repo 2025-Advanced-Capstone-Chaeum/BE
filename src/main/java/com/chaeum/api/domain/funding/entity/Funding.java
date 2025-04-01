@@ -50,7 +50,7 @@ public class Funding extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "funding_image")
+    @Column(name = "funding_image", nullable = false)
     private String fundingImage;
 
     @Column(name = "item_link")

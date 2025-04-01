@@ -24,7 +24,7 @@ public class FundingUpdateRequest {
     private String content;
 
     @NotNull
-    @Schema(description = "펀딩 이미지 URL", example = "https://chaeum.site/image.jpg")
+    @Schema(description = "펀딩 이미지 URL", example = "https://bucket.s3.ap-northeast-2.amazonaw.com/funding/764c13ef-7301-22f2-a1d4-e7c8cw4.png")
     private String fundingImage;
 
     @NotNull

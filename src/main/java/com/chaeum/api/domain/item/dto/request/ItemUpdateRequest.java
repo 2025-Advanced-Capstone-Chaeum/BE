@@ -22,4 +22,8 @@ public class ItemUpdateRequest {
     @NotNull
     @Schema(description = "등급", example = "BRONZE")
     private ItemGrade grade;
+
+    @NotNull
+    @Schema(description = "아이템 사진 URL", example = "https://bucket.s3.ap-northeast-2.amazonaw.com/item/764c13ef-7301-22f2-a1d4-e7c8cw4.png")
+    private String itemImageUrl;
 }

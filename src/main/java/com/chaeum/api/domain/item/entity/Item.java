@@ -53,7 +53,7 @@ public class Item extends BaseEntity {
     public static Item toEntity(ItemCreateRequest itemCreateRequest) {
         return Item.builder()
             .name(itemCreateRequest.getName())
-            .itemImageUrl(null)
+            .itemImageUrl(itemCreateRequest.getItemImageUrl())
             .category(itemCreateRequest.getCategory())
             .grade(itemCreateRequest.getGrade())
             .build();
@@ -61,6 +61,7 @@ public class Item extends BaseEntity {
 
     public void update(ItemUpdateRequest itemUpdateRequest) {
         Optional.ofNullable(itemUpdateRequest.getName()).ifPresent(this::setName);
+        Optional.ofNullable(itemUpdateRequest.getItemImageUrl()).ifPresent(this::setItemImageUrl);
         Optional.ofNullable(itemUpdateRequest.getCategory()).ifPresent(this::setCategory);
         Optional.ofNullable(itemUpdateRequest.getGrade()).ifPresent(this::setGrade);
     }

@@ -40,7 +40,8 @@ public class S3StorageService implements StorageService {
         String originalFilename = file.getOriginalFilename();
         String fileExtension = extractFileExtension(originalFilename);
         validateExtension(fileExtension);
-        String storedFileName = folder + UUID.randomUUID() + fileExtension;
+        String checkedFolder = checkFolder(folder);
+        String storedFileName = checkedFolder + UUID.randomUUID() + fileExtension;
         return uploadS3(file, storedFileName);
     }
 
@@ -76,5 +77,9 @@ public class S3StorageService implements StorageService {
         if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
             throw ChaeumException.from(ErrorCode.UNSUPPORTED_FILE_EXTENSION);
         }
+    }
+
+    private String checkFolder(String folder) {
+        return folder.endsWith("/") ? folder : folder + "/";
     }
 }

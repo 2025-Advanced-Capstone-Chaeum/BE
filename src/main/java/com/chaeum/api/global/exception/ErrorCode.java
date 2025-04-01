@@ -10,9 +10,8 @@ public enum ErrorCode {
 
     // 400: BAD REQUEST (잘못된 요청)
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    EMPTY_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다."),
-    UNSUPPORTED_IMAGE_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 형식입니다."),
-    IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 제한을 초과했습니다."),
+    UNSUPPORTED_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
+    FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "파일 크기가 제한을 초과했습니다."),
     UNSUPPORTED_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
     INVALID_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 소셜 로그인 타입입니다."),
     INVENTORY_QUANTITY_INSUFFICIENT(HttpStatus.BAD_REQUEST, "재고 수량이 0 이하로 감소할 수 없습니다."),

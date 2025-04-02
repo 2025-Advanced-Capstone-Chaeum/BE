@@ -15,7 +15,7 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
 
-    public BigDecimal getThisMonthTotalByMember(Long memberId) {
+    public BigDecimal getThisMonthTotalByMemberId(Long memberId) {
         LocalDateTime now = LocalDateTime.now();
         int currentYear = now.getYear();
         int currentMonth = now.getMonthValue();
@@ -30,7 +30,7 @@ public class DonationService {
         return total;
     }
 
-    public BigDecimal getThisYearTotalByMember(Long memberId) {
+    public BigDecimal getThisYearTotalByMemberId(Long memberId) {
         int currentYear = LocalDateTime.now().getYear();
         List<Donation> donations = donationRepository.findByMemberIdAndYear(memberId, currentYear);
         BigDecimal total = BigDecimal.ZERO;

@@ -2,6 +2,7 @@ package com.chaeum.api.domain.donation.entity;
 
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,7 +28,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "donation")
-public class Donation {
+public class Donation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -74,6 +74,7 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
                 .email(oAuth2Response.getEmail())
                 .name(oAuth2Response.getName())
                 .role(Role.DONOR)
+                .isBeneficiary(Boolean.FALSE)
                 .socialLoginType(SocialLoginType.from(oAuth2Response.getProvider()))
                 .build();
         return memberRepository.save(newMember);

@@ -34,6 +34,8 @@ public class DonorMyPageResponse implements MemberMyPageResponse {
                 .name(member.getName())
                 .email(member.getEmail())
                 .profileImage(member.getProfileImage())
+                .monthlyAmount(monthlyAmount)
+                .yearlyAmount(yearlyAmount)
                 .donations(donations)
                 .build();
     }

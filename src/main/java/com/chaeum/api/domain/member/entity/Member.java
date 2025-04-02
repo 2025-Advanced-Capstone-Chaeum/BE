@@ -1,14 +1,10 @@
 package com.chaeum.api.domain.member.entity;
 
-import com.chaeum.api.domain.attendance.entity.Attendance;
 import com.chaeum.api.domain.cat.entity.Cat;
 import com.chaeum.api.domain.donation.entity.Donation;
-import com.chaeum.api.domain.friendship.entity.Friendship;
 import com.chaeum.api.domain.inventory.entity.Inventory;
-import com.chaeum.api.domain.missionProgress.entity.MissionProgress;
+import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentRecord;
-import com.chaeum.api.domain.review.entity.Review;
-import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -79,21 +76,26 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Donation> donations;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MissionProgress> missionProgresses;
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<MissionProgress> missionProgresses;
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Friendship> friendships;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Friendship> friendships;
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Attendance> attendances;
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Title> titles;
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Notification> notifications;
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Review> reviews;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendances;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Title> titles;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews;
+    public void update(MemberUpdateRequest memberUpdateRequest) {
+        Optional.ofNullable(memberUpdateRequest.getName()).ifPresent(this::setName);
+        Optional.ofNullable(memberUpdateRequest.getProfileImage()).ifPresent(this::setProfileImage);
+    }
 }

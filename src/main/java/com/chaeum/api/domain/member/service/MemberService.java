@@ -50,17 +50,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberMyPageResponse getMemberMyPage() {
         Member member = getCurrentLoginMember();
-        Long memberId = member.getId();
-
-        if (member.getIsBeneficiary()) { // 수혜자 마이페이지
-            List<FundingSummaryResponse> fundings = fundingService.getFundingSummariesByMemberId(memberId);
-            return BeneficiaryMyPageResponse.toDto(member, fundings);
-        } else { // 기부자 마이페이지
-            BigDecimal monthlyAmount = donationService.getThisMonthTotalByMemberId(memberId);
-            BigDecimal yearlyAmount = donationService.getThisYearTotalByMemberId(memberId);
-            List<DonationSummaryResponse> donations = donationService.getDonationSummariesByMemberId(memberId);
-            return DonorMyPageResponse.toDto(member, monthlyAmount, yearlyAmount, donations);
-        }
+        return member.getIsBeneficiary() ? getBeneficiaryMyPage(member) : getDonorMyPage(member);
     }
 
     @Transactional
@@ -74,6 +64,19 @@ public class MemberService {
     public Long delete(Long memberId) {
         memberRepository.deleteById(memberId);
         return memberId;
+    }
+
+    private MemberMyPageResponse getBeneficiaryMyPage(Member member) {
+        List<FundingSummaryResponse> fundings = fundingService.getFundingSummariesByMemberId(member.getId());
+        return BeneficiaryMyPageResponse.toDto(member, fundings);
+    }
+
+    private MemberMyPageResponse getDonorMyPage(Member member) {
+        Long memberId = member.getId();
+        BigDecimal monthlyAmount = donationService.getThisMonthTotalByMemberId(memberId);
+        BigDecimal yearlyAmount = donationService.getThisYearTotalByMemberId(memberId);
+        List<DonationSummaryResponse> donations = donationService.getDonationSummariesByMemberId(memberId);
+        return DonorMyPageResponse.toDto(member, monthlyAmount, yearlyAmount, donations);
     }
 
     private Member findById(Long memberId) {

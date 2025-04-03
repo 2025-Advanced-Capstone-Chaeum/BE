@@ -1,10 +1,9 @@
 package com.chaeum.api.domain.member.service;
 
 import com.chaeum.api.domain.donation.dto.response.DonationSummaryResponse;
-import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.donation.service.DonationService;
 import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
-import com.chaeum.api.domain.funding.repository.FundingRepository;
+import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
 import com.chaeum.api.domain.member.dto.response.BeneficiaryMyPageResponse;
 import com.chaeum.api.domain.member.dto.response.DonorMyPageResponse;
@@ -29,8 +28,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final DonationService donationService;
-    private final DonationRepository donationRepository;
-    private final FundingRepository fundingRepository;
+    private final FundingService fundingService;
 
     public Member getCurrentLoginMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,21 +51,14 @@ public class MemberService {
     public MemberMyPageResponse getMemberMyPage() {
         Member member = getCurrentLoginMember();
         Long memberId = member.getId();
-        if (member.getIsBeneficiary()) {
-            // 수혜자 마이페이지
-            List<FundingSummaryResponse> fundings = fundingRepository
-                    .findByMemberIdOrderByCreatedAtDesc(memberId).stream()
-                    .map(FundingSummaryResponse::toDto)
-                    .toList();
+
+        if (member.getIsBeneficiary()) { // 수혜자 마이페이지
+            List<FundingSummaryResponse> fundings = fundingService.getFundingSummariesByMemberId(memberId);
             return BeneficiaryMyPageResponse.toDto(member, fundings);
-        } else {
-            // 기부자 마이페이지
+        } else { // 기부자 마이페이지
             BigDecimal monthlyAmount = donationService.getThisMonthTotalByMemberId(memberId);
             BigDecimal yearlyAmount = donationService.getThisYearTotalByMemberId(memberId);
-            List<DonationSummaryResponse> donations = donationRepository
-                    .findByMemberIdOrderByCreatedAtDesc(memberId).stream()
-                    .map(DonationSummaryResponse::toDto)
-                    .toList();
+            List<DonationSummaryResponse> donations = donationService.getDonationSummariesByMemberId(memberId);
             return DonorMyPageResponse.toDto(member, monthlyAmount, yearlyAmount, donations);
         }
     }

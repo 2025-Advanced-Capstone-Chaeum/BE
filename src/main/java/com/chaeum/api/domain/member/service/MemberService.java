@@ -40,7 +40,7 @@ public class MemberService {
         if (principal instanceof CustomMemberDetails customMemberDetails) {
             return customMemberDetails.getMember();
         }
-        throw ChaeumException.from(ErrorCode.UNAUTHORIZED);
+        throw ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND);
     }
 
     public Long getCurrentLoginMemberId() {

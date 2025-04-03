@@ -50,8 +50,9 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberMyPageResponse getMemberMyPage(Long memberId) {
-        Member member = findById(memberId);
+    public MemberMyPageResponse getMemberMyPage() {
+        Member member = getCurrentLoginMember();
+        Long memberId = member.getId();
         if (member.getIsBeneficiary()) {
             // 수혜자 마이페이지
             List<FundingSummaryResponse> fundings = fundingRepository

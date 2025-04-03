@@ -37,8 +37,7 @@ public class MemberController {
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("")
     public ApiResponse<MemberMyPageResponse> getMemberMyPage() {
-        Long memberId = memberService.getCurrentLoginMemberId();
-        return ApiResponse.success(memberService.getMemberMyPage(memberId));
+        return ApiResponse.success(memberService.getMemberMyPage());
     }
 
     @Operation(

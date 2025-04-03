@@ -42,7 +42,7 @@ public class MemberController {
 
     @Operation(
             summary = "회원 수정",
-            description = "[모든 Role 가능] 회원 정보를 수정합니다."
+            description = "[모든 Role 가능] 회원의 이름과 프로필 이미지를 수정할 수 있습니다."
     )
     @PreAuthorize("hasRole('DONOR')")
     @PatchMapping("")
@@ -56,7 +56,7 @@ public class MemberController {
 
     @Operation(
             summary = "회원 삭제",
-            description = "[모든 Role 가능] 회원을 삭제합니다."
+            description = "[모든 Role 가능]"
     )
     @PreAuthorize("hasRole('DONOR')")
     @DeleteMapping("/{memberId}")

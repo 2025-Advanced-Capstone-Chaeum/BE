@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 public class DonationSummaryResponse {
 
+    private Long id;
+
     private String title;
 
     private String imageUrl;

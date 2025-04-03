@@ -3,6 +3,7 @@ package com.chaeum.api.domain.funding.service;
 import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
 import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.funding.dto.response.FundingResponse;
+import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
 import com.chaeum.api.domain.funding.repository.FundingRepository;
@@ -74,6 +75,13 @@ public class FundingService {
     public Long delete(Long fundingId) {
         fundingRepository.deleteById(fundingId);
         return fundingId;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FundingSummaryResponse> getFundingSummariesByMemberId(Long memberId) {
+        return fundingRepository.findByMemberIdOrderByCreatedAtDesc(memberId).stream()
+                .map(FundingSummaryResponse::toDto)
+                .toList();
     }
 
     @Scheduled(fixedRate = 60 * 1000) // 1분마다 실행

@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 public class FundingSummaryResponse {
 
+    private Long id;
+
     private String title;
 
     private String fundingImage;

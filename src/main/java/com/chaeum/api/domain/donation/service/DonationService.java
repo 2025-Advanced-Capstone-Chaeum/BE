@@ -4,10 +4,10 @@ import com.chaeum.api.domain.donation.entity.Donation;
 import com.chaeum.api.domain.donation.repository.DonationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +15,7 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
 
+    @Transactional(readOnly = true)
     public BigDecimal getThisMonthTotalByMemberId(Long memberId) {
         LocalDateTime now = LocalDateTime.now();
         int currentYear = now.getYear();
@@ -25,6 +26,7 @@ public class DonationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal getThisYearTotalByMemberId(Long memberId) {
         int currentYear = LocalDateTime.now().getYear();
 

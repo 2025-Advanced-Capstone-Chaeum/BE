@@ -49,12 +49,12 @@ public class Inventory extends BaseEntity {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    public static Inventory create(Item item, Member member) {
+    public static Inventory create(Item item, Member member, int quantity) {
         return Inventory.builder()
             .member(member)
             .item(item)
             .isWearing(false)
-            .quantity(1)
+            .quantity(quantity)
             .build();
     }
 

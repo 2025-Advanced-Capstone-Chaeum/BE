@@ -7,8 +7,10 @@ import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+
 import java.math.BigInteger;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +36,14 @@ public class CatService {
         return cat.addExpAndGetLevelUps(gainedExp);
     }
 
+    @Transactional
+    public void registerCatForMember(Member member) {
+        if (catRepository.existsByMemberId(member.getId())) return;
+        catRepository.save(Cat.toEntity(member));
+    }
+
     public Cat findByMemberId(Long memberId) {
         return catRepository.findByMemberId(memberId)
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.CAT_NOT_FOUND));
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.CAT_NOT_FOUND));
     }
 }

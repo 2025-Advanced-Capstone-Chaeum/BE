@@ -21,8 +21,9 @@ public class FundingSummaryResponse {
 
     private LocalDateTime createdAt;
 
-    public static FundingSummaryResponse toDto(Funding funding){
+    public static FundingSummaryResponse toDto(Funding funding) {
         return FundingSummaryResponse.builder()
+                .id(funding.getId())
                 .title(funding.getTitle())
                 .fundingImage(funding.getFundingImage())
                 .amount(funding.getCurrentAmount())

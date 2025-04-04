@@ -15,9 +15,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,9 +51,17 @@ public class Cat extends BaseEntity {
     @Column(name = "experience_point", nullable = false)
     private BigInteger experiencePoint;
 
+    public static Cat create(Member member) {
+        return Cat.builder()
+                .member(member)
+                .level(1)
+                .experiencePoint(BigInteger.ZERO)
+                .build();
+    }
+
     @Transient
     private static LevelUpStrategy levelUpStrategy =
-        new PowerLevelUpStrategy(LevelUpConstants.BASE_EXP, LevelUpConstants.EXPONENT);
+            new PowerLevelUpStrategy(LevelUpConstants.BASE_EXP, LevelUpConstants.EXPONENT);
 
     public List<Integer> addExpAndGetLevelUps(BigInteger gainedExp) {
         this.experiencePoint = this.experiencePoint.add(gainedExp);

@@ -3,11 +3,12 @@ package com.chaeum.api.domain.funding.service;
 import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
 import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.funding.dto.response.FundingResponse;
+import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
 import com.chaeum.api.domain.funding.repository.FundingRepository;
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.service.MemberService;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
@@ -25,11 +26,11 @@ import java.util.List;
 public class FundingService {
 
     private final FundingRepository fundingRepository;
-    private final MemberService memberService;
+    private final LoginMemberProvider loginMemberProvider;
 
     @Transactional
     public Long save(FundingCreateRequest fundingCreateRequest) {
-        Member member = memberService.getCurrentLoginMember();
+        Member member = loginMemberProvider.getCurrentLoginMember();
         Funding funding = Funding.toEntity(fundingCreateRequest, member);
         fundingRepository.save(funding);
         return funding.getId();
@@ -74,6 +75,13 @@ public class FundingService {
     public Long delete(Long fundingId) {
         fundingRepository.deleteById(fundingId);
         return fundingId;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FundingSummaryResponse> getFundingSummariesByMemberId(Long memberId) {
+        return fundingRepository.findByMemberIdOrderByCreatedAtDesc(memberId).stream()
+                .map(FundingSummaryResponse::toDto)
+                .toList();
     }
 
     @Scheduled(fixedRate = 60 * 1000) // 1분마다 실행

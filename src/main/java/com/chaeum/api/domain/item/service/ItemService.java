@@ -67,6 +67,11 @@ public class ItemService {
         return itemId;
     }
 
+    @Transactional(readOnly = true)
+    public List<Item> findByCategory(ItemCategory category) {
+        return itemRepository.findByCategory(category);
+    }
+
     public Item findById(Long itemId) {
         return itemRepository.findById(itemId)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.ITEM_NOT_FOUND));

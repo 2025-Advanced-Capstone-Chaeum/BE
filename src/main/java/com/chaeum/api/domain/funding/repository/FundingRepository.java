@@ -12,4 +12,6 @@ import java.util.List;
 public interface FundingRepository extends JpaRepository<Funding, Long> {
 
     List<Funding> findByStatusAndEndDateBefore(FundingStatus status, LocalDateTime endDate);
+
+    List<Funding> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 }

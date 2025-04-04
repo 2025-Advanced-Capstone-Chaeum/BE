@@ -9,15 +9,17 @@ import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.service.MemberService;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import com.chaeum.api.global.utils.ExpConstants;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,57 +29,60 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final LoginMemberProvider loginMemberProvider;
     private final ItemService itemService;
-    private final MemberService memberService;
     private final CatService catService;
+
+    private static final int DEFAULT_ITEM_QUANTITY = 1;
+    private static final int DEFAULT_INTERACTION_ITEM_QUANTITY = 5;
 
     @Transactional
     public Long save(InventoryCreateRequest inventoryCreateRequest) {
         Long itemId = inventoryCreateRequest.getItemId();
         Item item = itemService.findById(itemId);
-        Member member = memberService.getCurrentLoginMember();
+        Member member = loginMemberProvider.getCurrentLoginMember();
 
         Inventory inventory = inventoryRepository.findByItemId(itemId)
-            .map(existingInventory -> {
-                existingInventory.addQuantity();
-                return existingInventory;
-            })
-            .orElseGet(() -> {
-                Inventory newInventory = Inventory.create(item, member);
-                inventoryRepository.save(newInventory);
-                return newInventory;
-            });
+                .map(existingInventory -> {
+                    existingInventory.addQuantity();
+                    return existingInventory;
+                })
+                .orElseGet(() -> {
+                    Inventory newInventory = Inventory.create(item, member, DEFAULT_ITEM_QUANTITY);
+                    inventoryRepository.save(newInventory);
+                    return newInventory;
+                });
 
         return inventory.getId();
     }
 
     @Transactional(readOnly = true)
     public CreatedAtCursorResult<InventoryResponse> getInventoriesByCategory(
-        ItemCategory category, LocalDateTime cursor, int limit
+            ItemCategory category, LocalDateTime cursor, int limit
     ) {
-        Long memberId = memberService.getCurrentLoginMemberId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         List<Inventory> inventories = findByMemberId(memberId);
 
         List<InventoryResponse> filteredInventories = inventories.stream()
-            .filter(inventory -> inventory.getItem().getCategory() == category)
-            .filter(inventory -> cursor == null || inventory.getCreatedAt().isAfter(cursor))
-            .sorted(Comparator.comparing(Inventory::getCreatedAt))
-            .map(InventoryResponse::toDto)
-            .collect(Collectors.toList());
+                .filter(inventory -> inventory.getItem().getCategory() == category)
+                .filter(inventory -> cursor == null || inventory.getCreatedAt().isAfter(cursor))
+                .sorted(Comparator.comparing(Inventory::getCreatedAt))
+                .map(InventoryResponse::toDto)
+                .collect(Collectors.toList());
 
         return CreatedAtCursorResult.of(filteredInventories, cursor, limit);
     }
 
     @Transactional(readOnly = true)
     public List<Long> getWearingInventoryItems() {
-        Long memberId = memberService.getCurrentLoginMemberId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         List<Inventory> inventories = inventoryRepository.findByMemberIdAndIsWearing(
-            memberId, true);
+                memberId, true);
         return inventories.stream()
-            .map(Inventory::getItem)
-            .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))
-            .map(Item::getId)
-            .toList();
+                .map(Inventory::getItem)
+                .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))
+                .map(Item::getId)
+                .toList();
     }
 
     @Transactional
@@ -106,9 +111,17 @@ public class InventoryService {
         catService.addExperience(ExpConstants.INTERACTION);
     }
 
+    @Transactional
+    public void registerDefaultInteractionItems(Member member) {
+        itemService.findByCategory(ItemCategory.INTERACTION).stream()
+                .filter(item -> !inventoryRepository.existsByMemberIdAndItemId(member.getId(), item.getId()))
+                .map(item -> Inventory.create(item, member, DEFAULT_INTERACTION_ITEM_QUANTITY))
+                .forEach(inventoryRepository::save);
+    }
+
     public Inventory findByInventoryId(Long inventoryId) {
         return inventoryRepository.findById(inventoryId)
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
     }
 
     public List<Inventory> findByMemberId(Long memberId) {

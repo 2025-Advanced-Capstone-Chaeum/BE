@@ -51,7 +51,7 @@ public class Cat extends BaseEntity {
     @Column(name = "experience_point", nullable = false)
     private BigInteger experiencePoint;
 
-    public static Cat toEntity(Member member) {
+    public static Cat create(Member member) {
         return Cat.builder()
                 .member(member)
                 .level(1)

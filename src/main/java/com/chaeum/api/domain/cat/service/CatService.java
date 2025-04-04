@@ -39,7 +39,7 @@ public class CatService {
     @Transactional
     public void registerCatForMember(Member member) {
         if (catRepository.existsByMemberId(member.getId())) return;
-        catRepository.save(Cat.toEntity(member));
+        catRepository.save(Cat.create(member));
     }
 
     public Cat findByMemberId(Long memberId) {

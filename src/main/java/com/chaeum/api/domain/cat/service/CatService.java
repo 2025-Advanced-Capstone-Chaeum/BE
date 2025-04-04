@@ -4,7 +4,7 @@ import com.chaeum.api.domain.cat.dto.response.CatInformationResponse;
 import com.chaeum.api.domain.cat.entity.Cat;
 import com.chaeum.api.domain.cat.repository.CatRepository;
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.service.MemberService;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 
@@ -20,18 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CatService {
 
     private final CatRepository catRepository;
-    private final MemberService memberService;
+    private final LoginMemberProvider loginMemberProvider;
 
     @Transactional(readOnly = true)
     public CatInformationResponse getMyCatInformation() {
-        Long memberId = memberService.getCurrentLoginMemberId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         Cat cat = findByMemberId(memberId);
         return CatInformationResponse.toDto(cat);
     }
 
     @Transactional
     public List<Integer> addExperience(BigInteger gainedExp) {
-        Long memberId = memberService.getCurrentLoginMemberId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         Cat cat = findByMemberId(memberId);
         return cat.addExpAndGetLevelUps(gainedExp);
     }

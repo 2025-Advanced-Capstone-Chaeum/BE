@@ -1,7 +1,6 @@
 package com.chaeum.api.domain.paymentRecord.service;
 
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
 import com.chaeum.api.domain.paymentRecord.dto.response.PaymentResponse;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentRecord;
@@ -9,6 +8,7 @@ import com.chaeum.api.domain.paymentRecord.entity.PaymentGatewayInfo;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentMethod;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentStatus;
 import com.chaeum.api.domain.paymentRecord.repository.PaymentRecordRepository;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.siot.IamportRestClient.IamportClient;
@@ -31,7 +31,7 @@ import java.util.List;
 public class PaymentRecordService {
 
     private final PaymentRecordRepository paymentRecordRepository;
-    private final MemberService memberService;
+    private final LoginMemberProvider loginMemberProvider;
     private final IamportClient iamportClient;
 
     @Transactional
@@ -77,7 +77,7 @@ public class PaymentRecordService {
         Payment iamportPayment = fetchAndValidateIamportPayment(paymentCreateRequest);
         log.info("[결제 생성] 결제 검증 완료 - 결제 상태: {}, 결제 금액: {}", iamportPayment.getStatus(), iamportPayment.getAmount());
 
-        Member member = memberService.getCurrentLoginMember();
+        Member member = loginMemberProvider.getCurrentLoginMember();
         PaymentGatewayInfo paymentGatewayInfo = PaymentGatewayInfo.create(paymentCreateRequest.getPaymentGatewayInfoRequest());
 
         PaymentRecord paymentRecord = PaymentRecord.create(member, paymentCreateRequest, paymentGatewayInfo);

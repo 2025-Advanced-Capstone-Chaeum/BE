@@ -10,12 +10,10 @@ import com.chaeum.api.domain.member.dto.response.DonorMyPageResponse;
 import com.chaeum.api.domain.member.dto.response.MemberMyPageResponse;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.repository.MemberRepository;
-import com.chaeum.api.global.auth.dto.CustomMemberDetails;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,27 +27,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final DonationService donationService;
     private final FundingService fundingService;
-
-    public Member getCurrentLoginMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw ChaeumException.from(ErrorCode.UNAUTHORIZED);
-        }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CustomMemberDetails customMemberDetails) {
-            return customMemberDetails.getMember();
-        }
-        throw ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND);
-    }
-
-    public Long getCurrentLoginMemberId() {
-        return getCurrentLoginMember().getId();
-    }
+    private final LoginMemberProvider loginMemberProvider;
 
     @Transactional(readOnly = true)
     public MemberMyPageResponse getMemberMyPage() {
-        Member member = getCurrentLoginMember();
+        Member member = loginMemberProvider.getCurrentLoginMember();
         return member.getIsBeneficiary() ? getBeneficiaryMyPage(member) : getDonorMyPage(member);
     }
 

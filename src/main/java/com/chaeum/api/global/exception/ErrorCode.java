@@ -20,6 +20,8 @@ public enum ErrorCode {
     INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 상태입니다."),
     PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
     PAYMENT_VERIFY_FAILED(HttpStatus.BAD_REQUEST, "결제 검증에 실패했습니다."),
+    INVALID_FRIENDSHIP_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 친구 상태입니다."),
+    INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신과 친구할 수 없습니다."),
     DONATION_AMOUNT_EXCEEDS_GOAL(HttpStatus.BAD_REQUEST, "기부 금액은 목표 금액을 넘을 수 없습니다."),
     INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
 
@@ -56,6 +58,7 @@ public enum ErrorCode {
     // 409: CONFLICT (중복된 요청)
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
     DUPLICATE_MEMBER_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
+    ALREADY_FRIENDSHIP_EXISTS(HttpStatus.CONFLICT, "이미 친구 관계가 존재합니다."),
 
     // 500: INTERNAL SERVER ERROR (서버 내부 오류)
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류가 발생했습니다."),

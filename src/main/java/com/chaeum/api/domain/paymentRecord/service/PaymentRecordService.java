@@ -1,5 +1,9 @@
 package com.chaeum.api.domain.paymentRecord.service;
 
+import com.chaeum.api.domain.donation.entity.Donation;
+import com.chaeum.api.domain.donation.entity.DonationStatus;
+import com.chaeum.api.domain.donation.service.DonationService;
+import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
 import com.chaeum.api.domain.paymentRecord.dto.response.PaymentResponse;
@@ -31,6 +35,7 @@ import java.util.List;
 public class PaymentRecordService {
 
     private final PaymentRecordRepository paymentRecordRepository;
+    private final DonationService donationService;
     private final LoginMemberProvider loginMemberProvider;
     private final IamportClient iamportClient;
 
@@ -74,7 +79,10 @@ public class PaymentRecordService {
 
         log.info("[결제 생성] 결제 검증 시작 - impUid: {}", paymentCreateRequest.getPaymentGatewayInfoRequest().getImportUid());
 
-        Payment iamportPayment = fetchAndValidateIamportPayment(paymentCreateRequest);
+        Long donationId = paymentCreateRequest.getDonationId();
+        Donation donation = donationService.findById(donationId);
+
+        Payment iamportPayment = fetchAndValidateIamportPayment(paymentCreateRequest, donation);
         log.info("[결제 생성] 결제 검증 완료 - 결제 상태: {}, 결제 금액: {}", iamportPayment.getStatus(), iamportPayment.getAmount());
 
         Member member = loginMemberProvider.getCurrentLoginMember();
@@ -83,10 +91,15 @@ public class PaymentRecordService {
         PaymentRecord paymentRecord = PaymentRecord.create(member, paymentCreateRequest, paymentGatewayInfo);
         log.info("[결제 생성] PaymentRecord 생성 완료 - memberId: {}, amount: {}", member.getId(), paymentCreateRequest.getAmount());
 
+        member.deductPoints(donation.getAmount()); // 포인트 차감
+
+        Funding funding = donation.getFunding();
+        funding.addCurrentAmount(donation.getAmount()); // 펀딩 기부 금액 상황 최신화
+
         return paymentRecord;
     }
 
-    private Payment fetchAndValidateIamportPayment(PaymentCreateRequest paymentCreateRequest)
+    private Payment fetchAndValidateIamportPayment(PaymentCreateRequest paymentCreateRequest, Donation donation)
             throws IamportResponseException, IOException {
 
         String impUid = paymentCreateRequest.getPaymentGatewayInfoRequest().getImportUid();
@@ -96,6 +109,7 @@ public class PaymentRecordService {
 
         if (payment == null) {
             log.warn("[Iamport 검증] 결제 정보 없음 - impUid: {}", impUid);
+            donation.manageStatus(DonationStatus.FAILED);
             throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
         }
 
@@ -106,8 +120,11 @@ public class PaymentRecordService {
 
         if (actualAmount == null || actualAmount.compareTo(requestedAmount) != 0) {
             log.warn("[Iamport 검증] 금액 불일치 - 요청 금액: {}, 실제 금액: {}", requestedAmount, actualAmount);
+            donation.manageStatus(DonationStatus.FAILED);
             throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
         }
+
+        donation.manageStatus(DonationStatus.COMPLETED);
 
         return payment;
     }

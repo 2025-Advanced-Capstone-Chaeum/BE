@@ -20,6 +20,8 @@ public enum ErrorCode {
     INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 상태입니다."),
     PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
     PAYMENT_VERIFY_FAILED(HttpStatus.BAD_REQUEST, "결제 검증에 실패했습니다."),
+    DONATION_AMOUNT_EXCEEDS_GOAL(HttpStatus.BAD_REQUEST, "기부 금액은 목표 금액을 넘을 수 없습니다."),
+    INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
     INVALID_FRIENDSHIP_STATUS(HttpStatus.BAD_REQUEST, "존재하지 않거나 잘못된 친구 상태입니다."),
     INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청을 보낼 수 없습니다."),
     INVALID_FRIENDSHIP_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 해당 변경이 불가능합니다."),
@@ -60,6 +62,7 @@ public enum ErrorCode {
     NOT_FOUND_ACCESS_TOKEN(HttpStatus.NOT_FOUND, "엑세스 토큰을 찾을 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "리프레시 토큰을 찾을 수 없습니다."),
     CAT_NOT_FOUND(HttpStatus.NOT_FOUND, "고양이를 찾을 수 없습니다."),
+    DONATION_NOT_FOUND(HttpStatus.NOT_FOUND, "기부 내역을 찾을 수 없습니다."),
     FRIENDSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "친구 관계를 찾을 수 없습니다."),
     DONATION_NOT_FOUND(HttpStatus.NOT_FOUND, "기부 내역을 찾을 수 없습니다."),
 

@@ -5,6 +5,12 @@ import com.chaeum.api.domain.donation.dto.response.DonationCreateResponse;
 import com.chaeum.api.domain.donation.dto.response.DonationSummaryResponse;
 import com.chaeum.api.domain.donation.entity.Donation;
 import com.chaeum.api.domain.donation.repository.DonationRepository;
+import com.chaeum.api.domain.funding.entity.Funding;
+import com.chaeum.api.domain.funding.service.FundingService;
+import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.service.FundingService;
@@ -63,6 +69,17 @@ public class DonationService {
         return donationRepository.findByMemberIdOrderByCreatedAtDesc(memberId).stream()
             .map(DonationSummaryResponse::toDto)
             .toList();
+    }
+
+    @Transactional
+    public Long delete(Long donationId) {
+        donationRepository.deleteById(donationId);
+        return donationId;
+    }
+
+    public Donation findById(Long id) {
+        return donationRepository.findById(id)
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.DONATION_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

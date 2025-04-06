@@ -1,5 +1,6 @@
 package com.chaeum.api.domain.donation.entity;
 
+import com.chaeum.api.domain.donation.dto.request.DonationCreateRequest;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
@@ -51,4 +52,22 @@ public class Donation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private DonationStatus status;
+
+    public static Donation toEntity(DonationCreateRequest request, Member member, Funding funding) {
+        BigDecimal finalAmount = getFinalAmount(request);
+        return Donation.builder()
+            .member(member)
+            .funding(funding)
+            .amount(finalAmount)
+            .status(DonationStatus.ONGOING)
+            .build();
+    }
+
+    public void manageStatus(DonationStatus status) {
+        this.status = status;
+    }
+
+    private static BigDecimal getFinalAmount(DonationCreateRequest request) {
+        return request.getAmount().add(request.getPoint());
+    }
 }

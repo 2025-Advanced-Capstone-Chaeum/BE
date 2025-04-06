@@ -4,6 +4,8 @@ import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
 import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -100,6 +102,18 @@ public class Funding extends BaseEntity {
     public void markAsCompleted() {
         if (this.status == FundingStatus.ONGOING) {
             this.status = FundingStatus.COMPLETED;
+        }
+    }
+
+    public void addCurrentAmount(BigDecimal amount) {
+        validateAmount(amount);
+        this.currentAmount = this.currentAmount.add(amount);
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        BigDecimal newTotal = this.currentAmount.add(amount);
+        if (newTotal.compareTo(this.goalAmount) > 0) {
+            throw ChaeumException.from(ErrorCode.DONATION_AMOUNT_EXCEEDS_GOAL);
         }
     }
 }

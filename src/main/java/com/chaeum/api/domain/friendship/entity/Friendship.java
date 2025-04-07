@@ -54,6 +54,11 @@ public class Friendship extends BaseEntity {
             .build();
     }
 
+    // 친구 관계에서 현재 로그인한 사용자를 기준으로 상대방을 반환
+    public Member getFriendOf(Member me) {
+        return member.equals(me) ? friend : member;
+    }
+
     public void accept() {
         this.status = FriendshipStatus.ACCEPTED;
     }

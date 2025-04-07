@@ -2,9 +2,11 @@ package com.chaeum.api.domain.member.entity;
 
 import com.chaeum.api.domain.cat.entity.Cat;
 import com.chaeum.api.domain.donation.entity.Donation;
+import com.chaeum.api.domain.friendship.entity.Friendship;
 import com.chaeum.api.domain.inventory.entity.Inventory;
 import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentRecord;
+import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,19 +86,13 @@ public class Member extends BaseEntity {
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<MissionProgress> missionProgresses;
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Friendship> friendships;
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Attendance> attendances;
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Title> titles;
-//
+
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Notification> notifications;
-//
+
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Review> reviews;
 

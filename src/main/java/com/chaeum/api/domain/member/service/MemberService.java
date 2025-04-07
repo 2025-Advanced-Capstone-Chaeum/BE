@@ -61,8 +61,8 @@ public class MemberService {
         return DonorMyPageResponse.toDto(member, monthlyAmount, yearlyAmount, donations);
     }
 
-    private Member findById(Long memberId) {
+    public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

@@ -20,10 +20,10 @@ public enum ErrorCode {
     INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 상태입니다."),
     PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
     PAYMENT_VERIFY_FAILED(HttpStatus.BAD_REQUEST, "결제 검증에 실패했습니다."),
-    INVALID_FRIENDSHIP_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 친구 상태입니다."),
-    INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신과 친구할 수 없습니다."),
-    INVALID_FRIENDSHIP_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "잘못된 친구 상태 전이입니다."),
-    INVALID_FRIENDSHIP_ACTION(HttpStatus.BAD_REQUEST, "현재 상태에서 허용되지 않는 친구 요청 처리입니다."),
+    INVALID_FRIENDSHIP_STATUS(HttpStatus.BAD_REQUEST, "존재하지 않거나 잘못된 친구 상태입니다."),
+    INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청을 보낼 수 없습니다."),
+    INVALID_FRIENDSHIP_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 해당 변경이 불가능합니다."),
+    INVALID_FRIENDSHIP_ACTION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 이 요청을 처리할 수 없습니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

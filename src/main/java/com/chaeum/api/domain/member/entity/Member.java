@@ -72,20 +72,29 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cat cat;
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Inventory> inventoryItems;
+    private List<Inventory> inventoryItems = List.of();
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentRecord> payments;
+    private List<PaymentRecord> payments = List.of();
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Donation> donations;
+    private List<Donation> donations = List.of();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Friendship> friendships;
+    @Builder.Default
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Friendship> sentFriendships = List.of();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Friendship> receivedFriendships = List.of();
+
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Title> titles;
+    private List<Title> titles = List.of();
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<MissionProgress> missionProgresses;
@@ -102,6 +111,10 @@ public class Member extends BaseEntity {
     public void update(MemberUpdateRequest memberUpdateRequest) {
         Optional.ofNullable(memberUpdateRequest.getName()).ifPresent(this::setName);
         Optional.ofNullable(memberUpdateRequest.getProfileImage()).ifPresent(this::setProfileImage);
+    }
+
+    public boolean isSame(Member other) {
+        return other != null && this.id != null && this.id.equals(other.getId());
     }
 
     public void deductPoints(BigDecimal point) {

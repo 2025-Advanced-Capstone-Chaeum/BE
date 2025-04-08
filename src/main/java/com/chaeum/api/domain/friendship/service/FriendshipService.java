@@ -107,7 +107,7 @@ public class FriendshipService {
     }
 
     private void validateNotSelfRequest(Member me, Member target) {
-        if (me.getId().equals(target.getId())) {
+        if (me.isSame(target)) {
             throw ChaeumException.from(ErrorCode.INVALID_SELF_FRIENDSHIP);
         }
     }

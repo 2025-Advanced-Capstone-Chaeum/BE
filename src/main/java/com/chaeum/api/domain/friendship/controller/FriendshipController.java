@@ -56,7 +56,7 @@ public class FriendshipController {
     }
 
     @Operation(
-        summary = "조건별 친구 조회",
+        summary = "이름별 친구 조회",
         description = """
             [모든 Role 가능]<br>
             이름을 입력하지 않으면 전체 조회됨<br>

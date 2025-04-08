@@ -35,45 +35,55 @@ public class FriendshipService {
     @Transactional
     public Long save(FriendshipCreateRequest friendshipCreateRequest) {
         Member sender = loginMemberProvider.getCurrentLoginMember();
-        Member receiver = memberService.findById(friendshipCreateRequest.getFriendshipId());
+        Member receiver = memberService.findById(friendshipCreateRequest.getReceiverId());
+
         validateNotSelfRequest(sender, receiver);
         validateDuplicateFriendship(sender, receiver);
-        Friendship friendship = Friendship.create(sender, receiver, friendshipCreateRequest.getFriendshipStatus());
+
+        Friendship friendship = Friendship.create(sender, receiver);
         friendshipRepository.save(friendship);
+
         return friendship.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public FriendshipResponse getFriend(Long friendshipId) {
+        Member current = loginMemberProvider.getCurrentLoginMember();
         Friendship friendship = findById(friendshipId);
-        Member me = loginMemberProvider.getCurrentLoginMember();
-        Member friend = friendship.getFriend();
-        validateMyFriendship(me, friend);
-        List<TitleName> activeTitleNames = titleService.getActiveTitleNames(friend);
-        int sharedDonationCount = donationService.getCountSharedDonations(me, friend);
-        return FriendshipResponse.toDto(friend, activeTitleNames, sharedDonationCount);
+
+        if (friendship.isParticipant(current)) {
+            throw ChaeumException.from(ErrorCode.FORBIDDEN_FRIENDSHIP_ACCESS);
+        }
+
+        Member friend = friendship.getFriendOf(current);
+        List<TitleName> titles = titleService.getActiveTitleNames(friend);
+        int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
+
+        return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
     }
 
     @Transactional(readOnly = true)
     public IdCursorResult<FriendshipResponse> getFriendshipsByCondition(String friendName, Long cursor, int limit) {
-        Member me = loginMemberProvider.getCurrentLoginMember();
+        Member current = loginMemberProvider.getCurrentLoginMember();
 
-        List<Friendship> friendships = friendshipRepository.findAll().stream()
+        List<Friendship> friendships = friendshipRepository
+            .findBySenderOrReceiverAndStatus(current, current, FriendshipStatus.ACCEPTED).stream()
             .filter(friendship -> {
-                Member friend = friendship.getFriendOf(me);
-                return (friendName == null || friendName.isBlank()
-                    || friend.getName().toLowerCase().contains(friendName.toLowerCase()))
-                    && (cursor == null || friendship.getId() > cursor);
+                Member friend = friendship.getFriendOf(current);
+                return !friend.isSame(current) && (
+                    friendName == null || friendName.isBlank()
+                        || friend.getName().toLowerCase().contains(friendName.toLowerCase())
+                ) && (cursor == null || friendship.getId() < cursor);
             })
-            .sorted(Comparator.comparingLong(Friendship::getId))
+            .sorted(Comparator.comparingLong(Friendship::getId).reversed())
             .collect(Collectors.toList());
 
         List<FriendshipResponse> responses = friendships.stream()
             .map(friendship -> {
-                Member friend = friendship.getFriendOf(me);
-                List<TitleName> titleNames = titleService.getActiveTitleNames(friend);
-                int sharedDonationCount = donationService.getCountSharedDonations(me, friend);
-                return FriendshipResponse.toDto(friend, titleNames, sharedDonationCount);
+                Member friend = friendship.getFriendOf(current);
+                List<TitleName> titles = titleService.getActiveTitleNames(friend);
+                int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
+                return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
             })
             .collect(Collectors.toList());
 
@@ -82,10 +92,11 @@ public class FriendshipService {
 
     @Transactional
     public Long update(FriendshipUpdateRequest friendshipUpdateRequest) {
-        Member member = loginMemberProvider.getCurrentLoginMember();
+        Member current = loginMemberProvider.getCurrentLoginMember();
         Friendship friendship = findById(friendshipUpdateRequest.getFriendshipId());
-        validateMyFriendship(member, friendship.getFriend());
-        friendshipUpdateRequest.getFriendshipStatus().apply(friendship);
+
+        friendship.updateStatus(current, friendshipUpdateRequest.getFriendshipStatus());
+
         return friendship.getId();
     }
 
@@ -102,18 +113,10 @@ public class FriendshipService {
     }
 
     private void validateDuplicateFriendship(Member me, Member friend) {
-        boolean exists = friendshipRepository.existsByMemberAndFriend(me, friend)
-            || friendshipRepository.existsByMemberAndFriend(friend, me);
+        boolean exists = friendshipRepository.existsBySenderAndReceiver(me, friend)
+            || friendshipRepository.existsBySenderAndReceiver(friend, me);
         if (exists) {
             throw ChaeumException.from(ErrorCode.ALREADY_FRIENDSHIP_EXISTS);
-        }
-    }
-
-    private void validateMyFriendship(Member me, Member friend) {
-        boolean exists = friendshipRepository.existsByMemberAndFriendAndStatus(me, friend, FriendshipStatus.ACCEPTED)
-            || friendshipRepository.existsByMemberAndFriendAndStatus(friend, me, FriendshipStatus.ACCEPTED);
-        if (!exists) {
-            throw ChaeumException.from(ErrorCode.FRIENDSHIP_NOT_FOUND);
         }
     }
 

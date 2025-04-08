@@ -1,7 +1,13 @@
 package com.chaeum.api.domain.friendship.entity;
 
+import static com.chaeum.api.domain.friendship.entity.FriendshipStatus.ACCEPTED;
+import static com.chaeum.api.domain.friendship.entity.FriendshipStatus.BLOCKED;
+import static com.chaeum.api.domain.friendship.entity.FriendshipStatus.REJECTED;
+
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.EnumSet;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,38 +43,59 @@ public class Friendship extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private Member sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_id", nullable = false)
-    private Member friend;
+    private Member receiver;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private FriendshipStatus status;
 
-    public static Friendship create(Member member, Member friend, FriendshipStatus friendshipStatus) {
+    public static Friendship create(Member sender, Member receiver) {
         return Friendship.builder()
-            .member(member)
-            .friend(friend)
-            .status(friendshipStatus)
+            .sender(sender)
+            .receiver(receiver)
+            .status(FriendshipStatus.PENDING)
             .build();
     }
 
-    // 친구 관계에서 현재 로그인한 사용자를 기준으로 상대방을 반환
     public Member getFriendOf(Member me) {
-        return member.equals(me) ? friend : member;
+        return sender.equals(me) ? receiver : sender;
     }
 
-    public void accept() {
-        this.status = FriendshipStatus.ACCEPTED;
+    public void updateStatus(Member actor, FriendshipStatus newStatus) {
+        if (isParticipant(actor)) {
+            throw ChaeumException.from(ErrorCode.FORBIDDEN_FRIENDSHIP_ACCESS);
+        }
+
+        if (isSender(actor) && newStatus == FriendshipStatus.CANCELED) {
+            this.status = newStatus;
+            return;
+        }
+
+        if (isReceiver(actor) && EnumSet.of(ACCEPTED, REJECTED, BLOCKED).contains(newStatus)) {
+            this.status = newStatus;
+            return;
+        }
+
+        throw ChaeumException.from(ErrorCode.INVALID_FRIENDSHIP_STATUS_TRANSITION);
     }
 
-    public void reject() {
-        this.status = FriendshipStatus.REJECTED;
+    private boolean isSameMember(Member a, Member b) {
+        return a != null && b != null && a.getId().equals(b.getId());
     }
 
-    public void changeStatus(FriendshipStatus status) {
-        this.status = status;
+    public boolean isParticipant(Member member) {
+        return !isSender(member) && !isReceiver(member);
+    }
+
+    public boolean isSender(Member member) {
+        return isSameMember(sender, member);
+    }
+
+    public boolean isReceiver(Member member) {
+        return isSameMember(receiver, member);
     }
 }

@@ -29,7 +29,13 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
 
-    @Operation(summary = "친구 등록", description = "[모든 Role 가능]")
+    @Operation(
+        summary = "친구 요청",
+        description = """
+            [모든 Role 가능]<br>
+            친구 요청 시 PENDING으로 친구 관계가 생성됩니다.
+            """
+    )
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     public ApiResponse<Long> save(
@@ -52,7 +58,7 @@ public class FriendshipController {
     @Operation(
         summary = "조건별 친구 조회",
         description = """
-            [모든 Role 조회 가능]<br>
+            [모든 Role 가능]<br>
             이름을 입력하지 않으면 전체 조회됨<br>
             """
     )
@@ -68,7 +74,7 @@ public class FriendshipController {
         return ApiResponse.success(friendships);
     }
 
-    @Operation(summary = "친구 요청 상태 변경", description = "친구 요청 수락, 거절 등")
+    @Operation(summary = "친구 관계 상태 변경", description = "[모든 Role 가능]")
     @PreAuthorize("hasRole('DONOR')")
     @PatchMapping("")
     public ApiResponse<Long> updateFriendshipStatus(

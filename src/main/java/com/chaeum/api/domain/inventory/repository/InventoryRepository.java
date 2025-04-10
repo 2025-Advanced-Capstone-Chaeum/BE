@@ -15,5 +15,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Optional<Inventory> findByItemId(Long itemId);
 
+    Optional<Inventory> findByMemberIdAndItemId(Long memberId, Long itemId);
+
     boolean existsByMemberIdAndItemId(Long memberId, Long itemId);
 }

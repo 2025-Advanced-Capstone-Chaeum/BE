@@ -1,6 +1,7 @@
 package com.chaeum.api.domain.inventory.service;
 
 import com.chaeum.api.domain.cat.service.CatService;
+import com.chaeum.api.domain.donation.dto.response.DonationInteractionReward;
 import com.chaeum.api.domain.inventory.dto.request.InventoryCreateRequest;
 import com.chaeum.api.domain.inventory.dto.response.InventoryResponse;
 import com.chaeum.api.domain.inventory.entity.Inventory;
@@ -14,12 +15,10 @@ import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import com.chaeum.api.global.utils.ExpConstants;
-
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +53,16 @@ public class InventoryService {
                 });
 
         return inventory.getId();
+    }
+
+    @Transactional
+    public void saveRewardInventory(
+        List<DonationInteractionReward> interactionRewards,
+        Long nonInteractionRewardItemId
+    ) {
+        Member member = loginMemberProvider.getCurrentLoginMember();
+        saveInteractionItems(interactionRewards, member);
+        saveNonInteractionItem(nonInteractionRewardItemId, member);
     }
 
     @Transactional(readOnly = true)
@@ -119,6 +128,27 @@ public class InventoryService {
                 .forEach(inventoryRepository::save);
     }
 
+    private void saveNonInteractionItem(Long nonInteractionRewardItemId, Member member) {
+        if (nonInteractionRewardItemId != null) {
+            boolean exists = inventoryRepository.existsByMemberIdAndItemId(member.getId(), nonInteractionRewardItemId);
+            if (!exists) {
+                Item nonInteractionItem = itemService.findById(nonInteractionRewardItemId);
+                Inventory newInventory = Inventory.create(nonInteractionItem, member, DEFAULT_ITEM_QUANTITY);
+                inventoryRepository.save(newInventory);
+            }
+        }
+    }
+
+    private void saveInteractionItems(List<DonationInteractionReward> interactionRewards, Member member) {
+        interactionRewards.forEach(interactionReward -> {
+            Item interactionItem = itemService.findInteractionItemByType(interactionReward.getInteractionType());
+            Inventory inventory = inventoryRepository.findByMemberIdAndItemId(member.getId(), interactionItem.getId())
+                .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
+
+            inventory.addQuantity(interactionReward.getQuantity());
+        });
+    }
+
     public Inventory findByInventoryId(Long inventoryId) {
         return inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
@@ -126,5 +156,9 @@ public class InventoryService {
 
     public List<Inventory> findByMemberId(Long memberId) {
         return inventoryRepository.findByMemberId(memberId);
+    }
+
+    public boolean existsByMemberIdAndItemId(Long memberId, Long itemId) {
+        return inventoryRepository.existsByMemberIdAndItemId(memberId, itemId);
     }
 }

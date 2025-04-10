@@ -137,14 +137,4 @@ public class Member extends BaseEntity {
     public boolean isSame(Member other) {
         return other != null && this.id != null && this.id.equals(other.getId());
     }
-
-    public void deductPoints(BigDecimal point) {
-        this.points = this.points.subtract(point);
-    }
-
-    public void validatePointInsufficient(BigDecimal point) {
-        if (this.points.compareTo(point) < 0) {
-            throw ChaeumException.from(ErrorCode.INSUFFICIENT_POINTS);
-        }
-    }
 }

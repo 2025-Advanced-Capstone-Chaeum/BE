@@ -11,20 +11,12 @@ import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
-import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.funding.entity.Funding;
-import com.chaeum.api.domain.funding.service.FundingService;
-import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.global.auth.util.LoginMemberProvider;
-import com.chaeum.api.global.exception.ChaeumException;
-import com.chaeum.api.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -85,16 +77,5 @@ public class DonationService {
     @Transactional(readOnly = true)
     public int getCountSharedDonations(Member member1, Member member2) {
         return donationRepository.countSameFundingDonations(member1.getId(), member2.getId());
-    }
-
-    @Transactional
-    public Long delete(Long donationId) {
-        donationRepository.deleteById(donationId);
-        return donationId;
-    }
-
-    public Donation findById(Long id) {
-        return donationRepository.findById(id)
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.DONATION_NOT_FOUND));
     }
 }

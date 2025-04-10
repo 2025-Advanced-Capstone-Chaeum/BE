@@ -29,10 +29,21 @@ public class MemberService {
     private final FundingService fundingService;
     private final LoginMemberProvider loginMemberProvider;
 
+    @Transactional
+    public void addPoints(Member member, BigDecimal points) {
+        member.addPoints(points);
+        memberRepository.save(member);
+    }
+
     @Transactional(readOnly = true)
     public MemberMyPageResponse getMemberMyPage() {
         Member member = loginMemberProvider.getCurrentLoginMember();
         return member.getIsBeneficiary() ? getBeneficiaryMyPage(member) : getDonorMyPage(member);
+    }
+
+    public BigDecimal getMyPoint() {
+        Member member = loginMemberProvider.getCurrentLoginMember();
+        return member.getPoints();
     }
 
     @Transactional

@@ -55,8 +55,7 @@ public class InventoryService {
         Long nonInteractionRewardItemId
     ) {
         Member member = loginMemberProvider.getCurrentLoginMember();
-        member.addPoints(BigDecimal.valueOf(pointReward));
-        memberService.save(member);
+        memberService.addPoints(member, BigDecimal.valueOf(pointReward));
         saveInteractionItems(interactionRewards, member);
         saveNonInteractionItem(nonInteractionRewardItemId, member);
     }

@@ -7,6 +7,7 @@ import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +39,13 @@ public class MemberController {
     @GetMapping("")
     public ApiResponse<MemberMyPageResponse> getMemberMyPage() {
         return ApiResponse.success(memberService.getMemberMyPage());
+    }
+
+    @Operation(summary = "내 포인트 조회", description = "[모든 Role 가능]")
+    @PreAuthorize("hasRole('DONOR')")
+    @GetMapping("/point")
+    public ApiResponse<BigDecimal> getMyPoint() {
+        return ApiResponse.success(memberService.getMyPoint());
     }
 
     @Operation(

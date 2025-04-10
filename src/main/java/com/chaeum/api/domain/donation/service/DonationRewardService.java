@@ -9,13 +9,13 @@ import com.chaeum.api.domain.item.entity.ItemGrade;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class DonationRewardService {
 
     private static final List<String> INTERACTION_ITEMS = List.of("밥주기", "쓰다듬기", "놀아주기");
 
+    @Transactional
     public DonationRewardResponse generateDonationReward() {
         Member member = loginMemberProvider.getCurrentLoginMember();
 
@@ -40,8 +41,7 @@ public class DonationRewardService {
         Long nonInteractionRewardItemId = generateNonInteractionReward(member);
 
         // 보상 획득
-        member.addPoints(BigDecimal.valueOf(pointReward));
-        inventoryService.saveRewardInventory(interactionRewards, nonInteractionRewardItemId);
+        inventoryService.saveRewardInventory(pointReward, interactionRewards, nonInteractionRewardItemId);
 
         return DonationRewardResponse.create(
             interactionRewards,

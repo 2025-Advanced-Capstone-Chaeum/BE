@@ -10,11 +10,13 @@ import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import com.chaeum.api.global.utils.ExpConstants;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +32,7 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final LoginMemberProvider loginMemberProvider;
     private final ItemService itemService;
+    private final MemberService memberService;
     private final CatService catService;
 
     private static final int DEFAULT_ITEM_QUANTITY = 1;
@@ -40,27 +43,20 @@ public class InventoryService {
         Long itemId = inventoryCreateRequest.getItemId();
         Item item = itemService.findById(itemId);
         Member member = loginMemberProvider.getCurrentLoginMember();
-
-        Inventory inventory = inventoryRepository.findByItemId(itemId)
-                .map(existingInventory -> {
-                    existingInventory.addQuantity();
-                    return existingInventory;
-                })
-                .orElseGet(() -> {
-                    Inventory newInventory = Inventory.create(item, member, DEFAULT_ITEM_QUANTITY);
-                    inventoryRepository.save(newInventory);
-                    return newInventory;
-                });
+        Inventory inventory = getInventory(itemId, item, member);
 
         return inventory.getId();
     }
 
     @Transactional
     public void saveRewardInventory(
+        int pointReward,
         List<DonationInteractionReward> interactionRewards,
         Long nonInteractionRewardItemId
     ) {
         Member member = loginMemberProvider.getCurrentLoginMember();
+        member.addPoints(BigDecimal.valueOf(pointReward));
+        memberService.save(member);
         saveInteractionItems(interactionRewards, member);
         saveNonInteractionItem(nonInteractionRewardItemId, member);
     }
@@ -126,6 +122,19 @@ public class InventoryService {
                 .filter(item -> !inventoryRepository.existsByMemberIdAndItemId(member.getId(), item.getId()))
                 .map(item -> Inventory.create(item, member, DEFAULT_INTERACTION_ITEM_QUANTITY))
                 .forEach(inventoryRepository::save);
+    }
+
+    private Inventory getInventory(Long itemId, Item item, Member member) {
+        return inventoryRepository.findByItemId(itemId)
+            .map(existingInventory -> {
+                existingInventory.addQuantity();
+                return existingInventory;
+            })
+            .orElseGet(() -> {
+                Inventory newInventory = Inventory.create(item, member, DEFAULT_ITEM_QUANTITY);
+                inventoryRepository.save(newInventory);
+                return newInventory;
+            });
     }
 
     private void saveNonInteractionItem(Long nonInteractionRewardItemId, Member member) {

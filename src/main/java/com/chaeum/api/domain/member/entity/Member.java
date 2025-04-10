@@ -117,9 +117,20 @@ public class Member extends BaseEntity {
         this.points = this.points.subtract(point);
     }
 
+    public void addPoints(BigDecimal point) {
+        validatePointAmount(point);
+        this.points = this.points.add(point);
+    }
+
     public void validatePointInsufficient(BigDecimal point) {
         if (this.points.compareTo(point) < 0) {
             throw ChaeumException.from(ErrorCode.INSUFFICIENT_POINTS);
+        }
+    }
+
+    private void validatePointAmount(BigDecimal point) {
+        if (point.compareTo(BigDecimal.ZERO) < 0) {
+            throw ChaeumException.from(ErrorCode.INVALID_POINT_AMOUNT);
         }
     }
 

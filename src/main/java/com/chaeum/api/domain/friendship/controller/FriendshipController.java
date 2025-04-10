@@ -63,14 +63,14 @@ public class FriendshipController {
             """
     )
     @PreAuthorize("hasRole('DONOR')")
-    @GetMapping("/condition")
-    public ApiResponse<IdCursorResult<FriendshipResponse>> getFriendsByCondition(
+    @GetMapping("/name")
+    public ApiResponse<IdCursorResult<FriendshipResponse>> getFriendsByName(
         @RequestParam(name = "friendName", required = false) String friendName,
         @RequestParam(name = "cursor", required = false) Long cursor,
         @RequestParam(name = "limit", defaultValue = "6") int limit
     ) {
         IdCursorResult<FriendshipResponse> friendships =
-            friendshipService.getFriendshipsByCondition(friendName, cursor, limit);
+            friendshipService.getFriendshipsByName(friendName, cursor, limit);
         return ApiResponse.success(friendships);
     }
 

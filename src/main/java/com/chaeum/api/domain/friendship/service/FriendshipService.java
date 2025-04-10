@@ -63,7 +63,7 @@ public class FriendshipService {
     }
 
     @Transactional(readOnly = true)
-    public IdCursorResult<FriendshipResponse> getFriendshipsByCondition(String friendName, Long cursor, int limit) {
+    public IdCursorResult<FriendshipResponse> getFriendshipsByName(String friendName, Long cursor, int limit) {
         Member current = loginMemberProvider.getCurrentLoginMember();
 
         List<Friendship> friendships = friendshipRepository

@@ -37,8 +37,8 @@ public class FileController {
         return ApiResponse.success(fileUploadResponse);
     }
 
-    @Operation(summary = "펀딩 사진 업로드", description = "[DONOR 이상 가능]")
-    @PreAuthorize("hasRole('DONOR')")
+    @Operation(summary = "펀딩 사진 업로드", description = "[RECIPIENT 이상 가능]")
+    @PreAuthorize("hasRole('RECIPIENT')")
     @PostMapping(
         value = "/funding",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -48,6 +48,20 @@ public class FileController {
         @RequestParam(name = "multipartFile") List<MultipartFile> multipartFiles
     ) {
         List<FileUploadResponse> fileUploadResponses = fileService.uploadFiles(multipartFiles, "funding/");
+        return ApiResponse.success(fileUploadResponses);
+    }
+
+    @Operation(summary = "펀딩 후기 사진 업로드", description = "[RECIPIENT 이상 가능]")
+    @PreAuthorize("hasRole('RECIPIENT')")
+    @PostMapping(
+        value = "/review",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ApiResponse<List<FileUploadResponse>> uploadReviewImage(
+        @RequestParam(name = "multipartFile") List<MultipartFile> multipartFiles
+    ) {
+        List<FileUploadResponse> fileUploadResponses = fileService.uploadFiles(multipartFiles, "review/");
         return ApiResponse.success(fileUploadResponses);
     }
 }

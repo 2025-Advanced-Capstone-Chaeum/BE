@@ -101,9 +101,6 @@ public class Member extends BaseEntity {
 //    private List<MissionProgress> missionProgresses;
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Attendance> attendances;
-
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Notification> notifications;
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)

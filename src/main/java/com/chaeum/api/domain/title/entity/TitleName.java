@@ -7,13 +7,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TitleName {
 
-    DONATION_ANGEL("DONATION_ANGEL", "기부 천사"),
-    EARLY_BIRD("EARLY_BIRD", "얼리버드"),
-    CHALLENGER("CHALLENGER", "도전가"),
-    FRIENDSHIP_MASTER("FRIENDSHIP_MASTER", "친구왕"),
-    SUPER_SUPPORTER("SUPER_SUPPORTER", "슈퍼 서포터"),
-    MONTHLY_TOP_DONOR("MONTHLY_TOP_DONOR", "이달의 기부왕");
+    SEED("나눔의 씨앗", "첫 번째 기부 시 획득"),
+    SPROUT("희망의 새싹", "5회 기부 시 획득"),
+    GROWING_TREE("성장하는 나무", "10회 기부 시 획득"),
+    FRUIT_TREE("열매 맺는 나무", "20회 기부 시 획득"),
+    FOREST_GUARDIAN("희망의 숲지기", "50회 기부 시 획득"),
+    LEGENDARY_TREE("전설의 나무", "100회 기부 시 획득"),
+    DONATION_ANGEL("기부 천사", "특별 기부자에게 부여"),
+    SAESSAK("새싹 기부자", "첫 기부 시 획득"),
+    GIBU_KING("단골 기부자", "꾸준한 기부자에게 부여");
 
-    private final String key;
-    private final String description;
+    private final String displayName;
+    private final String condition;
 }

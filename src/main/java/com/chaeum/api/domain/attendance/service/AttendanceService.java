@@ -33,14 +33,11 @@ public class AttendanceService {
     @Transactional(readOnly = true)
     public List<Integer> getAttendanceDaysByMonth(int year, int month) {
         validateYearMonth(year, month);
-        Member member = loginMemberProvider.getCurrentLoginMember();
+        Long memberId = loginMemberProvider.getCurrentLoginMember().getId();
         YearMonth targetMonth = YearMonth.of(year, month);
         LocalDate startDate = targetMonth.atDay(1);
         LocalDate endDate = targetMonth.atEndOfMonth();
-
-        return attendanceRepository.findAllByMemberAndDateBetween(member, startDate, endDate).stream()
-            .map(attendance -> attendance.getDate().getDayOfMonth())
-            .toList();
+        return attendanceRepository.findAttendanceDays(memberId, startDate, endDate);
     }
 
     private void validateYearMonth(int year, int month) {

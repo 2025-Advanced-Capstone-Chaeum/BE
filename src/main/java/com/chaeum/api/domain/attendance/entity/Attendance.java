@@ -1,6 +1,5 @@
 package com.chaeum.api.domain.attendance.entity;
 
-import com.chaeum.api.domain.attendance.dto.request.AttendanceCreateRequest;
 import com.chaeum.api.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +39,7 @@ public class Attendance {
     @Column(name = "attendance_date")
     private LocalDate date;
 
-    public static Attendance create(AttendanceCreateRequest attendanceCreateRequest, Member member, LocalDate date) {
+    public static Attendance create(Member member, LocalDate date) {
         return Attendance.builder()
             .member(member)
             .date(date)

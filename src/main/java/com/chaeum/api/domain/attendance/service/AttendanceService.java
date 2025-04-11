@@ -1,6 +1,5 @@
 package com.chaeum.api.domain.attendance.service;
 
-import com.chaeum.api.domain.attendance.dto.request.AttendanceCreateRequest;
 import com.chaeum.api.domain.attendance.entity.Attendance;
 import com.chaeum.api.domain.attendance.repository.AttendanceRepository;
 import com.chaeum.api.domain.member.entity.Member;
@@ -22,12 +21,12 @@ public class AttendanceService {
     private final LoginMemberProvider loginMemberProvider;
 
     @Transactional
-    public Long save(AttendanceCreateRequest attendanceCreateRequest) {
+    public Long save() {
         Member member = loginMemberProvider.getCurrentLoginMember();
         LocalDate today = LocalDate.now();
         validateDate(today);
         validateDuplicateAttendance(member, today);
-        Attendance attendance = Attendance.create(attendanceCreateRequest, member, today);
+        Attendance attendance = Attendance.create(member, today);
         return attendanceRepository.save(attendance).getId();
     }
 

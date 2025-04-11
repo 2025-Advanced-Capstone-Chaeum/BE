@@ -59,11 +59,11 @@ public class ReviewService {
     }
 
     @Transactional
-    public Long update(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
-        Review review = getReview(reviewId);
+    public Long update(Long fundingId, ReviewUpdateRequest reviewUpdateRequest) {
+        Review review = getReview(fundingId);
         List<UploadedFile> files = fileService.getUploadedFilesByUrls(reviewUpdateRequest.getImageUrls());
         review.update(files, reviewUpdateRequest);
-        return reviewId;
+        return review.getId();
     }
 
     @Transactional

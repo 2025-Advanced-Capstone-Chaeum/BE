@@ -67,7 +67,7 @@ public class ReviewController {
     @PreAuthorize("hasRole('RECIPIENT')")
     @PatchMapping("")
     public ApiResponse<Long> update(
-        @RequestParam(name = "reviewId") Long fundingId,
+        @RequestParam(name = "fundingId") Long fundingId,
         @Valid @RequestBody ReviewUpdateRequest reviewUpdateRequest
     ) {
         Long id = reviewService.update(fundingId, reviewUpdateRequest);

@@ -13,12 +13,14 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     boolean existsByMemberAndDate(Member member, LocalDate date);
 
-    @Query(value = """
-        SELECT EXTRACT(DAY FROM a.attendance_date)::int
-        FROM attendance a
-        WHERE a.member_id = :memberId
-          AND a.attendance_date BETWEEN :startDate AND :endDate
-        ORDER BY a.attendance_date
-        """, nativeQuery = true)
+    @Query(
+        value = """
+            SELECT EXTRACT(DAY FROM a.attendance_date)::int
+            FROM attendance a
+            WHERE a.member_id = :memberId
+              AND a.attendance_date BETWEEN :startDate AND :endDate
+            ORDER BY a.attendance_date
+            """,
+        nativeQuery = true)
     List<Integer> findAttendanceDays(Long memberId, LocalDate startDate, LocalDate endDate);
 }

@@ -33,7 +33,7 @@ public class AttendanceService {
     @Transactional(readOnly = true)
     public List<Integer> getAttendanceDaysByMonth(int year, int month) {
         validateYearMonth(year, month);
-        Long memberId = loginMemberProvider.getCurrentLoginMember().getId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         YearMonth targetMonth = YearMonth.of(year, month);
         LocalDate startDate = targetMonth.atDay(1);
         LocalDate endDate = targetMonth.atEndOfMonth();

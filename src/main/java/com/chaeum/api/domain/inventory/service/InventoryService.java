@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -123,6 +124,11 @@ public class InventoryService {
                 .forEach(inventoryRepository::save);
     }
 
+    @Transactional(readOnly = true)
+    public Set<Long> findItemIdsByMemberId(Long memberId) {
+        return inventoryRepository.findItemIdsByMemberId(memberId);
+    }
+
     private Inventory getInventory(Long itemId, Item item, Member member) {
         return inventoryRepository.findByItemId(itemId)
             .map(existingInventory -> {
@@ -166,7 +172,4 @@ public class InventoryService {
         return inventoryRepository.findByMemberId(memberId);
     }
 
-    public boolean existsByMemberIdAndItemId(Long memberId, Long itemId) {
-        return inventoryRepository.existsByMemberIdAndItemId(memberId, itemId);
-    }
 }

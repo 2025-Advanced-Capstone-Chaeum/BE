@@ -1,5 +1,12 @@
 package com.chaeum.api.domain.donation.service;
 
+import static com.chaeum.api.global.utils.DonationRewardConstants.INTERACTION_REWARD_COUNT;
+import static com.chaeum.api.global.utils.DonationRewardConstants.INTERACTION_REWARD_MAX;
+import static com.chaeum.api.global.utils.DonationRewardConstants.INTERACTION_REWARD_MIN;
+import static com.chaeum.api.global.utils.DonationRewardConstants.INTERACTION_TYPES;
+import static com.chaeum.api.global.utils.DonationRewardConstants.POINT_REWARD_MAX;
+import static com.chaeum.api.global.utils.DonationRewardConstants.POINT_REWARD_MIN;
+
 import com.chaeum.api.domain.donation.dto.response.DonationInteractionReward;
 import com.chaeum.api.domain.donation.dto.response.DonationRewardResponse;
 import com.chaeum.api.domain.inventory.service.InventoryService;
@@ -9,9 +16,11 @@ import com.chaeum.api.domain.item.entity.ItemGrade;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
+import com.chaeum.api.global.utils.DonationRewardConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +33,6 @@ public class DonationRewardService {
     private final ItemService itemService;
     private final InventoryService inventoryService;
     private final LoginMemberProvider loginMemberProvider;
-
-    private static final List<String> INTERACTION_ITEMS = List.of("밥주기", "쓰다듬기", "놀아주기");
 
     @Transactional
     public DonationRewardResponse generateDonationReward() {
@@ -51,18 +58,19 @@ public class DonationRewardService {
     }
 
     private int generateRandomPoint() {
-        return ThreadLocalRandom.current().nextInt(10, 501);
+        return ThreadLocalRandom.current().nextInt(POINT_REWARD_MIN, POINT_REWARD_MAX);
     }
 
     private List<DonationInteractionReward> generateInteractionRewards() {
         // 상호작용 아이템 목록을 섞은 후, 앞의 두 개를 선택
-        List<String> items = new ArrayList<>(INTERACTION_ITEMS);
+        List<String> items = new ArrayList<>(INTERACTION_TYPES);
         Collections.shuffle(items);
         List<DonationInteractionReward> rewards = new ArrayList<>();
 
         // 두 개의 아이템 각각 1~3개 보상
-        for (int i = 0; i < 2; i++) {
-            int quantity = ThreadLocalRandom.current().nextInt(1, 4);
+        for (int i = 0; i < INTERACTION_REWARD_COUNT; i++) {
+            int quantity = ThreadLocalRandom.current().nextInt(
+                INTERACTION_REWARD_MIN, INTERACTION_REWARD_MAX + 1);
             rewards.add(DonationInteractionReward.create(items.get(i), quantity));
         }
 
@@ -89,8 +97,10 @@ public class DonationRewardService {
             selectedGrade
         );
 
+        Set<Long> ownedItemIds = inventoryService.findItemIdsByMemberId(member.getId());
+
         List<Item> filteredCandidates = candidateItems.stream()
-            .filter(item -> !inventoryService.existsByMemberIdAndItemId(member.getId(), item.getId()))
+            .filter(item -> !ownedItemIds.contains(item.getId()))
             .toList();
 
         if (filteredCandidates.isEmpty()) {

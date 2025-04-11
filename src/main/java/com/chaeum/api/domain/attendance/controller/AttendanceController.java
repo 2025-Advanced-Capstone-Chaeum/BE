@@ -1,6 +1,5 @@
 package com.chaeum.api.domain.attendance.controller;
 
-import com.chaeum.api.domain.attendance.dto.request.AttendanceCreateRequest;
 import com.chaeum.api.domain.attendance.service.AttendanceService;
 import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,9 +27,8 @@ public class AttendanceController {
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     public ApiResponse<Long> save(
-        @Valid @RequestBody AttendanceCreateRequest attendanceCreateRequest
     ) {
-        Long id = attendanceService.save(attendanceCreateRequest);
+        Long id = attendanceService.save();
         return ApiResponse.success(id);
     }
 

@@ -24,6 +24,8 @@ public enum ErrorCode {
     INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청을 보낼 수 없습니다."),
     INVALID_FRIENDSHIP_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 해당 변경이 불가능합니다."),
     INVALID_FRIENDSHIP_ACTION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 이 요청을 처리할 수 없습니다."),
+    INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
+    ALREADY_ATTENDED_TODAY(HttpStatus.BAD_REQUEST, "이미 오늘 출석을 완료했습니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -55,6 +57,7 @@ public enum ErrorCode {
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "리프레시 토큰을 찾을 수 없습니다."),
     CAT_NOT_FOUND(HttpStatus.NOT_FOUND, "고양이를 찾을 수 없습니다."),
     FRIENDSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "친구 관계를 찾을 수 없습니다."),
+    ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND,"출석 정보를 찾을 수 없습니다."),
 
     // 409: CONFLICT (중복된 요청)
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),

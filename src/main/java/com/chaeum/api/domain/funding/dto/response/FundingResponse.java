@@ -33,6 +33,8 @@ public class FundingResponse implements IdProvider {
 
     private LocalDateTime endDate;
 
+    private Boolean isReviewed;
+
     private LocalDateTime createdAt;
 
     public static FundingResponse toDto(Funding funding) {
@@ -47,6 +49,7 @@ public class FundingResponse implements IdProvider {
                 .currentAmount(funding.getCurrentAmount())
                 .status(funding.getStatus())
                 .endDate(funding.getEndDate())
+                .isReviewed(funding.getIsReviewed())
                 .createdAt(funding.getCreatedAt())
                 .build();
     }

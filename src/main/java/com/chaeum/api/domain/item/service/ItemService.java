@@ -5,6 +5,7 @@ import com.chaeum.api.domain.item.dto.request.ItemUpdateRequest;
 import com.chaeum.api.domain.item.dto.response.ItemResponse;
 import com.chaeum.api.domain.item.entity.Item;
 import com.chaeum.api.domain.item.entity.ItemCategory;
+import com.chaeum.api.domain.item.entity.ItemGrade;
 import com.chaeum.api.domain.item.repository.ItemRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -72,8 +73,22 @@ public class ItemService {
         return itemRepository.findByCategory(category);
     }
 
+    @Transactional(readOnly = true)
+    public List<Item> findByCategoryInAndGrade(List<ItemCategory> categories, ItemGrade grade) {
+        return itemRepository.findByCategoryInAndGrade(categories, grade);
+    }
+
     public Item findById(Long itemId) {
         return itemRepository.findById(itemId)
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.ITEM_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Item findInteractionItemByType(String interactionType) {
+        List<Item> interactionItems = itemRepository.findByCategory(ItemCategory.INTERACTION);
+        return interactionItems.stream()
+            .filter(item -> item.getName().equalsIgnoreCase(interactionType))
+            .findFirst()
             .orElseThrow(() -> ChaeumException.from(ErrorCode.ITEM_NOT_FOUND));
     }
 }

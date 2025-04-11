@@ -23,10 +23,11 @@ public class DonationSummaryResponse {
 
     public static DonationSummaryResponse toDto(Donation donation) {
         return DonationSummaryResponse.builder()
-                .title(donation.getFunding().getTitle())
-                .imageUrl(donation.getFunding().getFundingImage())
-                .amount(donation.getAmount())
-                .createdAt(donation.getCreatedAt())
-                .build();
+            .id(donation.getId())
+            .title(donation.getFunding().getTitle())
+            .imageUrl(donation.getFunding().getFundingImage())
+            .amount(donation.getAmount())
+            .createdAt(donation.getCreatedAt())
+            .build();
     }
 }

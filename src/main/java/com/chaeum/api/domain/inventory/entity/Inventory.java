@@ -62,6 +62,10 @@ public class Inventory extends BaseEntity {
         this.quantity += 1;
     }
 
+    public void addQuantity(int amount) {
+        this.quantity += amount;
+    }
+
     public void removeQuantity() {
         validateQuantity();
         this.quantity -= 1;

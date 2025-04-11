@@ -8,6 +8,8 @@ import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
 import com.chaeum.api.domain.paymentRecord.entity.PaymentRecord;
 import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.global.entity.BaseEntity;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,8 +62,8 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "points")
-    private int points;
+    @Column(name = "points", nullable = false, precision = 10, scale = 2)
+    private BigDecimal points = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "social_login_type")
@@ -108,6 +111,27 @@ public class Member extends BaseEntity {
     public void update(MemberUpdateRequest memberUpdateRequest) {
         Optional.ofNullable(memberUpdateRequest.getName()).ifPresent(this::setName);
         Optional.ofNullable(memberUpdateRequest.getProfileImage()).ifPresent(this::setProfileImage);
+    }
+
+    public void deductPoints(BigDecimal point) {
+        this.points = this.points.subtract(point);
+    }
+
+    public void addPoints(BigDecimal point) {
+        validatePointAmount(point);
+        this.points = this.points.add(point);
+    }
+
+    public void validatePointInsufficient(BigDecimal point) {
+        if (this.points.compareTo(point) < 0) {
+            throw ChaeumException.from(ErrorCode.INSUFFICIENT_POINTS);
+        }
+    }
+
+    private void validatePointAmount(BigDecimal point) {
+        if (point.compareTo(BigDecimal.ZERO) < 0) {
+            throw ChaeumException.from(ErrorCode.INVALID_POINT_AMOUNT);
+        }
     }
 
     public boolean isSame(Member other) {

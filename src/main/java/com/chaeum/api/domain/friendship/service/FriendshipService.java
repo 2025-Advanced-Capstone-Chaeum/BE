@@ -9,7 +9,6 @@ import com.chaeum.api.domain.friendship.entity.FriendshipStatus;
 import com.chaeum.api.domain.friendship.repository.FriendshipRepository;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
-import com.chaeum.api.domain.title.entity.TitleName;
 import com.chaeum.api.domain.title.service.TitleService;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
@@ -56,10 +55,10 @@ public class FriendshipService {
         }
 
         Member friend = friendship.getFriendOf(current);
-        List<TitleName> titles = titleService.getActiveTitleNames(friend);
+        String title = String.valueOf(titleService.getTitle(friend));
         int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
 
-        return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
+        return FriendshipResponse.toDto(friend, title, sharedDonationCount);
     }
 
     @Transactional(readOnly = true)
@@ -81,9 +80,9 @@ public class FriendshipService {
         List<FriendshipResponse> responses = friendships.stream()
             .map(friendship -> {
                 Member friend = friendship.getFriendOf(current);
-                List<TitleName> titles = titleService.getActiveTitleNames(friend);
+                String title = String.valueOf(titleService.getTitle(friend));
                 int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
-                return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
+                return FriendshipResponse.toDto(friend, title, sharedDonationCount);
             })
             .collect(Collectors.toList());
 
@@ -94,9 +93,7 @@ public class FriendshipService {
     public Long update(FriendshipUpdateRequest friendshipUpdateRequest) {
         Member current = loginMemberProvider.getCurrentLoginMember();
         Friendship friendship = findById(friendshipUpdateRequest.getFriendshipId());
-
         friendship.updateStatus(current, friendshipUpdateRequest.getFriendshipStatus());
-
         return friendship.getId();
     }
 

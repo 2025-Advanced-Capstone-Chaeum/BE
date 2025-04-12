@@ -8,6 +8,7 @@ import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.title.service.TitleService;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -25,14 +26,19 @@ public class DonationService {
     private final DonationRepository donationRepository;
     private final FundingService fundingService;
     private final LoginMemberProvider loginMemberProvider;
+    private final TitleService titleService;
 
     @Transactional
     public DonationCreateResponse save(DonationCreateRequest request) {
         Member member = loginMemberProvider.getCurrentLoginMember();
         member.validatePointInsufficient(request.getPoint());
+
         Funding funding = fundingService.findById(request.getFundingId());
         Donation donation = Donation.toEntity(request, member, funding);
         Donation savedDonation = donationRepository.save(donation);
+
+        titleService.giveTitle(getDonationCountByMember(member));
+
         return DonationCreateResponse.toDto(savedDonation);
     }
 
@@ -77,5 +83,10 @@ public class DonationService {
     @Transactional(readOnly = true)
     public int getCountSharedDonations(Member member1, Member member2) {
         return donationRepository.countSameFundingDonations(member1.getId(), member2.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public int getDonationCountByMember(Member member) {
+        return donationRepository.countByMemberId(member.getId());
     }
 }

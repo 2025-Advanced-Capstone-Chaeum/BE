@@ -13,6 +13,7 @@ import com.chaeum.api.global.auth.dto.OAuth2MemberDto;
 import com.chaeum.api.global.auth.dto.OAuth2Response;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -40,10 +41,11 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
         };
 
         Member member = memberRepository.findByEmail(oAuth2Response.getEmail())
-                .map(existingMember -> updateMember(existingMember, oAuth2Response.getName()))
-                .orElseGet(() -> joinMember(oAuth2Response));
+            .map(existingMember -> updateMember(existingMember, oAuth2Response.getName()))
+            .orElseGet(() -> joinMember(oAuth2Response));
 
-        OAuth2MemberDto oAuth2MemberDto = new OAuth2MemberDto(member.getEmail(), member.getName(), member.getProfileImage());
+        OAuth2MemberDto oAuth2MemberDto = new OAuth2MemberDto(member.getEmail(), member.getName(),
+            member.getProfileImage());
         return new CustomOAuth2Member(oAuth2MemberDto, memberRepository);
     }
 
@@ -55,12 +57,13 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
     private Member createMemberForm(OAuth2Response oAuth2Response) {
         return Member.builder()
-                .email(oAuth2Response.getEmail())
-                .name(oAuth2Response.getName())
-                .role(Role.DONOR)
-                .isBeneficiary(false)
-                .socialLoginType(SocialLoginType.from(oAuth2Response.getProvider()))
-                .build();
+            .email(oAuth2Response.getEmail())
+            .name(oAuth2Response.getName())
+            .role(Role.DONOR)
+            .points(BigDecimal.ZERO)
+            .isBeneficiary(false)
+            .socialLoginType(SocialLoginType.from(oAuth2Response.getProvider()))
+            .build();
     }
 
     private void initNewMember(Member member) {

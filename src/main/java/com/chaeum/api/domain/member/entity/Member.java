@@ -62,6 +62,7 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image")
     private String profileImage;
 
+    @Builder.Default
     @Column(name = "points", nullable = false, precision = 10, scale = 2)
     private BigDecimal points = BigDecimal.ZERO;
 

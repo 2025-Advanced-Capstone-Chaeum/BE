@@ -51,7 +51,7 @@ public class ReviewService {
         List<Review> reviews = reviewRepository.findAll();
         List<ReviewSummaryResponse> filteredReviews = reviews.stream()
             .filter(review -> cursor == null || review.getCreatedAt().isAfter(cursor))
-            .sorted(Comparator.comparing(Review::getCreatedAt))
+            .sorted(Comparator.comparing(Review::getCreatedAt).reversed())
             .map(ReviewSummaryResponse::toDto)
             .collect(Collectors.toList());
 

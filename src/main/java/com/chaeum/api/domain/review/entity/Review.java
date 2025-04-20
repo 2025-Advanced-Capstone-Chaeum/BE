@@ -50,7 +50,7 @@ public class Review extends BaseEntity {
     private String content;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "review_images")
+    @JoinColumn(name = "review_id")
     private List<UploadedFile> reviewImages;
 
     public static Review toEntity(

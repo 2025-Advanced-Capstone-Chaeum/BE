@@ -5,6 +5,7 @@ import com.chaeum.api.global.file.dto.ExternalFileResponse;
 import com.chaeum.api.global.file.entity.UploadedFile;
 import com.chaeum.api.global.pagination.provider.CreatedAtProvider;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,11 +22,15 @@ public class ReviewSummaryResponse implements CreatedAtProvider {
     private LocalDateTime createdAt;
 
     public static ReviewSummaryResponse toDto(Review review) {
-        UploadedFile file = review.getReviewImages().getFirst();
+        Optional<UploadedFile> firstFile = review.getReviewImages().stream().findFirst();
+        ExternalFileResponse imageDto = firstFile
+            .map(ExternalFileResponse::toDto)
+            .orElse(null);
+
         return ReviewSummaryResponse.builder()
             .id(review.getId())
             .title(review.getTitle())
-            .reviewImage(ExternalFileResponse.toDto(file))
+            .reviewImage(imageDto)
             .createdAt(review.getCreatedAt())
             .build();
     }

@@ -1,12 +1,14 @@
 package com.chaeum.api.domain.title.service;
 
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.service.MemberQueryService;
+import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.domain.title.dto.response.TitleResponse;
 import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.domain.title.entity.TitleName;
 import com.chaeum.api.domain.title.repository.TitleRepository;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class TitleService {
 
     private final TitleRepository titleRepository;
+    private final MemberRepository memberRepository;
     private final LoginMemberProvider loginMemberProvider;
-    private final MemberQueryService memberQueryService;
 
     @Transactional
     public void giveTitle(long donationCount) {
-        Member member = memberQueryService.getCurrentMemberWithTitles();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
+        Member member = memberRepository.findByIdWithTitles(memberId)
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
         TitleName.getMatchedByCount(donationCount)
             .filter(title -> !hasTitle(member, title))
             .ifPresent(title -> saveTitle(member, title));

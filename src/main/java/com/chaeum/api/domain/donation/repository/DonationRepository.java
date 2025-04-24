@@ -13,8 +13,7 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
 
     List<Donation> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 
-    @Query("SELECT COUNT(d) FROM Donation d WHERE d.member.id = :memberId")
-    int countByMemberId(@Param("memberId") Long memberId);
+    Long countByMemberId(Long memberId);
 
     @Query(value = "SELECT * FROM donation d " +
         "WHERE d.member_id = :memberId " +

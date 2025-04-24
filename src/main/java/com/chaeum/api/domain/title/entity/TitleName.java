@@ -1,9 +1,8 @@
 package com.chaeum.api.domain.title.entity;
 
-import com.chaeum.api.global.exception.ChaeumException;
-import com.chaeum.api.global.exception.ErrorCode;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -22,11 +21,10 @@ public enum TitleName {
     private final String description;
     private final int minDonationCount;
 
-    public static TitleName getMatchedByCount(long count) {
+    public static Optional<TitleName> getMatchedByCount(long count) {
         return Arrays.stream(TitleName.values())
             .sorted(Comparator.comparingInt(TitleName::getMinDonationCount).reversed())
             .filter(title -> count >= title.getMinDonationCount())
-            .findFirst()
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.NOT_ELIGIBLE_FOR_TITLE));
+            .findFirst();
     }
 }

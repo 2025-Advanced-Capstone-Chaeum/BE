@@ -30,7 +30,6 @@ public enum ErrorCode {
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
     ALREADY_ATTENDED_TODAY(HttpStatus.BAD_REQUEST, "이미 오늘 출석을 완료했습니다."),
     ALREADY_HAS_TITLE(HttpStatus.BAD_REQUEST, "이미 보유한 칭호입니다."),
-    NOT_ELIGIBLE_FOR_TITLE(HttpStatus.BAD_REQUEST, "해당 조건으로 획득 가능한 칭호가 없습니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

@@ -22,9 +22,9 @@ public class TitleService {
     @Transactional
     public void giveTitle(long donationCount) {
         Member member = memberQueryService.getCurrentMemberWithTitles();
-        TitleName title = TitleName.getMatchedByCount(donationCount);
-        if (hasTitle(member, title)) return;
-        titleRepository.save(Title.create(title, member));
+        TitleName.getMatchedByCount(donationCount)
+            .filter(title -> !hasTitle(member, title))
+            .ifPresent(title -> saveTitle(member, title));
     }
 
     @Transactional(readOnly = true)
@@ -41,5 +41,9 @@ public class TitleService {
 
     private boolean hasTitle(Member member, TitleName title) {
         return member.getTitles().stream().anyMatch(t -> t.getName() == title);
+    }
+
+    private void saveTitle(Member member, TitleName title) {
+        titleRepository.save(Title.create(title, member));
     }
 }

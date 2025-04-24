@@ -7,8 +7,6 @@ import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.domain.title.entity.TitleName;
 import com.chaeum.api.domain.title.repository.TitleRepository;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
-import com.chaeum.api.global.exception.ChaeumException;
-import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,7 @@ public class TitleService {
     @Transactional
     public void giveTitle(long donationCount) {
         Member member = memberQueryService.getCurrentMemberWithTitles();
-        TitleName title = getTitleToGive(donationCount);
+        TitleName title = TitleName.getMatchedByCount(donationCount);
         if (hasTitle(member, title)) return;
         titleRepository.save(Title.create(title, member));
     }
@@ -39,16 +37,6 @@ public class TitleService {
         return titleRepository.findTopByMemberOrderByCreatedAtDesc(member)
             .map(TitleResponse::toDto)
             .orElse(TitleResponse.empty());
-    }
-
-    private TitleName getTitleToGive(long count) {
-        if (count >= 100) return TitleName.LEGENDARY_TREE;
-        if (count >= 50) return TitleName.FOREST_GUARDIAN;
-        if (count >= 20) return TitleName.FRUIT_TREE;
-        if (count >= 10) return TitleName.GROWING_TREE;
-        if (count >= 5) return TitleName.SPROUT;
-        if (count >= 1) return TitleName.SAESSAK;
-        throw ChaeumException.from(ErrorCode.NOT_ELIGIBLE_FOR_TITLE);
     }
 
     private boolean hasTitle(Member member, TitleName title) {

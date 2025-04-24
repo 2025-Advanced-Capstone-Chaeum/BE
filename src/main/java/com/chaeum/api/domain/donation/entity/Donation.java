@@ -4,6 +4,7 @@ import com.chaeum.api.domain.donation.dto.request.DonationCreateRequest;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,7 +43,7 @@ public class Donation extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "funding_id", nullable = false)
     private Funding funding;
 

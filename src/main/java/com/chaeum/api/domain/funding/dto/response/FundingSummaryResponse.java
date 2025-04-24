@@ -19,6 +19,8 @@ public class FundingSummaryResponse {
 
     private BigDecimal amount;
 
+    private Boolean isReviewed;
+
     private LocalDateTime createdAt;
 
     public static FundingSummaryResponse toDto(Funding funding) {
@@ -27,6 +29,8 @@ public class FundingSummaryResponse {
                 .title(funding.getTitle())
                 .fundingImage(funding.getFundingImage())
                 .amount(funding.getCurrentAmount())
+                .isReviewed(funding.getIsReviewed())
+                .createdAt(funding.getCreatedAt())
                 .build();
     }
 }

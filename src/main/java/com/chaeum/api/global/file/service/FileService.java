@@ -1,5 +1,7 @@
 package com.chaeum.api.global.file.service;
 
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.file.dto.FileUploadResponse;
 import com.chaeum.api.global.file.dto.FileUploadResult;
 import com.chaeum.api.global.file.entity.UploadedFile;
@@ -26,6 +28,18 @@ public class FileService {
             fileUploadResponses.add(fileUploadResponse);
         }
         return fileUploadResponses;
+    }
+
+    @Transactional(readOnly = true)
+    public List<UploadedFile> getUploadedFilesByUrls(List<String> fileUrls) {
+        if (fileUrls == null || fileUrls.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<UploadedFile> uploadedFiles = fileRepository.findAllByFileUrlIn(fileUrls);
+        if (uploadedFiles.size() != fileUrls.size()) {
+            throw ChaeumException.from(ErrorCode.INCLUDE_NOT_UPLOADED_FILE);
+        }
+        return uploadedFiles;
     }
 
     public FileUploadResponse uploadFile(MultipartFile file, String folder) {

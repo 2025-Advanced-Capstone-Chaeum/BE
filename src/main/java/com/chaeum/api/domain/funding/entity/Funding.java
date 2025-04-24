@@ -17,16 +17,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -74,6 +73,9 @@ public class Funding extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    @Column(name = "is_reviewed")
+    private Boolean isReviewed;
+
     public static Funding toEntity(FundingCreateRequest fundingCreateRequest, Member member) {
         return Funding.builder()
                 .member(member)
@@ -82,9 +84,11 @@ public class Funding extends BaseEntity {
                 .fundingImage(fundingCreateRequest.getFundingImage())
                 .itemLink(fundingCreateRequest.getItemLink())
                 .address(fundingCreateRequest.getAddress())
+                .goalAmount(fundingCreateRequest.getGoalAmount())
                 .currentAmount(BigDecimal.ZERO)
                 .status(FundingStatus.ONGOING)
                 .endDate(fundingCreateRequest.getEndDate())
+                .isReviewed(Boolean.FALSE)
                 .build();
     }
 
@@ -108,6 +112,24 @@ public class Funding extends BaseEntity {
     public void addCurrentAmount(BigDecimal amount) {
         validateAmount(amount);
         this.currentAmount = this.currentAmount.add(amount);
+    }
+
+    public void markReviewed() {
+        if (this.isReviewed == Boolean.FALSE) {
+            this.isReviewed = Boolean.TRUE;
+        }
+    }
+
+    public void validateGoalReached() {
+        if (this.currentAmount.compareTo(this.goalAmount) < 0) {
+            throw ChaeumException.from(ErrorCode.GOAL_AMOUNT_NOT_REACHED);
+        }
+    }
+
+    public void validateStatusCompleted() {
+        if (this.status != FundingStatus.COMPLETED) {
+            throw ChaeumException.from(ErrorCode.FUNDING_IS_NOT_COMPLETED);
+        }
     }
 
     private void validateAmount(BigDecimal amount) {

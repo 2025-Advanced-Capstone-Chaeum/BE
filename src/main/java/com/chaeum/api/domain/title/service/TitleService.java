@@ -2,7 +2,6 @@ package com.chaeum.api.domain.title.service;
 
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberQueryService;
-import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.domain.title.dto.response.TitleResponse;
 import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.domain.title.entity.TitleName;

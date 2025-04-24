@@ -1,7 +1,6 @@
 package com.chaeum.api.global.auth.util;
 
 import com.chaeum.api.domain.member.entity.Member;
-import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;

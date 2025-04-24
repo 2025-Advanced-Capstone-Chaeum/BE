@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginMemberProvider {
 
-    private final MemberRepository memberRepository;
-
     public Member getCurrentLoginMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -31,10 +29,5 @@ public class LoginMemberProvider {
 
     public Long getCurrentLoginMemberId() {
         return getCurrentLoginMember().getId();
-    }
-
-    public Member getCurrentLoginMemberWithTitles() {
-        return memberRepository.findByIdWithTitles(getCurrentLoginMemberId())
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

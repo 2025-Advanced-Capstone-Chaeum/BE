@@ -86,7 +86,7 @@ public class DonationService {
     }
 
     @Transactional(readOnly = true)
-    public int getDonationCountByMember(Member member) {
+    public Long getDonationCountByMember(Member member) {
         return donationRepository.countByMemberId(member.getId());
     }
 }

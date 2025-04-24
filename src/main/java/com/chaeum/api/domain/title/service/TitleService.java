@@ -1,6 +1,8 @@
 package com.chaeum.api.domain.title.service;
 
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.service.MemberQueryService;
+import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.domain.title.dto.response.TitleResponse;
 import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.domain.title.entity.TitleName;
@@ -18,10 +20,11 @@ public class TitleService {
 
     private final TitleRepository titleRepository;
     private final LoginMemberProvider loginMemberProvider;
+    private final MemberQueryService memberQueryService;
 
     @Transactional
-    public void giveTitle(int donationCount) {
-        Member member = loginMemberProvider.getCurrentLoginMemberWithTitles();
+    public void giveTitle(long donationCount) {
+        Member member = memberQueryService.getCurrentMemberWithTitles();
         TitleName title = getTitleToGive(donationCount);
         if (hasTitle(member, title)) return;
         titleRepository.save(Title.create(title, member));
@@ -39,7 +42,7 @@ public class TitleService {
             .orElse(TitleResponse.empty());
     }
 
-    private TitleName getTitleToGive(int count) {
+    private TitleName getTitleToGive(long count) {
         if (count >= 100) return TitleName.LEGENDARY_TREE;
         if (count >= 50) return TitleName.FOREST_GUARDIAN;
         if (count >= 20) return TitleName.FRUIT_TREE;

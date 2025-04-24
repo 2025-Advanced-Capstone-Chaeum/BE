@@ -9,15 +9,16 @@ import com.chaeum.api.domain.friendship.entity.FriendshipStatus;
 import com.chaeum.api.domain.friendship.repository.FriendshipRepository;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
-import com.chaeum.api.domain.title.entity.TitleName;
 import com.chaeum.api.domain.title.service.TitleService;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,11 +56,7 @@ public class FriendshipService {
             throw ChaeumException.from(ErrorCode.FORBIDDEN_FRIENDSHIP_ACCESS);
         }
 
-        Member friend = friendship.getFriendOf(current);
-        List<TitleName> titles = titleService.getActiveTitleNames(friend);
-        int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
-
-        return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
+        return toFriendshipResponse(current, friendship);
     }
 
     @Transactional(readOnly = true)
@@ -79,12 +76,7 @@ public class FriendshipService {
             .collect(Collectors.toList());
 
         List<FriendshipResponse> responses = friendships.stream()
-            .map(friendship -> {
-                Member friend = friendship.getFriendOf(current);
-                List<TitleName> titles = titleService.getActiveTitleNames(friend);
-                int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
-                return FriendshipResponse.toDto(friend, titles, sharedDonationCount);
-            })
+            .map(friendship -> toFriendshipResponse(current, friendship))
             .collect(Collectors.toList());
 
         return IdCursorResult.of(responses, cursor, limit);
@@ -94,9 +86,7 @@ public class FriendshipService {
     public Long update(FriendshipUpdateRequest friendshipUpdateRequest) {
         Member current = loginMemberProvider.getCurrentLoginMember();
         Friendship friendship = findById(friendshipUpdateRequest.getFriendshipId());
-
         friendship.updateStatus(current, friendshipUpdateRequest.getFriendshipStatus());
-
         return friendship.getId();
     }
 
@@ -104,6 +94,13 @@ public class FriendshipService {
     public Long delete(Long friendshipId) {
         friendshipRepository.deleteById(friendshipId);
         return friendshipId;
+    }
+
+    private FriendshipResponse toFriendshipResponse(Member current, Friendship friendship) {
+        Member friend = friendship.getFriendOf(current);
+        String title = String.valueOf(titleService.getTitle(friend));
+        int sharedDonationCount = donationService.getCountSharedDonations(current, friend);
+        return FriendshipResponse.toDto(friend, title, sharedDonationCount);
     }
 
     private void validateNotSelfRequest(Member me, Member target) {

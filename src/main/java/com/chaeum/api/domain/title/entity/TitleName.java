@@ -1,5 +1,8 @@
 package com.chaeum.api.domain.title.entity;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -7,13 +10,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TitleName {
 
-    DONATION_ANGEL("DONATION_ANGEL", "기부 천사"),
-    EARLY_BIRD("EARLY_BIRD", "얼리버드"),
-    CHALLENGER("CHALLENGER", "도전가"),
-    FRIENDSHIP_MASTER("FRIENDSHIP_MASTER", "친구왕"),
-    SUPER_SUPPORTER("SUPER_SUPPORTER", "슈퍼 서포터"),
-    MONTHLY_TOP_DONOR("MONTHLY_TOP_DONOR", "이달의 기부왕");
+    SAESSAK("나눔의 씨앗", "첫 기부 시 획득", 1),
+    SPROUT("희망의 새싹", "5회 기부 시 획득", 5),
+    GROWING_TREE("성장하는 나무", "10회 기부 시 획득", 10),
+    FRUIT_TREE("열매 맺는 나무", "20회 기부 시 획득", 20),
+    FOREST_GUARDIAN("희망의 숲지기", "50회 기부 시 획득", 50),
+    LEGENDARY_TREE("전설의 나무", "100회 기부 시 획득", 100);
 
-    private final String key;
+    private final String displayName;
     private final String description;
+    private final int minDonationCount;
+
+    public static Optional<TitleName> getMatchedByCount(long count) {
+        return Arrays.stream(TitleName.values())
+            .sorted(Comparator.comparingInt(TitleName::getMinDonationCount).reversed())
+            .filter(title -> count >= title.getMinDonationCount())
+            .findFirst();
+    }
 }

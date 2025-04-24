@@ -31,6 +31,7 @@ public enum ErrorCode {
     FUNDING_IS_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "펀딩이 종료되지 않았습니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
     ALREADY_ATTENDED_TODAY(HttpStatus.BAD_REQUEST, "이미 오늘 출석을 완료했습니다."),
+    ALREADY_HAS_TITLE(HttpStatus.BAD_REQUEST, "이미 보유한 칭호입니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -66,6 +67,7 @@ public enum ErrorCode {
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."),
     INCLUDE_NOT_UPLOADED_FILE(HttpStatus.NOT_FOUND, "서버에 업로드되지 않은 파일이 포함되어 있습니다."),
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "출석 정보를 찾을 수 없습니다."),
+    TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "칭호를 찾을 수 없습니다."),
 
     // 409: CONFLICT (중복된 요청)
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),

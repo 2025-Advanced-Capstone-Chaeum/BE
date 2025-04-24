@@ -38,10 +38,14 @@ public class Title extends BaseEntity {
     @Column(name = "title_name", nullable = false)
     private TitleName name;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = Boolean.FALSE;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public static Title create(TitleName name, Member member) {
+        return Title.builder()
+            .name(name)
+            .member(member)
+            .build();
+    }
 }

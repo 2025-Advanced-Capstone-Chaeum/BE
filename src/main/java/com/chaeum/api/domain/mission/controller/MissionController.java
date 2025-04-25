@@ -31,8 +31,7 @@ public class MissionController {
     private final MissionService missionService;
 
     @Operation(summary = "미션 추가", description = "ADMIN 이상 추가 가능")
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasRole('DONOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ApiResponse<Long> save(
         @Valid @RequestBody MissionCreateRequest missionCreateRequest
@@ -72,8 +71,7 @@ public class MissionController {
     }
 
     @Operation(summary = "미션 수정", description = "ADMIN 이상 수정 가능")
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasRole('DONOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("")
     public ApiResponse<Long> updateStatus(
         @RequestParam(name = "missionId") Long missionId,
@@ -84,8 +82,7 @@ public class MissionController {
     }
 
     @Operation(summary = "미션 삭제", description = "ADMIN 이상 삭제 가능")
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasRole('DONOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{missionId}")
     public ApiResponse<Long> delete(
         @PathVariable(name = "missionId") Long missionId

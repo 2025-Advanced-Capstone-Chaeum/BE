@@ -5,11 +5,13 @@ import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.domain.title.dto.response.TitleResponse;
 import com.chaeum.api.domain.title.entity.Title;
 import com.chaeum.api.domain.title.entity.TitleName;
+import com.chaeum.api.domain.title.event.TitleEvent;
 import com.chaeum.api.domain.title.repository.TitleRepository;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class TitleService {
     private final TitleRepository titleRepository;
     private final MemberRepository memberRepository;
     private final LoginMemberProvider loginMemberProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void giveTitle(long donationCount) {
@@ -48,6 +51,9 @@ public class TitleService {
     }
 
     private void saveTitle(Member member, TitleName title) {
-        titleRepository.save(Title.create(title, member));
+        Title savedTitle = titleRepository.save(Title.create(title, member));
+        eventPublisher.publishEvent(
+            TitleEvent.from(savedTitle, member)
+        );
     }
 }

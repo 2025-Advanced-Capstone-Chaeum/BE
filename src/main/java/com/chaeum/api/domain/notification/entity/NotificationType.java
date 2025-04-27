@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum NotificationType {
 
     BENEFICIARY("Beneficiary", "수혜자 등록 알림"),
-    CAT("Cat", "고양이 알림"),
     DONATION("Donation", "기부 알림"),
     FRIEND("Friend", "친구 신청/거절 알림"),
     FUNDING("Funding", "펀딩 관련 알림"),

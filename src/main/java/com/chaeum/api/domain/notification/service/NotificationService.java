@@ -46,7 +46,6 @@ public class NotificationService {
     private NotificationResponse mapToDto(Notification notification) {
         return switch (notification.getType()) {
             case BENEFICIARY -> BeneficiaryNotificationResponse.toDto(notification);
-            case CAT -> CatNotificationResponse.toDto(notification);
             case DONATION -> DonationNotificationResponse.toDto(notification);
             case FRIEND -> FriendNotificationResponse.toDto(notification);
             case FUNDING -> FundingNotificationResponse.toDto(notification);

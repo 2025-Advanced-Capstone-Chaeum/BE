@@ -29,7 +29,7 @@ public class NotificationController {
                     [모든 Role 가능]<br>
                     나의 알림을 조회합니다.<br>
                     현재 알림에 사용되는 행위는 다음과 같습니다.<br>
-                    펀딩 등록, 후기 등록, 보상 획득, 수혜자 등록, 기부 참여, 친구 신청, 칭호 획득, 고양이 성장
+                    펀딩 등록, 후기 등록, 보상 획득, 수혜자 등록, 기부 참여, 친구 신청, 칭호 획득
                     """
     )
     @PreAuthorize("hasRole('DONOR')")

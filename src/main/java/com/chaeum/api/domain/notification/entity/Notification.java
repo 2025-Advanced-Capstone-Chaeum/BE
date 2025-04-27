@@ -31,12 +31,31 @@ public class Notification extends BaseEntity {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
+    @Column(name = "target_id")
+    private Long targetId;
+
     @Column(name = "notification_type", nullable = false)
     private NotificationType type;
 
-    @Column(name = "notification_image_url", nullable = false)
+    @Column(name = "notification_image_url")
     private String notificationImageUrl;
 
     @Column(name = "content", nullable = false)
     private String content;
+
+    public static Notification create(
+        Long memberId,
+        Long targetId,
+        NotificationType type,
+        String notificationImageUrl,
+        String content
+    ) {
+        return Notification.builder()
+            .memberId(memberId)
+            .targetId(targetId)
+            .type(type)
+            .notificationImageUrl(notificationImageUrl)
+            .content(content)
+            .build();
+    }
 }

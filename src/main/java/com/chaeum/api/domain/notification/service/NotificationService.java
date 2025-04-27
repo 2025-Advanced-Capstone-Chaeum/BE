@@ -1,7 +1,6 @@
 package com.chaeum.api.domain.notification.service;
 
 import com.chaeum.api.domain.notification.dto.response.BeneficiaryNotificationResponse;
-import com.chaeum.api.domain.notification.dto.response.CatNotificationResponse;
 import com.chaeum.api.domain.notification.dto.response.DonationNotificationResponse;
 import com.chaeum.api.domain.notification.dto.response.FriendNotificationResponse;
 import com.chaeum.api.domain.notification.dto.response.FundingNotificationResponse;
@@ -11,13 +10,11 @@ import com.chaeum.api.domain.notification.dto.response.RewardNotificationRespons
 import com.chaeum.api.domain.notification.dto.response.TitleNotificationResponse;
 import com.chaeum.api.domain.notification.entity.Notification;
 import com.chaeum.api.domain.notification.repository.NotificationRepository;
-import com.chaeum.api.domain.review.entity.Review;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

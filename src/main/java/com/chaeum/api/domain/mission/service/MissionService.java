@@ -35,6 +35,8 @@ public class MissionService {
         return MissionResponse.toDto(mission);
     }
 
+    // 내 미션들만 볼 수 있는 서비스 로직 작성
+
     @Transactional(readOnly = true)
     public IdCursorResult<MissionResponse> getMissionsByCondition(String missionName, MissionType missionType,
         Long cursor, int limit) {

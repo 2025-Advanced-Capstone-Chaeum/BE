@@ -50,14 +50,10 @@ public class MissionController {
         return ApiResponse.success(missionResponse);
     }
 
-    @Operation(
-        summary = "조건별 미션 조회",
-        description = """
-            모든 Role 조회 가능<br>
-            조건을 하나라도 입력하지 않으면 전체 조회됨<br>
-            """
-    )
-    @PreAuthorize("hasRole('DONOR')")
+    // 내 미션 조회 컨트롤러 구현
+
+    @Operation(summary = "조건별 미션 조회", description = "ADMIN 이상 조회 가능")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/condition")
     public ApiResponse<IdCursorResult<MissionResponse>> getMissionsByCondition(
         @RequestParam(name = "missionName", required = false) String missionName,

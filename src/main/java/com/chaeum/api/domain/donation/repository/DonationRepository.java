@@ -29,6 +29,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
         nativeQuery = true)
     List<Donation> findByMemberIdAndYear(@Param("memberId") Long memberId, @Param("year") int year);
 
+    List<Donation> findByFundingId(Long fundingId);
+
     @Query("""
             SELECT COUNT(DISTINCT d1.funding.id)
             FROM Donation d1

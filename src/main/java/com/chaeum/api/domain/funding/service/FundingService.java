@@ -6,6 +6,7 @@ import com.chaeum.api.domain.funding.dto.response.FundingResponse;
 import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
+import com.chaeum.api.domain.funding.event.FundingEvent;
 import com.chaeum.api.domain.funding.repository.FundingRepository;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
@@ -13,6 +14,7 @@ import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +29,19 @@ public class FundingService {
 
     private final FundingRepository fundingRepository;
     private final LoginMemberProvider loginMemberProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long save(FundingCreateRequest fundingCreateRequest) {
         Member member = loginMemberProvider.getCurrentLoginMember();
         Funding funding = Funding.toEntity(fundingCreateRequest, member);
-        fundingRepository.save(funding);
+        Funding savedFunding = fundingRepository.save(funding);
+
+        eventPublisher.publishEvent(
+            FundingEvent.from(savedFunding, member)
+        );
+        System.out.println("이벤트 처리 ");
+
         return funding.getId();
     }
 

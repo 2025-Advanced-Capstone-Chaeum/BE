@@ -6,6 +6,7 @@ import com.chaeum.api.domain.friendship.dto.request.FriendshipUpdateRequest;
 import com.chaeum.api.domain.friendship.dto.response.FriendshipResponse;
 import com.chaeum.api.domain.friendship.entity.Friendship;
 import com.chaeum.api.domain.friendship.entity.FriendshipStatus;
+import com.chaeum.api.domain.friendship.event.FriendEvent;
 import com.chaeum.api.domain.friendship.repository.FriendshipRepository;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class FriendshipService {
     private final TitleService titleService;
     private final MemberService memberService;
     private final DonationService donationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long save(FriendshipCreateRequest friendshipCreateRequest) {
@@ -42,7 +45,9 @@ public class FriendshipService {
         validateDuplicateFriendship(sender, receiver);
 
         Friendship friendship = Friendship.create(sender, receiver);
-        friendshipRepository.save(friendship);
+        Friendship savedFriendship = friendshipRepository.save(friendship);
+
+        eventPublisher.publishEvent(FriendEvent.from(savedFriendship));
 
         return friendship.getId();
     }

@@ -4,6 +4,7 @@ import com.chaeum.api.domain.donation.dto.request.DonationCreateRequest;
 import com.chaeum.api.domain.donation.dto.response.DonationCreateResponse;
 import com.chaeum.api.domain.donation.dto.response.DonationSummaryResponse;
 import com.chaeum.api.domain.donation.entity.Donation;
+import com.chaeum.api.domain.donation.event.DonationEvent;
 import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.service.FundingService;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class DonationService {
     private final FundingService fundingService;
     private final LoginMemberProvider loginMemberProvider;
     private final TitleService titleService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public DonationCreateResponse save(DonationCreateRequest request) {
@@ -36,6 +39,9 @@ public class DonationService {
         Funding funding = fundingService.findById(request.getFundingId());
         Donation donation = Donation.toEntity(request, member, funding);
         Donation savedDonation = donationRepository.save(donation);
+        eventPublisher.publishEvent(
+            DonationEvent.from(savedDonation, member, funding.getMember())
+        );
 
         titleService.giveTitle(getDonationCountByMember(member));
 
@@ -88,5 +94,14 @@ public class DonationService {
     @Transactional(readOnly = true)
     public Long getDonationCountByMember(Member member) {
         return donationRepository.countByMemberId(member.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getDonatedMemberIdsByFundingId(Long fundingId) {
+        List<Donation> donations = donationRepository.findByFundingId(fundingId);
+        return donations.stream()
+            .map(donation -> donation.getMember().getId())
+            .distinct()
+            .toList();
     }
 }

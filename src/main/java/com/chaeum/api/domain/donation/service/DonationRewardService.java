@@ -16,7 +16,6 @@ import com.chaeum.api.domain.item.entity.ItemGrade;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
-import com.chaeum.api.global.utils.DonationRewardConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,23 +91,29 @@ public class DonationRewardService {
 
         // 상호작용이 아닌 카테고리(DECORATION, INTERIOR)에 해당하는 아이템 중에서,
         // 선택된 등급을 가진 아이템을 조회
-        List<Item> candidateItems = itemService.findByCategoryInAndGrade(
-            List.of(ItemCategory.DECORATION, ItemCategory.INTERIOR),
-            selectedGrade
-        );
+        ItemGrade[] grades = ItemGrade.values();
+        int startIndex = selectedGrade.ordinal();
 
-        Set<Long> ownedItemIds = inventoryService.findItemIdsByMemberId(member.getId());
+        for (int idx = startIndex; idx >= 0; idx--) {
+            ItemGrade gradeToTry = grades[idx];
+            List<Item> candidateItems = itemService.findByCategoryInAndGrade(
+                List.of(ItemCategory.DECORATION, ItemCategory.INTERIOR),
+                gradeToTry
+            );
 
-        List<Item> filteredCandidates = candidateItems.stream()
-            .filter(item -> !ownedItemIds.contains(item.getId()))
-            .toList();
+            // 이미 소유한 아이템 제외
+            Set<Long> ownedItemIds = inventoryService.findItemIdsByMemberId(member.getId());
+            List<Item> filtered = candidateItems.stream()
+                .filter(item -> !ownedItemIds.contains(item.getId()))
+                .toList();
 
-        if (filteredCandidates.isEmpty()) {
-            return null;
+            if (!filtered.isEmpty()) {
+                int randomIndex = ThreadLocalRandom.current().nextInt(filtered.size());
+                return filtered.get(randomIndex).getId();
+            }
         }
 
-        int randomIndex = ThreadLocalRandom.current().nextInt(filteredCandidates.size());
-        return filteredCandidates.get(randomIndex).getId();
+        return null;
     }
 
     private ItemGrade getSelectedGrade(double randomValue) {

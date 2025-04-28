@@ -2,6 +2,7 @@ package com.chaeum.api.domain.inventory.service;
 
 import com.chaeum.api.domain.cat.service.CatService;
 import com.chaeum.api.domain.donation.dto.response.DonationInteractionReward;
+import com.chaeum.api.domain.inventory.event.RewardEvent;
 import com.chaeum.api.domain.inventory.dto.request.InventoryCreateRequest;
 import com.chaeum.api.domain.inventory.dto.response.InventoryResponse;
 import com.chaeum.api.domain.inventory.entity.Inventory;
@@ -18,11 +19,13 @@ import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import com.chaeum.api.global.utils.ExpConstants;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ public class InventoryService {
     private final ItemService itemService;
     private final MemberService memberService;
     private final CatService catService;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final int DEFAULT_ITEM_QUANTITY = 1;
     private static final int DEFAULT_INTERACTION_ITEM_QUANTITY = 5;
@@ -126,7 +130,8 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public Set<Long> findItemIdsByMemberId(Long memberId) {
-        return inventoryRepository.findItemIdsByMemberId(memberId);
+        Set<Long> itemIds = inventoryRepository.findItemIdsByMemberId(memberId);
+        return (itemIds != null) ? itemIds : Collections.emptySet();
     }
 
     private Inventory getInventory(Long itemId, Item item, Member member) {
@@ -149,6 +154,10 @@ public class InventoryService {
                 Item nonInteractionItem = itemService.findById(nonInteractionRewardItemId);
                 Inventory newInventory = Inventory.create(nonInteractionItem, member, DEFAULT_ITEM_QUANTITY);
                 inventoryRepository.save(newInventory);
+
+                eventPublisher.publishEvent(
+                    RewardEvent.from(nonInteractionItem, member)
+                );
             }
         }
     }

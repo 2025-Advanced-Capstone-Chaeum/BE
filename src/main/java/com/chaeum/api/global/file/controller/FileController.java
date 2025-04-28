@@ -23,6 +23,20 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Operation(summary = "미션 사진 업로드", description = "[ADMIN 이상 가능]")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(
+        value = "/mission",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ApiResponse<FileUploadResponse> uploadMissionImage(
+        @RequestParam(name = "multipartFile") MultipartFile multipartFile
+    ) {
+        FileUploadResponse fileUploadResponse = fileService.uploadFile(multipartFile, "mission/");
+        return ApiResponse.success(fileUploadResponse);
+    }
+
     @Operation(summary = "아이템 사진 업로드", description = "[ADMIN 이상 가능]")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(

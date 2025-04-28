@@ -1,4 +1,4 @@
-package com.chaeum.api.domain.mission.entity;
+package com.chaeum.api.domain.missionProgress.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -43,10 +43,6 @@ public class Mission extends BaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "mission_status", nullable = false)
-    private MissionStatus status;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "mission_type", nullable = false)
     private MissionType type;
 

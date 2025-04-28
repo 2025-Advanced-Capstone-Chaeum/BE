@@ -55,7 +55,6 @@ public class Mission extends BaseEntity {
             .name(missionCreateRequest.getName())
             .missionImageUrl(missionCreateRequest.getMissionImageUrl())
             .description(missionCreateRequest.getDescription())
-            .status(MissionStatus.IN_PROGRESS)
             .type(missionCreateRequest.getType())
             .build();
     }

@@ -55,7 +55,7 @@ public class Mission extends BaseEntity {
             .name(missionCreateRequest.getName())
             .missionImageUrl(missionCreateRequest.getMissionImageUrl())
             .description(missionCreateRequest.getDescription())
-            .status(missionCreateRequest.getStatus())
+            .status(MissionStatus.IN_PROGRESS)
             .type(missionCreateRequest.getType())
             .build();
     }
@@ -64,7 +64,6 @@ public class Mission extends BaseEntity {
         Optional.ofNullable(missionUpdateRequest.getName()).ifPresent(this::setName);
         Optional.ofNullable(missionUpdateRequest.getMissionImage()).ifPresent(this::setMissionImageUrl);
         Optional.ofNullable(missionUpdateRequest.getDescription()).ifPresent(this::setDescription);
-        Optional.ofNullable(missionUpdateRequest.getStatus()).ifPresent(this::setStatus);
         Optional.ofNullable(missionUpdateRequest.getType()).ifPresent(this::setType);
     }
 }

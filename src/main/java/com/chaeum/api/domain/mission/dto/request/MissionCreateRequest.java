@@ -1,6 +1,5 @@
 package com.chaeum.api.domain.mission.dto.request;
 
-import com.chaeum.api.domain.mission.entity.MissionStatus;
 import com.chaeum.api.domain.mission.entity.MissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -22,10 +21,6 @@ public class MissionCreateRequest {
     @NotNull
     @Schema(description = "미션 사진 URL", example = "https://bucket.s3.ap-northeast-2.amazonaw.com/item/mission-image.png")
     private String missionImageUrl;
-
-    @NotNull
-    @Schema(description = "미션 상태", example = "PENDING")
-    private MissionStatus status;
 
     @NotNull
     @Schema(description = "미션 종류", example = "CHECK_IN")

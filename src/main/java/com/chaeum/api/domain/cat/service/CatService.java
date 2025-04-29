@@ -4,6 +4,8 @@ import com.chaeum.api.domain.cat.dto.response.CatInformationResponse;
 import com.chaeum.api.domain.cat.entity.Cat;
 import com.chaeum.api.domain.cat.repository.CatRepository;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.memberMission.service.MemberMissionService;
+import com.chaeum.api.domain.mission.entity.MissionType;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -21,6 +23,7 @@ public class CatService {
 
     private final CatRepository catRepository;
     private final LoginMemberProvider loginMemberProvider;
+    private final MemberMissionService memberMissionService;
 
     @Transactional(readOnly = true)
     public CatInformationResponse getMyCatInformation() {
@@ -33,6 +36,7 @@ public class CatService {
     public List<Integer> addExperience(BigInteger gainedExp) {
         Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         Cat cat = findByMemberId(memberId);
+        memberMissionService.increaseProgressByType(MissionType.CAT_EXP);
         return cat.addExpAndGetLevelUps(gainedExp);
     }
 
@@ -44,6 +48,6 @@ public class CatService {
 
     public Cat findByMemberId(Long memberId) {
         return catRepository.findByMemberId(memberId)
-                .orElseThrow(() -> ChaeumException.from(ErrorCode.CAT_NOT_FOUND));
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.CAT_NOT_FOUND));
     }
 }

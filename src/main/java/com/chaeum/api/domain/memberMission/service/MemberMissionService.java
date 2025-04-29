@@ -50,7 +50,7 @@ public class MemberMissionService {
             .allMatch(m -> m.getUpdatedAt().toLocalDate().isEqual(today));
 
         // 오늘 받은 미션이 모두 존재하면 그대로 반환
-        if (allToday) {
+        if (!existingMissions.isEmpty() && allToday) {
             return existingMissions.stream()
                 .limit(MEMBER_MISSION_ASSIGN_COUNT)
                 .toList();

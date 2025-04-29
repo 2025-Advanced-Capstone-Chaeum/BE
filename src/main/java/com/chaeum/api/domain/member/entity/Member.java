@@ -97,15 +97,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Title> titles = List.of();
 
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<MissionProgress> missionProgresses;
-
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Notification> notifications;
-
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Review> reviews;
-
     public void update(MemberUpdateRequest memberUpdateRequest) {
         Optional.ofNullable(memberUpdateRequest.getName()).ifPresent(this::setName);
         Optional.ofNullable(memberUpdateRequest.getProfileImage()).ifPresent(this::setProfileImage);

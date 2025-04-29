@@ -63,12 +63,14 @@ public class MemberMission extends BaseEntity {
     }
 
     public void reset() {
-        this.currentCount = 0;
-        this.status = MissionStatus.FAILED;
+        if (!isCompleted()) {
+            this.currentCount = 0;
+            this.status = MissionStatus.FAILED;
+        }
     }
 
     public void increaseProgress() {
-        if (isCompleted()) {
+        if (isCompleted() || isFailed()) {
             return;
         }
         updateStatusToInProgress();
@@ -80,6 +82,10 @@ public class MemberMission extends BaseEntity {
 
     private boolean isCompleted() {
         return this.status == MissionStatus.COMPLETED;
+    }
+
+    private boolean isFailed() {
+        return this.status == MissionStatus.FAILED;
     }
 
     private void increaseCurrentCount() {

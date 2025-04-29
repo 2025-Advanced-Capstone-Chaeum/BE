@@ -3,6 +3,8 @@ package com.chaeum.api.domain.attendance.service;
 import com.chaeum.api.domain.attendance.entity.Attendance;
 import com.chaeum.api.domain.attendance.repository.AttendanceRepository;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.memberMission.service.MemberMissionService;
+import com.chaeum.api.domain.mission.entity.MissionType;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -19,6 +21,7 @@ public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final LoginMemberProvider loginMemberProvider;
+    private final MemberMissionService memberMissionService;
 
     @Transactional
     public Long save() {
@@ -27,7 +30,9 @@ public class AttendanceService {
         validateDate(today);
         validateDuplicateAttendance(member, today);
         Attendance attendance = Attendance.create(member, today);
-        return attendanceRepository.save(attendance).getId();
+        Long id = attendanceRepository.save(attendance).getId();
+        memberMissionService.increaseProgressByType(MissionType.ATTENDANCE);
+        return id;
     }
 
     @Transactional(readOnly = true)

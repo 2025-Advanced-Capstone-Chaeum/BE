@@ -26,6 +26,6 @@ public class MissionCreateRequest {
     private String missionImageUrl;
 
     @NotNull
-    @Schema(description = "미션 종류", example = "CHECK_IN")
+    @Schema(description = "미션 타입", example = "ATTENDANCE")
     private MissionType type;
 }

@@ -26,6 +26,6 @@ public class MissionUpdateRequest {
     private String missionImage;
 
     @NotNull
-    @Schema(description = "미션 유형", example = "CHECK_IN")
+    @Schema(description = "미션 타입", example = "ATTENDANCE")
     private MissionType type;
 }

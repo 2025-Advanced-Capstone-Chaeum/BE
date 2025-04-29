@@ -1,13 +1,13 @@
 package com.chaeum.api.domain.memberMission.service;
 
 import static com.chaeum.api.global.utils.MemberMissionConstants.ATTENDANCE_PROGRESS_MIN;
-import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_PROGRESS_MAX;
-import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_PROGRESS_MIN;
+import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_EXP_PROGRESS_MAX;
+import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_EXP_PROGRESS_MIN;
+import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_INTERACTION_PROGRESS_MAX;
+import static com.chaeum.api.global.utils.MemberMissionConstants.CAT_INTERACTION_PROGRESS_MIN;
 import static com.chaeum.api.global.utils.MemberMissionConstants.DONATION_PROGRESS_MAX;
 import static com.chaeum.api.global.utils.MemberMissionConstants.DONATION_PROGRESS_MIN;
-import static com.chaeum.api.global.utils.MemberMissionConstants.FRIEND_PROGRESS_MAX;
-import static com.chaeum.api.global.utils.MemberMissionConstants.FRIEND_PROGRESS_MIN;
-import static com.chaeum.api.global.utils.MemberMissionConstants.ITEM_PROGRESS_MIN;
+import static com.chaeum.api.global.utils.MemberMissionConstants.ITEM_WEAR_PROGRESS_MIN;
 import static com.chaeum.api.global.utils.MemberMissionConstants.MEMBER_MISSION_ASSIGN_COUNT;
 
 import com.chaeum.api.domain.mission.entity.Mission;
@@ -39,10 +39,10 @@ public class MemberMissionRandomService {
     public int getRandomProgressCount(MissionType type) {
         return switch (type) {
             case ATTENDANCE -> ATTENDANCE_PROGRESS_MIN;
-            case ITEM -> ITEM_PROGRESS_MIN;
-            case FRIEND -> getRandomNumberInRange(FRIEND_PROGRESS_MIN, FRIEND_PROGRESS_MAX);
+            case CAT_EXP -> getRandomNumberInRange(CAT_EXP_PROGRESS_MIN, CAT_EXP_PROGRESS_MAX);
+            case CAT_INTERACTION -> getRandomNumberInRange(CAT_INTERACTION_PROGRESS_MIN, CAT_INTERACTION_PROGRESS_MAX);
             case DONATION -> getRandomNumberInRange(DONATION_PROGRESS_MIN, DONATION_PROGRESS_MAX);
-            case CAT -> getRandomNumberInRange(CAT_PROGRESS_MIN, CAT_PROGRESS_MAX);
+            case ITEM_WEAR -> ITEM_WEAR_PROGRESS_MIN;
         };
     }
 

@@ -12,6 +12,8 @@ import com.chaeum.api.domain.item.entity.ItemCategory;
 import com.chaeum.api.domain.item.service.ItemService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
+import com.chaeum.api.domain.memberMission.service.MemberMissionService;
+import com.chaeum.api.domain.mission.entity.MissionType;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
@@ -39,6 +41,7 @@ public class InventoryService {
     private final MemberService memberService;
     private final CatService catService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MemberMissionService memberMissionService;
 
     private static final int DEFAULT_ITEM_QUANTITY = 1;
     private static final int DEFAULT_INTERACTION_ITEM_QUANTITY = 5;
@@ -67,17 +70,17 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public CreatedAtCursorResult<InventoryResponse> getInventoriesByCategory(
-            ItemCategory category, LocalDateTime cursor, int limit
+        ItemCategory category, LocalDateTime cursor, int limit
     ) {
         Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         List<Inventory> inventories = findByMemberId(memberId);
 
         List<InventoryResponse> filteredInventories = inventories.stream()
-                .filter(inventory -> inventory.getItem().getCategory() == category)
-                .filter(inventory -> cursor == null || inventory.getCreatedAt().isAfter(cursor))
-                .sorted(Comparator.comparing(Inventory::getCreatedAt))
-                .map(InventoryResponse::toDto)
-                .collect(Collectors.toList());
+            .filter(inventory -> inventory.getItem().getCategory() == category)
+            .filter(inventory -> cursor == null || inventory.getCreatedAt().isAfter(cursor))
+            .sorted(Comparator.comparing(Inventory::getCreatedAt))
+            .map(InventoryResponse::toDto)
+            .collect(Collectors.toList());
 
         return CreatedAtCursorResult.of(filteredInventories, cursor, limit);
     }
@@ -86,12 +89,12 @@ public class InventoryService {
     public List<Long> getWearingInventoryItems() {
         Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         List<Inventory> inventories = inventoryRepository.findByMemberIdAndIsWearing(
-                memberId, true);
+            memberId, true);
         return inventories.stream()
-                .map(Inventory::getItem)
-                .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))
-                .map(Item::getId)
-                .toList();
+            .map(Inventory::getItem)
+            .filter(item -> item.isCategoryIn(ItemCategory.DECORATION, ItemCategory.INTERIOR))
+            .map(Item::getId)
+            .toList();
     }
 
     @Transactional
@@ -118,14 +121,15 @@ public class InventoryService {
         inventory.getItem().validateCategory(ItemCategory.INTERACTION);
         inventory.removeQuantity();
         catService.addExperience(ExpConstants.INTERACTION);
+        memberMissionService.increaseProgressByType(MissionType.CAT_INTERACTION);
     }
 
     @Transactional
     public void registerDefaultInteractionItems(Member member) {
         itemService.findByCategory(ItemCategory.INTERACTION).stream()
-                .filter(item -> !inventoryRepository.existsByMemberIdAndItemId(member.getId(), item.getId()))
-                .map(item -> Inventory.create(item, member, DEFAULT_INTERACTION_ITEM_QUANTITY))
-                .forEach(inventoryRepository::save);
+            .filter(item -> !inventoryRepository.existsByMemberIdAndItemId(member.getId(), item.getId()))
+            .map(item -> Inventory.create(item, member, DEFAULT_INTERACTION_ITEM_QUANTITY))
+            .forEach(inventoryRepository::save);
     }
 
     @Transactional(readOnly = true)
@@ -174,7 +178,7 @@ public class InventoryService {
 
     public Inventory findByInventoryId(Long inventoryId) {
         return inventoryRepository.findById(inventoryId)
-                .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.INVENTORY_NOT_FOUND));
     }
 
     public List<Inventory> findByMemberId(Long memberId) {

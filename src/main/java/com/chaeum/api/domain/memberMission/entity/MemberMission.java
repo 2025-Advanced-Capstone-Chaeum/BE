@@ -1,4 +1,4 @@
-package com.chaeum.api.domain.missionProgress.entity;
+package com.chaeum.api.domain.memberMission.entity;
 
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.mission.entity.Mission;
@@ -28,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "mission_progress")
-public class MissionProgress extends BaseEntity {
+public class MemberMission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

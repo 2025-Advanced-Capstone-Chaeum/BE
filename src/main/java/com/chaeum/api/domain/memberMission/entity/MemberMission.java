@@ -51,4 +51,45 @@ public class MemberMission extends BaseEntity {
 
     @Column(name = "progress_count", nullable = false)
     private int progressCount;
+
+    public static MemberMission create(Member member, Mission mission, int progressCount) {
+        return MemberMission.builder()
+            .member(member)
+            .mission(mission)
+            .status(MissionStatus.PENDING)
+            .currentCount(0)
+            .progressCount(progressCount)
+            .build();
+    }
+
+    public void reset() {
+        this.currentCount = 0;
+        this.status = MissionStatus.PENDING;
+    }
+
+    public void increaseProgress() {
+        if (isCompleted()) {
+            return;
+        }
+        increaseCurrentCount();
+        if (isMissionCompleted()) {
+            completeMission();
+        }
+    }
+
+    private boolean isCompleted() {
+        return this.status == MissionStatus.COMPLETED;
+    }
+
+    private void increaseCurrentCount() {
+        this.currentCount++;
+    }
+
+    private boolean isMissionCompleted() {
+        return this.currentCount >= this.progressCount;
+    }
+
+    private void completeMission() {
+        this.status = MissionStatus.COMPLETED;
+    }
 }

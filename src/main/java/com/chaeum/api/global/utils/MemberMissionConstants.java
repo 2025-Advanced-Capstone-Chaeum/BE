@@ -9,17 +9,15 @@ public class MemberMissionConstants {
     public static final int MEMBER_MISSION_ASSIGN_COUNT = 5;
 
     public static final int ATTENDANCE_PROGRESS_MIN = 1;
-    public static final int ATTENDANCE_PROGRESS_MAX = 1;
 
-    public static final int CAT_PROGRESS_MIN = 1;
-    public static final int CAT_PROGRESS_MAX = 5;
+    public static final int CAT_EXP_PROGRESS_MIN = 10;
+    public static final int CAT_EXP_PROGRESS_MAX = 50;
+
+    public static final int CAT_INTERACTION_PROGRESS_MIN = 1;
+    public static final int CAT_INTERACTION_PROGRESS_MAX = 5;
 
     public static final int DONATION_PROGRESS_MIN = 1;
     public static final int DONATION_PROGRESS_MAX = 3;
 
-    public static final int FRIEND_PROGRESS_MIN = 1;
-    public static final int FRIEND_PROGRESS_MAX = 3;
-
-    public static final int ITEM_PROGRESS_MIN = 1;
-    public static final int ITEM_PROGRESS_MAX = 1;
+    public static final int ITEM_WEAR_PROGRESS_MIN = 1;
 }

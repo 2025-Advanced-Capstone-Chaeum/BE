@@ -1,14 +1,8 @@
-[업로드 파일 이미지 더미데이터]
+-- [uploaded_file 더미데이터]
 TRUNCATE TABLE uploaded_file RESTART IDENTITY CASCADE;
 
-INSERT INTO uploaded_file (file_url,
-                           original_file_name,
-                           stored_file_name,
-                           file_size,
-                           content_type,
-                           review_id,
-                           created_at,
-                           updated_at)
+INSERT INTO uploaded_file (file_url, original_file_name, stored_file_name, file_size, content_type, review_id,
+                           created_at, updated_at)
 VALUES ('https://s3.ap-northeast-2.amazonaws.com/item/review-1.png', 'review-1.png', 'uuid-review-1.png', 102400,
         'image/png', 1, '2025-04-19 08:02:00', '2025-04-19 08:02:00'),
        ('https://s3.ap-northeast-2.amazonaws.com/item/review-2.png', 'review-2.png', 'uuid-review-2.png', 101320,

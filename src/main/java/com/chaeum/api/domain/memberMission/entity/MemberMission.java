@@ -27,11 +27,12 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "mission_progress")
+@Table(name = "member_mission")
 public class MemberMission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_mission_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

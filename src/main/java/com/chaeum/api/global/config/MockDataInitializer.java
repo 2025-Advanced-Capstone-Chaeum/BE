@@ -31,10 +31,11 @@ public class MockDataInitializer {
         "data/08-cat.sql",
         "data/09-attendance.sql",
         "data/10-friendship.sql",
-        "data/11-review.sql",
-        "data/12-title.sql",
-        "data/13-notification.sql",
-        "data/14-payment-record.sql"
+        "data/11-uploaded_file.sql",
+        "data/12-review.sql",
+        "data/13-title.sql",
+        "data/14-notification.sql",
+        "data/15-payment-record.sql"
     };
 
     @PostConstruct

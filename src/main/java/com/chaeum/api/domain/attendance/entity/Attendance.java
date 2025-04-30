@@ -36,7 +36,7 @@ public class Attendance {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name = "attendance_date")
+    @Column(name = "attendance_date", nullable = false)
     private LocalDate date;
 
     public static Attendance create(Member member, LocalDate date) {

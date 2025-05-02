@@ -10,8 +10,8 @@ public class MemberMissionConstants {
 
     public static final int ATTENDANCE_PROGRESS_MIN = 1;
 
-    public static final int CAT_EXP_PROGRESS_MIN = 10;
-    public static final int CAT_EXP_PROGRESS_MAX = 50;
+    public static final int CAT_EXP_PROGRESS_MIN = 100;
+    public static final int CAT_EXP_PROGRESS_MAX = 500;
 
     public static final int CAT_INTERACTION_PROGRESS_MIN = 1;
     public static final int CAT_INTERACTION_PROGRESS_MAX = 5;

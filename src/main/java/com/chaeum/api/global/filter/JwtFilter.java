@@ -9,6 +9,7 @@ import com.chaeum.api.global.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         // 1. 헤더에서 Access Token 추출
-        String accessToken = getAccessTokenFromHeader(request);
+        String accessToken = resolveTokenFromCookie(request) == null ? getTokenFromRequestBearer(request) : resolveTokenFromCookie(request);
         if (!StringUtils.hasText(accessToken)) {
             filterChain.doFilter(request, response);
             return;
@@ -66,11 +67,23 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // 헤더에서 Access Token 추출
-    private String getAccessTokenFromHeader(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7);
+    private String resolveTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if ("AccessToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    // Swgger 테스트 시에 사용합니다.
+    private String getTokenFromRequestBearer(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 부분 제거
         }
         return null;
     }

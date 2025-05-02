@@ -75,10 +75,7 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         addCookie(response, "AccessToken", accessToken, jwtProperties.getAccessTokenExpiration());
         addCookie(response, "RefreshToken", refreshTokenValue, jwtProperties.getRefreshTokenExpiration());
 
-        // 6. JWT를 응답 헤더에 추가
-        response.setHeader("Authorization", "Bearer " + accessToken);
-
-        // 7. 클라이언트 리다이렉트
+        // 6. 클라이언트 리다이렉트
         response.sendRedirect(homeUrl);
     }
 

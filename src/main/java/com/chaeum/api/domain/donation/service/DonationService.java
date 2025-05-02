@@ -9,6 +9,8 @@ import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.memberMission.service.MemberMissionService;
+import com.chaeum.api.domain.mission.entity.MissionType;
 import com.chaeum.api.domain.title.service.TitleService;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
@@ -30,6 +32,7 @@ public class DonationService {
     private final LoginMemberProvider loginMemberProvider;
     private final TitleService titleService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MemberMissionService memberMissionService;
 
     @Transactional
     public DonationCreateResponse save(DonationCreateRequest request) {
@@ -39,11 +42,12 @@ public class DonationService {
         Funding funding = fundingService.findById(request.getFundingId());
         Donation donation = Donation.toEntity(request, member, funding);
         Donation savedDonation = donationRepository.save(donation);
+
+        memberMissionService.increaseProgressByType(MissionType.DONATION);
+        titleService.giveTitle(getDonationCountByMember(member));
         eventPublisher.publishEvent(
             DonationEvent.from(savedDonation, member, funding.getMember())
         );
-
-        titleService.giveTitle(getDonationCountByMember(member));
 
         return DonationCreateResponse.toDto(savedDonation);
     }

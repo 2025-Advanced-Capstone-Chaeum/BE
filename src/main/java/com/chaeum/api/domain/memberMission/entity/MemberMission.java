@@ -1,4 +1,4 @@
-package com.chaeum.api.domain.missionProgress.entity;
+package com.chaeum.api.domain.memberMission.entity;
 
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.mission.entity.Mission;
@@ -27,11 +27,12 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "mission_progress")
-public class MissionProgress extends BaseEntity {
+@Table(name = "member_mission")
+public class MemberMission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_mission_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,4 +52,51 @@ public class MissionProgress extends BaseEntity {
 
     @Column(name = "progress_count", nullable = false)
     private int progressCount;
+
+    public static MemberMission create(Member member, Mission mission, int progressCount) {
+        return MemberMission.builder()
+            .member(member)
+            .mission(mission)
+            .status(MissionStatus.PENDING)
+            .currentCount(0)
+            .progressCount(progressCount)
+            .build();
+    }
+
+    public void increaseProgress() {
+        increaseProgress(1);
+    }
+
+    public void increaseProgress(int amount) {
+        if (isCompleted()) {
+            return;
+        }
+        updateStatusToInProgress();
+        increaseCurrentCount(amount);
+        if (isMissionCompleted()) {
+            completeMission();
+        }
+    }
+
+    private boolean isCompleted() {
+        return this.status == MissionStatus.COMPLETED;
+    }
+
+    private void increaseCurrentCount(int amount) {
+        this.currentCount += amount;
+    }
+
+    private boolean isMissionCompleted() {
+        return this.currentCount >= this.progressCount;
+    }
+
+    private void updateStatusToInProgress() {
+        if (status == MissionStatus.PENDING) {
+            this.status = MissionStatus.IN_PROGRESS;
+        }
+    }
+
+    private void completeMission() {
+        this.status = MissionStatus.COMPLETED;
+    }
 }

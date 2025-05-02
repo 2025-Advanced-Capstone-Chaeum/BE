@@ -7,10 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MissionType {
 
-    CHECK_IN("CHECK_IN", "출석 미션"),
+    ATTENDANCE("ATTENDANCE", "출석 미션"),
+    CAT_EXP("CAT_EXP", "고양이 경험치 획득 미션"),
+    CAT_INTERACTION("CAT_INTERACTION", "고양이 상호작용 미션"),
     DONATION("DONATION", "기부 미션"),
-    REFERRAL("REFERRAL", "친구 초대 미션"),
-    CUSTOM("CUSTOM", "커스텀 미션");
+    ITEM_WEAR("ITEM_WEAR", "아이템 착용 미션");
 
     private final String key;
     private final String description;

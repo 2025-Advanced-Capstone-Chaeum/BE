@@ -9,6 +9,7 @@ import com.chaeum.api.domain.memberMission.repository.MemberMissionRepository;
 import com.chaeum.api.domain.mission.entity.Mission;
 import com.chaeum.api.domain.mission.entity.MissionType;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class MemberMissionService {
     @Transactional
     public List<MemberMissionResponse> getMemberMissions() {
         Long memberId = loginMemberProvider.getCurrentLoginMemberId();
-        List<MemberMission> missions = refreshOrGenerateMemberMissions(memberId);
+        List<MemberMission> missions = getOrGenerateMemberMissions(memberId);
         return missions.stream()
             .map(MemberMissionResponse::toDto)
             .toList();
@@ -43,7 +44,17 @@ public class MemberMissionService {
             .forEach(MemberMission::increaseProgress);
     }
 
-    private List<MemberMission> refreshOrGenerateMemberMissions(Long memberId) {
+    @Transactional
+    public void increaseProgressByType(MissionType missionType, BigInteger amount) {
+        int intAmount = amount.intValue();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
+        List<MemberMission> missions = findMissionsByMemberId(memberId);
+        missions.stream()
+            .filter(mission -> mission.getMission().getType() == missionType)
+            .forEach(mission -> mission.increaseProgress(intAmount));
+    }
+
+    private List<MemberMission> getOrGenerateMemberMissions(Long memberId) {
         List<MemberMission> existingMissions = memberMissionRepository.findByMemberId(memberId);
         LocalDate today = LocalDate.now();
         boolean allToday = existingMissions.stream()
@@ -75,8 +86,7 @@ public class MemberMissionService {
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정 초기화
     @Transactional
     public void resetAllMemberMissions() {
-        List<MemberMission> missions = memberMissionRepository.findAll();
-        missions.forEach(MemberMission::reset);
+        memberMissionRepository.deleteAllInBatch();
     }
 
     public List<MemberMission> findMissionsByMemberId(Long memberId) {

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -34,6 +35,9 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
 
     @Value("${frontend.home-url}")
     private String homeUrl;
+
+    @Value("${spring.jwt.cookie-domain}")
+    private String cookieDomain;
 
     @Override
     public void onAuthenticationSuccess(
@@ -60,16 +64,34 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
 
         // 3. Access Token & Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", email, memberRole, jwtProperties.getAccessTokenExpiration());
-        String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole, jwtProperties.getRefreshTokenExpiration());
+        String refreshTokenValue = jwtUtil.createJwt("refresh", email, memberRole,
+            jwtProperties.getRefreshTokenExpiration());
 
         // 4. Redis에 Refresh Token 저장
         RefreshToken refreshToken = new RefreshToken(memberId, email, refreshTokenValue);
         refreshTokenRepository.save(refreshToken);
 
-        // 5. JWT를 응답 헤더에 추가
+        // 5. 쿠키에 토큰 추가
+        addCookie(response, "AccessToken", accessToken, jwtProperties.getAccessTokenExpiration());
+        addCookie(response, "RefreshToken", refreshTokenValue, jwtProperties.getRefreshTokenExpiration());
+
+        // 6. JWT를 응답 헤더에 추가
         response.setHeader("Authorization", "Bearer " + accessToken);
 
-        // 6. 클라이언트 리다이렉트
+        // 7. 클라이언트 리다이렉트
         response.sendRedirect(homeUrl);
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, long maxAgeMillis) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+            .maxAge(maxAgeMillis / 1000)
+            .path("/")
+            .secure(true)
+            .httpOnly(true)
+            .sameSite("None")
+            .domain(cookieDomain)
+            .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 }

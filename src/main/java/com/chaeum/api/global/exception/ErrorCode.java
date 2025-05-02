@@ -84,6 +84,7 @@ public enum ErrorCode {
     IMAGE_STORE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "이미지를 저장하는 데 실패했습니다."),
     S3_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "S3에 파일 업로드 중 오류가 발생했습니다."),
     PAYMENT_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "결제 정보를 저장에 실패했습니다."),
+    MOCK_INIT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "목업 데이터 초기화에 실패했습니다."),
     INTERNAL_SERVER_ERROR_GENERIC(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다. 관리자에게 문의하세요.");
 
     private final HttpStatus status;

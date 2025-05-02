@@ -3,6 +3,8 @@ package com.chaeum.api.domain.notification.entity;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +36,7 @@ public class Notification extends BaseEntity {
     @Column(name = "target_id")
     private Long targetId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "notification_type", nullable = false)
     private NotificationType type;
 

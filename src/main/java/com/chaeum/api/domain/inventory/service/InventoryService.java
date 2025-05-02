@@ -20,6 +20,7 @@ import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.pagination.cursorResult.CreatedAtCursorResult;
 import com.chaeum.api.global.utils.ExpConstants;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
@@ -119,9 +120,10 @@ public class InventoryService {
     public void useInteractionItem(Long inventoryId) {
         Inventory inventory = findByInventoryId(inventoryId);
         inventory.getItem().validateCategory(ItemCategory.INTERACTION);
-        inventory.removeQuantity();
-        catService.addExperience(ExpConstants.INTERACTION);
+        BigInteger exp = ExpConstants.INTERACTION;
+        catService.addExperience(exp);
         memberMissionService.increaseProgressByType(MissionType.CAT_INTERACTION);
+        memberMissionService.increaseProgressByType(MissionType.CAT_EXP, exp);
     }
 
     @Transactional

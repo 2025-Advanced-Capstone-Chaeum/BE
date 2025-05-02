@@ -11,7 +11,6 @@ import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 
 import java.math.BigInteger;
-import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,11 +32,11 @@ public class CatService {
     }
 
     @Transactional
-    public List<Integer> addExperience(BigInteger gainedExp) {
+    public void addExperience(BigInteger gainedExp) {
         Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         Cat cat = findByMemberId(memberId);
         memberMissionService.increaseProgressByType(MissionType.CAT_EXP);
-        return cat.addExpAndGetLevelUps(gainedExp);
+        cat.addExpAndGetLevelUps(gainedExp);
     }
 
     @Transactional

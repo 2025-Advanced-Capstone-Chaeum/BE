@@ -1,5 +1,7 @@
 package com.chaeum.api.global.config;
 
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
 import jakarta.annotation.PostConstruct;
 import java.sql.Connection;
 import javax.sql.DataSource;
@@ -49,7 +51,7 @@ public class MockDataInitializer {
             log.info("모든 목업 데이터 스크립트가 성공적으로 로딩되었습니다.");
         } catch (Exception e) {
             log.error("목업 데이터 스크립트 로딩에 실패했습니다.", e);
-            throw new IllegalStateException("목업 데이터 초기화 실패", e);
+            throw ChaeumException.from(ErrorCode.MOCK_INIT_FAIL);
         }
     }
 }

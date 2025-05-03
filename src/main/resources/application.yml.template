@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       dialect: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate.jdbc.time_zone: UTC
@@ -104,6 +104,10 @@ cors:
 
 frontend:
   home-url: ${FRONTEND_HOME_URL}
+
+internal:
+  api:
+    key: ${OCR_API_KEY}
 
 logging:
   level:

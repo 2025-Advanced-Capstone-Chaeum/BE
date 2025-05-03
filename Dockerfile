@@ -29,4 +29,4 @@ ENV SPRING_PROFILES_ACTIVE=dev
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # CMD로 환경변수 주입
-CMD ["--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
+#CMD ["--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]

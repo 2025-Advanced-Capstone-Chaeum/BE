@@ -3,6 +3,7 @@ package com.chaeum.api.domain.funding.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,8 +25,11 @@ public class FundingUpdateRequest {
     private String content;
 
     @NotNull
-    @Schema(description = "펀딩 이미지 URL", example = "https://bucket.s3.ap-northeast-2.amazonaw.com/funding/764c13ef-7301-22f2-a1d4-e7c8cw4.png")
-    private String fundingImage;
+    @Schema(
+        description = "펀딩 이미지 URL 리스트",
+        example = "[\"https://bucket.s3.ap-northeast-2.amazonaws.com/funding/764c13ef-1.png\"]"
+    )
+    private List<String> imageUrls;
 
     @NotNull
     @Schema(description = "물품 구매 링크", example = "https://chaeum.site/item")

@@ -25,7 +25,7 @@ public class DonationEvent {
             .id(donation.getId())
             .sender(sender)
             .receiver(receiver)
-            .fundingImageUrl(donation.getFunding().getFundingImage())
+            .fundingImageUrl(donation.getFunding().getFundingImages().getFirst().getFileUrl())
             .content(message)
             .build();
     }

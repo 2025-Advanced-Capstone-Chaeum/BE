@@ -22,7 +22,7 @@ public class ReviewEvent {
         return ReviewEvent.builder()
             .id(review.getId())
             .receiver(receiver)
-            .fundingImageUrl(review.getFunding().getFundingImage())
+            .fundingImageUrl(review.getFunding().getFundingImages().getFirst().getFileUrl())
             .content(message)
             .build();
     }

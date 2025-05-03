@@ -26,7 +26,7 @@ public class FundingController {
     @PreAuthorize("hasAnyRole('RECIPIENT', 'ADMIN')")
     @PostMapping("")
     public ApiResponse<Long> save(
-            @Valid @RequestBody FundingCreateRequest request
+        @Valid @RequestBody FundingCreateRequest request
     ) {
         Long id = fundingService.save(request);
         return ApiResponse.success(id);
@@ -36,26 +36,26 @@ public class FundingController {
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("")
     public ApiResponse<FundingResponse> getFunding(
-            @RequestParam(name = "fundingId") Long fundingId
+        @RequestParam(name = "fundingId") Long fundingId
     ) {
         FundingResponse fundingResponse = fundingService.getFunding(fundingId);
         return ApiResponse.success(fundingResponse);
     }
 
     @Operation(
-            summary = "조건별 펀딩 조회",
-            description = """
-                    [모든 Role 가능] 펀딩 상태, 펀딩 제목, 커서 기반 페이징으로 펀딩 목록을 조회합니다.<br>
-                    조건을 모두 생략하면 전체 조회됩니다.
-                    """
+        summary = "조건별 펀딩 조회",
+        description = """
+            [모든 Role 가능] 펀딩 상태, 펀딩 제목, 커서 기반 페이징으로 펀딩 목록을 조회합니다.<br>
+            조건을 모두 생략하면 전체 조회됩니다.
+            """
     )
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
     public ApiResponse<IdCursorResult<FundingResponse>> getFundingsByCondition(
-            @RequestParam(name = "status", required = false) FundingStatus status,
-            @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "cursor", required = false) Long cursor,
-            @RequestParam(name = "limit", defaultValue = "3") int limit
+        @RequestParam(name = "status", required = false) FundingStatus status,
+        @RequestParam(name = "title", required = false) String title,
+        @RequestParam(name = "cursor", required = false) Long cursor,
+        @RequestParam(name = "limit", defaultValue = "3") int limit
     ) {
         IdCursorResult<FundingResponse> fundings = fundingService.getFundingsByCondition(status, title, cursor, limit);
         return ApiResponse.success(fundings);
@@ -65,8 +65,8 @@ public class FundingController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("")
     public ApiResponse<Long> update(
-            @RequestParam(name = "fundingId") Long fundingId,
-            @Valid @RequestBody FundingUpdateRequest fundingUpdateRequest
+        @RequestParam(name = "fundingId") Long fundingId,
+        @Valid @RequestBody FundingUpdateRequest fundingUpdateRequest
     ) {
         Long id = fundingService.update(fundingId, fundingUpdateRequest);
         return ApiResponse.success(id);
@@ -76,7 +76,7 @@ public class FundingController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{fundingId}")
     public ApiResponse<Long> delete(
-            @PathVariable(name = "fundingId") Long fundingId
+        @PathVariable(name = "fundingId") Long fundingId
     ) {
         Long id = fundingService.delete(fundingId);
         return ApiResponse.success(id);

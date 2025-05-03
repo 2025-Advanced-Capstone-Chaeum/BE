@@ -22,7 +22,7 @@ public class FundingEvent {
         return FundingEvent.builder()
             .id(funding.getId())
             .receiver(receiver)
-            .fundingImageUrl(funding.getFundingImage())
+            .fundingImageUrl(funding.getFundingImages().getFirst().getFileUrl())
             .content(message)
             .build();
     }

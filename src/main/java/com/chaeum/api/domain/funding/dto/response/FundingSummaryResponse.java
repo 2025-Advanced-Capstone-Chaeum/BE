@@ -1,6 +1,9 @@
 package com.chaeum.api.domain.funding.dto.response;
 
 import com.chaeum.api.domain.funding.entity.Funding;
+import com.chaeum.api.global.file.dto.ExternalFileResponse;
+import com.chaeum.api.global.file.entity.UploadedFile;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +18,7 @@ public class FundingSummaryResponse {
 
     private String title;
 
-    private String fundingImage;
+    private ExternalFileResponse previewImage;
 
     private BigDecimal amount;
 
@@ -24,13 +27,18 @@ public class FundingSummaryResponse {
     private LocalDateTime createdAt;
 
     public static FundingSummaryResponse toDto(Funding funding) {
+        Optional<UploadedFile> firstFile = funding.getFundingImages().stream().findFirst();
+        ExternalFileResponse imageDto = firstFile
+            .map(ExternalFileResponse::toDto)
+            .orElse(null);
+
         return FundingSummaryResponse.builder()
-                .id(funding.getId())
-                .title(funding.getTitle())
-                .fundingImage(funding.getFundingImage())
-                .amount(funding.getCurrentAmount())
-                .isReviewed(funding.getIsReviewed())
-                .createdAt(funding.getCreatedAt())
-                .build();
+            .id(funding.getId())
+            .title(funding.getTitle())
+            .previewImage(imageDto)
+            .amount(funding.getCurrentAmount())
+            .isReviewed(funding.getIsReviewed())
+            .createdAt(funding.getCreatedAt())
+            .build();
     }
 }

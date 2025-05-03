@@ -6,6 +6,8 @@ import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.entity.BaseEntity;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.file.entity.UploadedFile;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,9 +18,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,8 +55,9 @@ public class Funding extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "funding_image", nullable = false)
-    private String fundingImage;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "funding_image")
+    private List<UploadedFile> fundingImages;
 
     @Column(name = "item_link")
     private String itemLink;
@@ -76,26 +81,26 @@ public class Funding extends BaseEntity {
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
 
-    public static Funding toEntity(FundingCreateRequest fundingCreateRequest, Member member) {
+    public static Funding toEntity(FundingCreateRequest fundingCreateRequest, List<UploadedFile> files, Member member) {
         return Funding.builder()
-                .member(member)
-                .title(fundingCreateRequest.getTitle())
-                .content(fundingCreateRequest.getContent())
-                .fundingImage(fundingCreateRequest.getFundingImage())
-                .itemLink(fundingCreateRequest.getItemLink())
-                .address(fundingCreateRequest.getAddress())
-                .goalAmount(fundingCreateRequest.getGoalAmount())
-                .currentAmount(BigDecimal.ZERO)
-                .status(FundingStatus.ONGOING)
-                .endDate(fundingCreateRequest.getEndDate())
-                .isReviewed(Boolean.FALSE)
-                .build();
+            .member(member)
+            .title(fundingCreateRequest.getTitle())
+            .content(fundingCreateRequest.getContent())
+            .fundingImages(files)
+            .itemLink(fundingCreateRequest.getItemLink())
+            .address(fundingCreateRequest.getAddress())
+            .goalAmount(fundingCreateRequest.getGoalAmount())
+            .currentAmount(BigDecimal.ZERO)
+            .status(FundingStatus.ONGOING)
+            .endDate(fundingCreateRequest.getEndDate())
+            .isReviewed(Boolean.FALSE)
+            .build();
     }
 
-    public void update(FundingUpdateRequest fundingUpdateRequest) {
+    public void update(List<UploadedFile> files, FundingUpdateRequest fundingUpdateRequest) {
         Optional.ofNullable(fundingUpdateRequest.getTitle()).ifPresent(this::setTitle);
         Optional.ofNullable(fundingUpdateRequest.getContent()).ifPresent(this::setContent);
-        Optional.ofNullable(fundingUpdateRequest.getFundingImage()).ifPresent(this::setFundingImage);
+        Optional.ofNullable(files).ifPresent(this::setFundingImages);
         Optional.ofNullable(fundingUpdateRequest.getItemLink()).ifPresent(this::setItemLink);
         Optional.ofNullable(fundingUpdateRequest.getAddress()).ifPresent(this::setAddress);
         Optional.ofNullable(fundingUpdateRequest.getGoalAmount()).ifPresent(this::setGoalAmount);

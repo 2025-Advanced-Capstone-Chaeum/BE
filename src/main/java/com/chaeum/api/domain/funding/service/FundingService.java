@@ -12,6 +12,8 @@ import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.file.entity.UploadedFile;
+import com.chaeum.api.global.file.service.FileService;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,11 +32,13 @@ public class FundingService {
     private final FundingRepository fundingRepository;
     private final LoginMemberProvider loginMemberProvider;
     private final ApplicationEventPublisher eventPublisher;
+    private final FileService fileService;
 
     @Transactional
     public Long save(FundingCreateRequest fundingCreateRequest) {
         Member member = loginMemberProvider.getCurrentLoginMember();
-        Funding funding = Funding.toEntity(fundingCreateRequest, member);
+        List<UploadedFile> files = fileService.getUploadedFilesByUrls(fundingCreateRequest.getImageUrls());
+        Funding funding = Funding.toEntity(fundingCreateRequest, files, member);
         Funding savedFunding = fundingRepository.save(funding);
 
         eventPublisher.publishEvent(
@@ -53,22 +57,22 @@ public class FundingService {
 
     @Transactional(readOnly = true)
     public IdCursorResult<FundingResponse> getFundingsByCondition(
-            FundingStatus status, String title, Long cursor, int limit
+        FundingStatus status, String title, Long cursor, int limit
     ) {
         List<Funding> filteredFundings = fundingRepository.findAll().stream()
-                .filter(funding -> isStatusMatch(funding, status))
-                .filter(funding -> isTitleMatch(funding, title))
-                .filter(funding -> isCursorAfter(funding, cursor))
-                .sorted(Comparator
-                        .comparing(Funding::getCreatedAt, Comparator.reverseOrder())
-                        .thenComparing(Funding::getId, Comparator.reverseOrder())
-                )
-                .limit(limit)
-                .toList();
+            .filter(funding -> isStatusMatch(funding, status))
+            .filter(funding -> isTitleMatch(funding, title))
+            .filter(funding -> isCursorAfter(funding, cursor))
+            .sorted(Comparator
+                .comparing(Funding::getCreatedAt, Comparator.reverseOrder())
+                .thenComparing(Funding::getId, Comparator.reverseOrder())
+            )
+            .limit(limit)
+            .toList();
 
         List<FundingResponse> responses = filteredFundings.stream()
-                .map(FundingResponse::toDto)
-                .toList();
+            .map(FundingResponse::toDto)
+            .toList();
 
         return IdCursorResult.of(responses, cursor, limit);
     }
@@ -76,7 +80,8 @@ public class FundingService {
     @Transactional
     public Long update(Long fundingId, FundingUpdateRequest fundingUpdateRequest) {
         Funding funding = findById(fundingId);
-        funding.update(fundingUpdateRequest);
+        List<UploadedFile> files = fileService.getUploadedFilesByUrls(fundingUpdateRequest.getImageUrls());
+        funding.update(files, fundingUpdateRequest);
         return funding.getId();
     }
 
@@ -89,34 +94,32 @@ public class FundingService {
     @Transactional(readOnly = true)
     public List<FundingSummaryResponse> getFundingSummariesByMemberId(Long memberId) {
         return fundingRepository.findByMemberIdOrderByCreatedAtDesc(memberId).stream()
-                .map(FundingSummaryResponse::toDto)
-                .toList();
+            .map(FundingSummaryResponse::toDto)
+            .toList();
     }
 
     @Scheduled(fixedRate = 60 * 1000) // 1분마다 실행
     @Transactional
     public void updateFundingStatusAutomatically() {
         fundingRepository.findByStatusAndEndDateBefore(FundingStatus.ONGOING, LocalDateTime.now())
-                .forEach(Funding::markAsCompleted);
+            .forEach(Funding::markAsCompleted);
     }
 
-    // 조건별 펀딩 조회 검증
     private boolean isStatusMatch(Funding funding, FundingStatus status) {
         return status == null || funding.getStatus() == status;
     }
 
     private boolean isTitleMatch(Funding funding, String keyword) {
         return keyword == null || keyword.isBlank()
-                || funding.getTitle().toLowerCase().contains(keyword.toLowerCase());
+            || funding.getTitle().toLowerCase().contains(keyword.toLowerCase());
     }
 
     private boolean isCursorAfter(Funding funding, Long cursor) {
         return cursor == null || funding.getId() > cursor;
     }
 
-    // Id로 조회
     public Funding findById(Long fundingId) {
         return fundingRepository.findById(fundingId)
-                .orElseThrow(() -> ChaeumException.from(ErrorCode.FUNDING_NOT_FOUND));
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.FUNDING_NOT_FOUND));
     }
 }

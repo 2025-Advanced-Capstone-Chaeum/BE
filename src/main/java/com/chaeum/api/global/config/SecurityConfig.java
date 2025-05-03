@@ -67,6 +67,7 @@ public class SecurityConfig {
 
                 // 경로별 접근 제어
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated())
 

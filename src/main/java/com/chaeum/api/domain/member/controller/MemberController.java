@@ -1,6 +1,7 @@
 package com.chaeum.api.domain.member.controller;
 
 import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
+import com.chaeum.api.domain.member.dto.request.RegisterBeneficiaryRequest;
 import com.chaeum.api.domain.member.dto.response.MemberMyPageResponse;
 import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.response.ApiResponse;
@@ -26,6 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+
+    @Operation(summary = "수혜자 등록", description = "[모든 Role 가능]")
+    @PreAuthorize("hasRole('DONOR')")
+    @PatchMapping("/beneficiary")
+    public ApiResponse<Long> registerBeneficiary(
+        @Valid @RequestBody RegisterBeneficiaryRequest request
+    ) {
+        return ApiResponse.success(memberService.registerBeneficiary(request));
+    }
 
     @Operation(
             summary = "마이페이지",

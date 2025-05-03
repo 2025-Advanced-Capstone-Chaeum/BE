@@ -22,11 +22,5 @@ COPY --from=build /app/build/libs/*.jar app.jar
 # 애플리케이션이 사용하는 포트 노출
 EXPOSE 8080
 
-# 환경변수 주입 가능하게 설정
-#ENV SPRING_PROFILES_ACTIVE=dev
-
 # ENTRYPOINT
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
-# CMD로 환경변수 주입
-#CMD ["--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]

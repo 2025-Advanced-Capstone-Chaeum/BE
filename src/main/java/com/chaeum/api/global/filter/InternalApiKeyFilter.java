@@ -13,6 +13,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class InternalApiKeyFilter extends OncePerRequestFilter {
 
+    private static final String OCR_HEADER_NAME = "X-Internal-key";
+    private static final String ERROR_MESSAGE = "Forbidden: invalid API key";
+    private static final String OCR_API_PATH = "/api/v1/member/beneficiary";
+
     @Value("${internal.api.key}")
     private String internalApiKey;
 
@@ -20,12 +24,11 @@ public class InternalApiKeyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
         if ("PATCH".equals(request.getMethod())
-            && request.getRequestURI().equals("/api/v1/member/beneficiary")) {
+            && request.getRequestURI().equals(OCR_API_PATH)) {
 
-            String apiKey = request.getHeader("X-Internal-key");
+            String apiKey = request.getHeader(OCR_HEADER_NAME);
             if (apiKey == null || !apiKey.equals(internalApiKey)) {
-                response.sendError(HttpStatus.FORBIDDEN.value(),
-                    "Forbidden: invalid API key");
+                response.sendError(HttpStatus.FORBIDDEN.value(), ERROR_MESSAGE);
                 return;
             }
         }

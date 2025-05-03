@@ -56,7 +56,7 @@ public class Funding extends BaseEntity {
     private String content;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "funding_image")
+    @JoinColumn(name = "funding_id")
     private List<UploadedFile> fundingImages;
 
     @Column(name = "item_link")

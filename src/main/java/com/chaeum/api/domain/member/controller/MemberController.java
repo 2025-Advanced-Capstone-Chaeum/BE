@@ -55,10 +55,9 @@ public class MemberController {
     @PreAuthorize("hasRole('DONOR')")
     @PatchMapping("")
     public ApiResponse<Long> update(
-            @RequestParam(name = "memberId") Long memberId,
             @Valid @RequestBody MemberUpdateRequest memberUpdateRequest
     ) {
-        Long id = memberService.update(memberId, memberUpdateRequest);
+        Long id = memberService.update(memberUpdateRequest);
         return ApiResponse.success(id);
     }
 

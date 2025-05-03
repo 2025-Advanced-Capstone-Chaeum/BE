@@ -47,7 +47,8 @@ public class MemberService {
     }
 
     @Transactional
-    public Long update(Long memberId, MemberUpdateRequest memberUpdateRequest) {
+    public Long update(MemberUpdateRequest memberUpdateRequest) {
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         Member member = findById(memberId);
         member.update(memberUpdateRequest);
         return member.getId();

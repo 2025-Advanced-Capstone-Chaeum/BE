@@ -5,6 +5,7 @@ import com.chaeum.api.domain.inventory.event.RewardEvent;
 import com.chaeum.api.domain.friendship.event.FriendEvent;
 import com.chaeum.api.domain.funding.event.FundingEvent;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.event.BeneficiaryEvent;
 import com.chaeum.api.domain.notification.entity.Notification;
 import com.chaeum.api.domain.notification.entity.NotificationType;
 import com.chaeum.api.domain.notification.repository.NotificationRepository;
@@ -21,13 +22,12 @@ public class NotificationEventListner {
 
     private final NotificationRepository notificationRepository;
 
-    //TODO: 수혜자 등록 로직이 있을 때 주석을 해제하고 관련 이벤트 로직을 추가합니다.
-//    @TransactionalEventListener
-//    public void handleBeneficiary(BeneficiaryEvent e) {
-//        notificationRepository.save(Notification.create(
-//            e.getMemberId(), e.getTargetId(), e.getType(), e.getNotificationImageUrl(), e.getContent()
-//        ));
-//    }
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleBeneficiary(BeneficiaryEvent e) {
+        notificationRepository.save(Notification.create(
+            e.getReceiver().getId(), null, NotificationType.BENEFICIARY, null, e.getContent()
+        ));
+    }
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleDonation(DonationEvent e) {

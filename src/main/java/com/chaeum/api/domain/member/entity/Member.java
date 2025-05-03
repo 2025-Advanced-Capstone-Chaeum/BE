@@ -126,4 +126,9 @@ public class Member extends BaseEntity {
     public boolean isSame(Member other) {
         return other != null && this.id != null && this.id.equals(other.getId());
     }
+
+    public void registerBeneficiary() {
+        this.role = Role.RECIPIENT;
+        this.isBeneficiary = Boolean.TRUE;
+    }
 }

@@ -3,7 +3,6 @@ package com.chaeum.api.global.filter;
 import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.exception.ErrorCode;
-import com.chaeum.api.global.response.ApiResponse;
 import com.chaeum.api.global.response.ErrorResponse;
 import com.chaeum.api.global.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,8 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {

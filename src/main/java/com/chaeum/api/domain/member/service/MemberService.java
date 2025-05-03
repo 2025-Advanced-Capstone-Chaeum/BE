@@ -5,20 +5,22 @@ import com.chaeum.api.domain.donation.service.DonationService;
 import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
 import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.dto.request.MemberUpdateRequest;
+import com.chaeum.api.domain.member.dto.request.RegisterBeneficiaryRequest;
 import com.chaeum.api.domain.member.dto.response.BeneficiaryMyPageResponse;
 import com.chaeum.api.domain.member.dto.response.DonorMyPageResponse;
 import com.chaeum.api.domain.member.dto.response.MemberMyPageResponse;
 import com.chaeum.api.domain.member.entity.Member;
+import com.chaeum.api.domain.member.event.BeneficiaryEvent;
 import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class MemberService {
     private final DonationService donationService;
     private final FundingService fundingService;
     private final LoginMemberProvider loginMemberProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void addPoints(Member member, BigDecimal points) {
@@ -58,6 +61,19 @@ public class MemberService {
     public Long delete(Long memberId) {
         memberRepository.deleteById(memberId);
         return memberId;
+    }
+
+    @Transactional
+    public Long registerBeneficiary(RegisterBeneficiaryRequest request) {
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
+        Member member = findById(memberId);
+        if(request.isResult()) {
+            member.registerBeneficiary();
+            eventPublisher.publishEvent(BeneficiaryEvent.createSuccess(member));
+            return member.getId();
+        }
+        eventPublisher.publishEvent(BeneficiaryEvent.createFailure(member));
+        return null;
     }
 
     private MemberMyPageResponse getBeneficiaryMyPage(Member member) {

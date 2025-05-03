@@ -23,7 +23,7 @@ COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 환경변수 주입 가능하게 설정
-ENV SPRING_PROFILES_ACTIVE=dev
+#ENV SPRING_PROFILES_ACTIVE=dev
 
 # ENTRYPOINT
 ENTRYPOINT ["java", "-jar", "app.jar"]

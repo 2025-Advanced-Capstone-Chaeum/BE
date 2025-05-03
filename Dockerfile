@@ -25,5 +25,8 @@ EXPOSE 8080
 # 환경변수 주입 가능하게 설정
 ENV SPRING_PROFILES_ACTIVE=dev
 
-# 애플리케이션 실행
-ENTRYPOINT ["sh", "-c", "java -jar app.jar --spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
+# ENTRYPOINT
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# CMD로 환경변수 주입
+CMD ["--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]

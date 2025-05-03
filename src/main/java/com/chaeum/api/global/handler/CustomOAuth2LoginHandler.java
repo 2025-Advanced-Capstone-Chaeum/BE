@@ -53,14 +53,8 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
                 .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
         Long memberId = member.getId();
 
-        // 2. 사용자 Role 가져오기 (없으면 기본값 "ROLE_DONOR")
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String role = authorities.stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse("ROLE_DONOR")
-                .replace("ROLE_", ""); // "ROLE_DONOR" -> "DONOR"
-        Role memberRole = Role.valueOf(role);
+        // 2. 사용자 Role 가져오기
+        Role memberRole = member.getRole();
 
         // 3. Access Token & Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", email, memberRole, jwtProperties.getAccessTokenExpiration());

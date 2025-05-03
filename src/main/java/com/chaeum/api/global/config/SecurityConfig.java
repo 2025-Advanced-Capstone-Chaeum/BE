@@ -5,6 +5,7 @@ import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.auth.service.CustomOAuth2MemberService;
 import com.chaeum.api.global.filter.CustomEntryPoint;
 import com.chaeum.api.global.filter.CustomLogoutFilter;
+import com.chaeum.api.global.filter.InternalApiKeyFilter;
 import com.chaeum.api.global.filter.JwtFilter;
 import com.chaeum.api.global.handler.CustomOAuth2LoginHandler;
 import com.chaeum.api.global.properties.CorsProperties;
@@ -81,6 +82,7 @@ public class SecurityConfig {
                         .tokenEndpoint(token -> token.accessTokenResponseClient(authorizationCodeTokenResponseClient())))
 
                 // 커스텀 필터 적용
+                .addFilterBefore(internalApiKeyFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(logoutFilter(), LogoutFilter.class);
 
@@ -105,6 +107,11 @@ public class SecurityConfig {
     @Bean
     public JwtFilter jwtFilter() {
         return new JwtFilter(jwtUtil, memberRepository);
+    }
+
+    @Bean
+    public InternalApiKeyFilter internalApiKeyFilter() {
+        return new InternalApiKeyFilter();
     }
 
     @Bean

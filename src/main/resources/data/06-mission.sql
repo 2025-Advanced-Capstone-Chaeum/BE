@@ -38,3 +38,6 @@ VALUES (1, '출석 체크하기', '오늘도 빠짐없이 출석 체크하고 �
        (8, '인테리어 아이템 착용', '고양이 주변을 따뜻한 인테리어 아이템으로 꾸며보세요.',
         'https://bucket.s3.ap-northeast-2.amazonaws.com/item/mission-interior.png', 'ITEM_WEAR',
         '2025-04-08 00:00:00', '2025-04-08 00:00:00');
+
+-- 시퀀스 재설정
+SELECT setval('mission_mission_id_seq', 8);

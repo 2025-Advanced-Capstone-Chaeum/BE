@@ -30,12 +30,12 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "payment")
+@Table(name = "payment_record")
 public class PaymentRecord extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
+    @Column(name = "payment_record_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -78,4 +78,18 @@ public class FileController {
         List<FileUploadResponse> fileUploadResponses = fileService.uploadFiles(multipartFiles, "review/");
         return ApiResponse.success(fileUploadResponses);
     }
+
+    @Operation(summary = "프로필 사진 업로드", description = "[모든 Role 가능]")
+    @PreAuthorize("hasRole('DONOR')")
+    @PostMapping(
+        value = "/profile",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ApiResponse<List<FileUploadResponse>> uploadProfileImage(
+        @RequestParam(name = "multipartFile") List<MultipartFile> multipartFiles
+    ) {
+        List<FileUploadResponse> fileUploadResponses = fileService.uploadFiles(multipartFiles, "profile/");
+        return ApiResponse.success(fileUploadResponses);
+    }
 }

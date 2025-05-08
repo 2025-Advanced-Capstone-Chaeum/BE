@@ -1,24 +1,38 @@
+-- [UPLOADED_FILE 더미 데이터]
 TRUNCATE TABLE uploaded_file RESTART IDENTITY CASCADE;
 
-INSERT INTO uploaded_file (file_url, original_file_name, stored_file_name, file_size, content_type,
+INSERT INTO uploaded_file (uploaded_file_id, file_url, original_file_name, stored_file_name, file_size, content_type,
                            review_id, funding_id, created_at, updated_at)
-VALUES ('https://s3.ap-northeast-2.amazonaws.com/item/review-1.png', 'review-1.png', 'uuid-review-1.png', 102400,
-        'image/png', 1, 1, '2025-04-19 08:02:00', '2025-04-19 08:02:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-2.png', 'review-2.png', 'uuid-review-2.png', 101320,
-        'image/png', 2, 2, '2025-04-18 22:26:00', '2025-04-18 22:26:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-3.png', 'review-3.png', 'uuid-review-3.png', 98000,
-        'image/png', 3, 3, '2025-04-20 20:47:00', '2025-04-20 20:47:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-4.png', 'review-4.png', 'uuid-review-4.png', 99000,
-        'image/png', 4, 4, '2025-04-16 09:32:00', '2025-04-16 09:32:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-5.png', 'review-5.png', 'uuid-review-5.png', 87000,
-        'image/png', 5, 5, '2025-04-17 18:04:00', '2025-04-17 18:04:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-6.png', 'review-6.png', 'uuid-review-6.png', 112000,
-        'image/png', 6, 6, '2025-04-24 07:27:00', '2025-04-24 07:27:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-7.png', 'review-7.png', 'uuid-review-7.png', 104560,
-        'image/png', 7, 7, '2025-04-25 10:15:00', '2025-04-25 10:15:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-8.png', 'review-8.png', 'uuid-review-8.png', 93500,
-        'image/png', 8, 8, '2025-04-19 14:54:00', '2025-04-19 14:54:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-9.png', 'review-9.png', 'uuid-review-9.png', 89300,
-        'image/png', 9, 9, '2025-04-20 18:44:00', '2025-04-20 18:44:00'),
-       ('https://s3.ap-northeast-2.amazonaws.com/item/review-10.png', 'review-10.png', 'uuid-review-10.png', 107800,
-        'image/png', 10, 10, '2025-04-20 16:28:00', '2025-04-20 16:28:00');
+VALUES
+-- 펀딩 이미지 (funding_id: 1~6)
+(1, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-1.png',
+ 'funding-1.png', 'uuid-funding-1.png', 95000, 'image/png',
+ NULL, 1, '2025-03-26 10:00:00', '2025-03-26 10:00:00'),
+
+(2, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-2.png',
+ 'funding-2.png', 'uuid-funding-2.png', 97000, 'image/png',
+ NULL, 2, '2025-03-20 11:00:00', '2025-03-20 11:00:00'),
+
+(3, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-3.png',
+ 'funding-3.png', 'uuid-funding-3.png', 91000, 'image/png',
+ NULL, 3, '2025-03-29 09:00:00', '2025-03-29 09:00:00'),
+
+(4, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-4.png',
+ 'funding-4.png', 'uuid-funding-4.png', 100200, 'image/png',
+ NULL, 4, '2025-03-03 14:00:00', '2025-03-03 14:00:00'),
+
+(5, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-5.png',
+ 'funding-5.png', 'uuid-funding-5.png', 88000, 'image/png',
+ NULL, 5, '2025-04-10 15:00:00', '2025-04-10 15:00:00'),
+
+(6, 'https://s3.ap-northeast-2.amazonaws.com/item/funding-6.png',
+ 'funding-6.png', 'uuid-funding-6.png', 89000, 'image/png',
+ NULL, 6, '2025-04-10 15:10:00', '2025-04-10 15:10:00'),
+
+-- 리뷰 이미지 (review_id: 1, funding_id: 2)
+(7, 'https://s3.ap-northeast-2.amazonaws.com/item/review-2.png',
+ 'review-2.png', 'uuid-review-2.png', 101320, 'image/png',
+ 1, 2, '2025-04-02 10:00:00', '2025-04-02 10:00:00');
+
+-- 시퀀스 재설정
+SELECT setval('uploaded_file_uploaded_file_id_seq', 7);

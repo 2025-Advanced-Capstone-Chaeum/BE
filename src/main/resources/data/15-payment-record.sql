@@ -4,47 +4,22 @@ TRUNCATE TABLE payment RESTART IDENTITY CASCADE;
 INSERT INTO payment (payment_id, member_id, amount, payment_method, status,
                      imp_uid, merchant_uid, pg_provider, fail_reason,
                      created_at, updated_at)
+VALUES
+-- 관리자 김채움 (member_id: 1)
+(1, 1, 20000, 'KAKAO_PAY', 'COMPLETED', 'imp_202504010001', 'merchant_202504010001', 'nice', NULL,
+ '2025-04-01 09:55:00', '2025-04-01 09:55:00'),
+(2, 1, 19000, 'KAKAO_PAY', 'COMPLETED', 'imp_202504020001', 'merchant_202504020001', 'nice', NULL,
+ '2025-04-02 10:50:00', '2025-04-02 10:50:00'),
+(3, 1, 30000, 'KAKAO_PAY', 'COMPLETED', 'imp_202504030001', 'merchant_202504030001', 'nice', NULL,
+ '2025-04-03 09:25:00', '2025-04-03 09:25:00'),
 
-VALUES (1, 7, 40000, 'TOSS_PAY', 'COMPLETED', 'imp_100001', 'merchant_200001', 'nice', NULL, '2025-04-07 00:00:00',
-        '2025-04-07 00:00:00'),
-       (2, 9, 43000, 'PAYCO', 'CANCELED', 'imp_100002', 'merchant_200002', 'danal', NULL, '2025-03-26 00:00:00',
-        '2025-03-26 00:00:00'),
-       (3, 6, 25000, 'KAKAO_PAY', 'PENDING', 'imp_100003', 'merchant_200003', 'nice', NULL, '2025-04-12 00:00:00',
-        '2025-04-12 00:00:00'),
-       (4, 8, 46000, 'KAKAO_PAY', 'FAILED', 'imp_100004', 'merchant_200004', 'tosspayments', '사유_4',
-        '2025-03-14 00:00:00', '2025-03-14 00:00:00'),
-       (5, 10, 5000, 'PAYCO', 'FAILED', 'imp_100005', 'merchant_200005', 'kcp', '사유_5', '2025-04-06 00:00:00',
-        '2025-04-06 00:00:00'),
-       (6, 2, 15000, 'KAKAO_PAY', 'PENDING', 'imp_100006', 'merchant_200006', 'danal', NULL, '2025-04-01 00:00:00',
-        '2025-04-01 00:00:00'),
-       (7, 7, 10000, 'KAKAO_PAY', 'COMPLETED', 'imp_100007', 'merchant_200007', 'nice', NULL, '2025-04-30 00:00:00',
-        '2025-04-30 00:00:00'),
-       (8, 2, 39000, 'PAYCO', 'PENDING', 'imp_100008', 'merchant_200008', 'kcp', NULL, '2025-03-01 00:00:00',
-        '2025-03-01 00:00:00'),
-       (9, 8, 27000, 'KAKAO_PAY', 'COMPLETED', 'imp_100009', 'merchant_200009', 'kcp', NULL, '2025-04-29 00:00:00',
-        '2025-04-29 00:00:00'),
-       (10, 4, 37000, 'PAYCO', 'FAILED', 'imp_100010', 'merchant_200010', 'kcp', '사유_10', '2025-03-20 00:00:00',
-        '2025-03-20 00:00:00'),
-       (11, 6, 31000, 'TOSS_PAY', 'FAILED', 'imp_100011', 'merchant_200011', 'danal', '사유_11', '2025-03-03 00:00:00',
-        '2025-03-03 00:00:00'),
-       (12, 5, 37000, 'KAKAO_PAY', 'CANCELED', 'imp_100012', 'merchant_200012', 'danal', NULL, '2025-04-28 00:00:00',
-        '2025-04-28 00:00:00'),
-       (13, 8, 13000, 'KAKAO_PAY', 'PENDING', 'imp_100013', 'merchant_200013', 'inicis', NULL, '2025-04-30 00:00:00',
-        '2025-04-30 00:00:00'),
-       (14, 2, 10000, 'TOSS_PAY', 'COMPLETED', 'imp_100014', 'merchant_200014', 'nice', NULL, '2025-03-08 00:00:00',
-        '2025-03-08 00:00:00'),
-       (15, 2, 39000, 'KAKAO_PAY', 'FAILED', 'imp_100015', 'merchant_200015', 'nice', '사유_15', '2025-03-05 00:00:00',
-        '2025-03-05 00:00:00'),
-       (16, 6, 50000, 'KAKAO_PAY', 'FAILED', 'imp_100016', 'merchant_200016', 'danal', '사유_16', '2025-03-22 00:00:00',
-        '2025-03-22 00:00:00'),
-       (17, 7, 44000, 'TOSS_PAY', 'PENDING', 'imp_100017', 'merchant_200017', 'inicis', NULL, '2025-04-12 00:00:00',
-        '2025-04-12 00:00:00'),
-       (18, 3, 47000, 'PAYCO', 'COMPLETED', 'imp_100018', 'merchant_200018', 'kcp', NULL, '2025-04-28 00:00:00',
-        '2025-04-28 00:00:00'),
-       (19, 4, 15000, 'KAKAO_PAY', 'COMPLETED', 'imp_100019', 'merchant_200019', 'kcp', NULL, '2025-04-25 00:00:00',
-        '2025-04-25 00:00:00'),
-       (20, 7, 18000, 'TOSS_PAY', 'FAILED', 'imp_100020', 'merchant_200020', 'kcp', '사유_20', '2025-03-02 00:00:00',
-        '2025-03-02 00:00:00');
+-- 기부자 김지훈 (member_id: 2)
+(4, 2, 15000, 'TOSS_PAY', 'COMPLETED', 'imp_202504051001', 'merchant_202504051001', 'toss', NULL,
+ '2025-04-05 15:05:00', '2025-04-05 15:05:00'),
+
+-- 기부자 이미진 (member_id: 3)
+(5, 3, 18000, 'PAYCO', 'COMPLETED', 'imp_202504061001', 'merchant_202504061001', 'kcp', NULL,
+ '2025-04-06 15:55:00', '2025-04-06 15:55:00');
 
 -- 시퀀스 재설정
-SELECT setval('payment_record_payment_record_id_seq', 20);
+SELECT setval('payment_record_payment_record_id_seq', 5);

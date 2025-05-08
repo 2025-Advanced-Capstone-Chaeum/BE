@@ -10,7 +10,7 @@ VALUES
 
 -- 기부자 (2~3)
 (2, 'jihun.kim@example.com', '김지훈', NULL, 'DONOR', 'NAVER', FALSE, 15000, '2025-04-02 10:00:00', '2025-04-02 10:00:00'),
-(3, 'minji.lee@example.com', '이미진', NULL, 'KAKAO', 'DONOR', FALSE, 26000, '2025-04-03 11:10:00', '2025-04-03 11:10:00'),
+(3, 'minji.lee@example.com', '이미진', NULL, 'DONOR', 'KAKAO', FALSE, 26000, '2025-04-03 11:10:00', '2025-04-03 11:10:00'),
 
 -- 수혜자 (4~5)
 (4, 'seoyeon.park@example.com', '박서연', NULL, 'RECIPIENT', 'NAVER', TRUE, 0, '2025-04-11 13:45:00', '2025-04-11 13:45:00'),

@@ -45,3 +45,6 @@ VALUES (1, 7, 40000, 'TOSS_PAY', 'COMPLETED', 'imp_100001', 'merchant_200001', '
         '2025-04-25 00:00:00'),
        (20, 7, 18000, 'TOSS_PAY', 'FAILED', 'imp_100020', 'merchant_200020', 'kcp', '사유_20', '2025-03-02 00:00:00',
         '2025-03-02 00:00:00');
+
+-- 시퀀스 재설정
+SELECT setval('payment_record_payment_record_id_seq', 20);

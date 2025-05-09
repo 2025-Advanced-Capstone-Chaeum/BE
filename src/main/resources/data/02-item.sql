@@ -27,3 +27,6 @@ VALUES (1, '밥주기', 'INTERACTION', 'BRONZE', 'https://bucket.s3.ap-northeast
         '2025-04-03 11:10:00', '2025-04-03 11:10:00'),
        (9, '캣타워', 'INTERIOR', 'DIAMOND', 'https://bucket.s3.ap-northeast-2.amazonaws.com/item/cattower.png',
         '2025-04-03 11:20:00', '2025-04-03 11:20:00');
+
+-- 시퀀스 재설정
+SELECT setval('item_item_id_seq', 9);

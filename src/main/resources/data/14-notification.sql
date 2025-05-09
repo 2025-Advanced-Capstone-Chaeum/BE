@@ -22,10 +22,9 @@ VALUES
 (6, 1, 2, 'DONATION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-donation.png',
  '펀딩 "치매 노인을 위한 안전장비"에 기부가 완료되었습니다.', '2025-04-21 11:05:00', '2025-04-21 11:05:00'),
 (7, 1, 3, 'DONATION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-donation.png',
- '펀딩 "호흡기 질환 예방 공기청정기 지원"에 기부가 완료되었습니다.', '2025-05-08 09:35:00', '2025-05-08 09:35:00');
+ '펀딩 "호흡기 질환 예방 공기청정기 지원"에 기부가 완료되었습니다.', '2025-05-08 09:35:00', '2025-05-08 09:35:00'),
 (8, 2, 5, 'DONATION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-donation.png',
-    '펀딩 "휠체어가 있으면 할머니가 좋아하실 거 같아요.', '2025-04-22 15:10:00', '2025-04-22 15:10:00')
-,
+    '펀딩 "휠체어가 있으면 할머니가 좋아하실 거 같아요.', '2025-04-22 15:10:00', '2025-04-22 15:10:00'),
 (9, 3, 6, 'DONATION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-donation.png',
  '펀딩 "다같이 먹을 식탁이 필요해요..', '2025-04-29 16:00:00', '2025-04-29 16:10:00'),
 
@@ -44,17 +43,17 @@ VALUES
  '회원님의 펀딩 "다같이 먹을 식탁이 필요해요."가 등록되었습니다.', '2025-04-10 09:10:00', '2025-04-10 09:10:00'),
 
 -- 미션 보상 알림
-(16, 1, 1, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(16, 1, 1, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 1번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-01 09:15:00', '2025-04-01 09:15:00'),
-(17, 2, 6, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(17, 2, 6, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 1번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-02 10:15:00', '2025-04-02 10:15:00'),
-(18, 2, 8, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(18, 2, 8, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 6번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-02 10:15:00', '2025-04-02 10:15:00'),
-(19, 3, 11, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(19, 3, 11, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 1번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-03 11:25:00', '2025-04-03 11:25:00'),
-(20, 3, 13, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(20, 3, 13, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 6번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-03 11:25:00', '2025-04-03 11:25:00'),
-(21, 5, 21, 'MISSION', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
+(21, 5, 21, 'REWARD', 'https://s3.ap-northeast-2.amazonaws.com/item/notification-mission.png',
  '미션 1번을 완료하셨어요! 포인트를 확인해보세요.', '2025-04-12 11:15:00', '2025-04-12 11:15:00'),
 
 -- 친구 요청 알림

@@ -52,7 +52,8 @@ public class FileController {
     }
 
     @Operation(summary = "펀딩 사진 업로드", description = "[RECIPIENT 이상 가능]")
-    @PreAuthorize("hasRole('RECIPIENT')")
+    // @PreAuthorize("hasRole('RECIPIENT')")
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping(
         value = "/funding",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -66,7 +67,8 @@ public class FileController {
     }
 
     @Operation(summary = "펀딩 후기 사진 업로드", description = "[RECIPIENT 이상 가능]")
-    @PreAuthorize("hasRole('RECIPIENT')")
+    // @PreAuthorize("hasRole('RECIPIENT')")
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping(
         value = "/review",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

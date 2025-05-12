@@ -23,7 +23,8 @@ public class FundingController {
     private final FundingService fundingService;
 
     @Operation(summary = "펀딩 등록", description = "[RECIPIENT or ADMIN만 가능] 펀딩을 등록합니다.")
-    @PreAuthorize("hasAnyRole('RECIPIENT', 'ADMIN')")
+    // @PreAuthorize("hasAnyRole('RECIPIENT', 'ADMIN')")
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     public ApiResponse<Long> save(
         @Valid @RequestBody FundingCreateRequest request

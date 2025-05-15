@@ -39,28 +39,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         if (!isValidAccessToken(accessToken, response)) return;
 
-        // 2. 토큰 검증
-        if (!validateAndParseToken(accessToken, response)) {
-            return;
-        }
-
-        // 3. 토큰에서 유저 이메일 정보 추출
         String email = jwtUtil.getEmail(accessToken);
+        CustomMemberDetails customMember = findMemberByEmail(email, response);
+        if (customMember == null) return;
 
-        // 4. 이메일 기반 사용자 조회
-        CustomMemberDetails customMemberDetails = loadUserByEmail(email, response);
-        if (customMemberDetails == null) {
-            return;
-        }
-
-        // 5. Spring Security Context에 사용자 등록
-        Authentication authToken = new UsernamePasswordAuthenticationToken(
-                customMemberDetails,
-                null,
-                customMemberDetails.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
+        setAuthentication(customMember);
         filterChain.doFilter(request, response);
     }
 
@@ -113,7 +96,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 .orElse(null);
     }
 
-    // API 응답 생성
+    private void setAuthentication(CustomMemberDetails member) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            member, null, member.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
     private void createErrorAPIResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

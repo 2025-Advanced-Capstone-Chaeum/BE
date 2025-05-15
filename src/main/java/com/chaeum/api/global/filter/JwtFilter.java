@@ -12,6 +12,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,9 +29,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain
     ) throws ServletException, IOException {
         String accessToken = extractAccessToken(request);
         if (!StringUtils.hasText(accessToken)) {
@@ -55,22 +56,18 @@ public class JwtFilter extends OncePerRequestFilter {
     private String extractFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("AccessToken".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
+        return Arrays.stream(cookies)
+            .filter(cookie -> "AccessToken".equals(cookie.getName()))
+            .map(Cookie::getValue)
+            .findFirst()
+            .orElse(null);
     }
 
-    // Swgger 테스트 시에 사용합니다.
-    private String getTokenFromRequestBearer(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // "Bearer " 부분 제거
-        }
-        return null;
+    private String extractFromHeader(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        return (StringUtils.hasText(bearer) && bearer.startsWith("Bearer "))
+            ? bearer.substring(7)
+            : null;
     }
 
     private boolean isValidAccessToken(String accessToken, HttpServletResponse response) throws IOException {
@@ -89,11 +86,10 @@ public class JwtFilter extends OncePerRequestFilter {
         return true;
     }
 
-    // 이메일로 사용자 조회
-    private CustomMemberDetails loadUserByEmail(String email, HttpServletResponse response) throws IOException {
+    private CustomMemberDetails findMemberByEmail(String email, HttpServletResponse response) throws IOException {
         return memberRepository.findByEmail(email)
-                .map(CustomMemberDetails::new)
-                .orElse(null);
+            .map(CustomMemberDetails::new)
+            .orElse(null);
     }
 
     private void setAuthentication(CustomMemberDetails member) {

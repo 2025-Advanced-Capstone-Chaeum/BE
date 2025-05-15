@@ -146,4 +146,25 @@ public class SecurityConfig {
     public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
         return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
     }
+
+    private void configureAuthorization(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(SecurityUrlConstants.PUBLIC_URLS).permitAll()
+//            .anyRequest().permitAll();
+            .anyRequest().authenticated();
+//         TODO: 개발 편의성을 위해 전체 허용, 운영 시 authenticated()로 변경
+    }
+
+    private void configureExceptionHandling(ExceptionHandlingConfigurer<HttpSecurity> exceptionHandling) {
+        exceptionHandling.authenticationEntryPoint(customEntryPoint);
+    }
+
+    private void configureOAuth2Login(OAuth2LoginConfigurer<HttpSecurity> oauth2) {
+        oauth2
+            .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2MemberService))
+            .successHandler(customOAuth2LoginHandler)
+            .tokenEndpoint(token -> token.accessTokenResponseClient(authorizationCodeTokenResponseClient()));
+    }
 }

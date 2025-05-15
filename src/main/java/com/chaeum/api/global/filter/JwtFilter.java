@@ -39,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        if (!isValidAccessToken(accessToken, response)) return;
 
         // 2. 토큰 검증
         if (!validateAndParseToken(accessToken, response)) {
@@ -65,7 +66,12 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String resolveTokenFromCookie(HttpServletRequest request) {
+    private String extractAccessToken(HttpServletRequest request) {
+        String token = extractFromCookie(request);
+        return token != null ? token : extractFromHeader(request);
+    }
+
+    private String extractFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;
 

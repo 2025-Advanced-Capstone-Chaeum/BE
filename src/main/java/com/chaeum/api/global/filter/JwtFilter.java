@@ -32,9 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
-        // 1. 헤더에서 Access Token 추출
-        String accessToken = resolveTokenFromCookie(request) == null ? getTokenFromRequestBearer(request) : resolveTokenFromCookie(request);
+        String accessToken = extractAccessToken(request);
         if (!StringUtils.hasText(accessToken)) {
             filterChain.doFilter(request, response);
             return;
@@ -92,8 +90,7 @@ public class JwtFilter extends OncePerRequestFilter {
         return null;
     }
 
-    // 토큰 검증 및 파싱
-    private boolean validateAndParseToken(String accessToken, HttpServletResponse response) throws IOException {
+    private boolean isValidAccessToken(String accessToken, HttpServletResponse response) throws IOException {
         if (!jwtUtil.validateToken(accessToken)) {
             createErrorAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;

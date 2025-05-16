@@ -42,6 +42,9 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 리프레시 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
     NOT_BEARER_TOKEN_TYPE(HttpStatus.UNAUTHORIZED, "Bearer 타입의 토큰이 아닙니다."),
+    UNSUPPORTED_AUTH_TOKEN(HttpStatus.UNAUTHORIZED, "지원하지 않는 토큰입니다."),
+    INVALID_SIGNATURE_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 서명이 유효하지 않습니다."),
+    EMPTY_OR_NULL_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 비어 있거나 null입니다."),
 
     // 403: FORBIDDEN (권한 없음)
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),

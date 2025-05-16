@@ -8,6 +8,7 @@ import com.chaeum.api.domain.donation.event.DonationEvent;
 import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.service.FundingService;
+import com.chaeum.api.domain.funding.service.RecommendedFundingService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.memberMission.service.MemberMissionService;
 import com.chaeum.api.domain.mission.entity.MissionType;
@@ -29,6 +30,7 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
     private final FundingService fundingService;
+    private final RecommendedFundingService recommendedFundingService;
     private final LoginMemberProvider loginMemberProvider;
     private final TitleService titleService;
     private final ApplicationEventPublisher eventPublisher;
@@ -49,6 +51,8 @@ public class DonationService {
             DonationEvent.from(savedDonation, member, funding.getMember())
         );
 
+        List<Donation> myDonations = findByMemberId(member.getId());
+        recommendedFundingService.recommendFunding(funding, myDonations);
         return DonationCreateResponse.toDto(savedDonation);
     }
 
@@ -74,7 +78,7 @@ public class DonationService {
 
     @Transactional(readOnly = true)
     public List<DonationSummaryResponse> getDonationSummariesByMemberId(Long memberId) {
-        return donationRepository.findByMemberIdOrderByCreatedAtDesc(memberId).stream()
+        return findByMemberId(memberId).stream()
             .map(DonationSummaryResponse::toDto)
             .toList();
     }
@@ -85,6 +89,12 @@ public class DonationService {
         return donationId;
     }
 
+    @Transactional(readOnly = true)
+    public List<Donation> findByMemberId(Long memberId) {
+        return donationRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
+    }
+
+    @Transactional(readOnly = true)
     public Donation findById(Long id) {
         return donationRepository.findById(id)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.DONATION_NOT_FOUND));

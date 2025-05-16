@@ -12,7 +12,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/funding")
@@ -59,6 +67,20 @@ public class FundingController {
         @RequestParam(name = "limit", defaultValue = "3") int limit
     ) {
         IdCursorResult<FundingResponse> fundings = fundingService.getFundingsByCondition(status, title, cursor, limit);
+        return ApiResponse.success(fundings);
+    }
+
+    @Operation(
+        summary = "추천순 펀딩 조회",
+        description = "[모든 Role 가능] 개인화된 추천 순으로 펀딩 목록을 조회합니다."
+    )
+    @PreAuthorize("hasRole('DONOR')")
+    @GetMapping("/recommend")
+    public ApiResponse<IdCursorResult<FundingResponse>> getRecommendedFundings(
+        @RequestParam(name = "cursor", required = false) Long cursor,
+        @RequestParam(name = "limit", defaultValue = "3") int limit
+    ) {
+        IdCursorResult<FundingResponse> fundings = fundingService.getRecommendedFundings(cursor, limit);
         return ApiResponse.success(fundings);
     }
 

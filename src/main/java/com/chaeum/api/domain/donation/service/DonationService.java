@@ -4,6 +4,7 @@ import com.chaeum.api.domain.donation.dto.request.DonationCreateRequest;
 import com.chaeum.api.domain.donation.dto.response.DonationCreateResponse;
 import com.chaeum.api.domain.donation.dto.response.DonationSummaryResponse;
 import com.chaeum.api.domain.donation.entity.Donation;
+import com.chaeum.api.domain.donation.entity.DonationStatus;
 import com.chaeum.api.domain.donation.event.DonationEvent;
 import com.chaeum.api.domain.donation.repository.DonationRepository;
 import com.chaeum.api.domain.funding.entity.Funding;
@@ -107,5 +108,17 @@ public class DonationService {
             .map(donation -> donation.getMember().getId())
             .distinct()
             .toList();
+    }
+
+    @Transactional
+    public void failDonation(Donation donation, ErrorCode code) {
+        donation.manageStatus(DonationStatus.FAILED);
+        throw ChaeumException.from(code);
+    }
+
+    @Transactional
+    public void completeDonation(Donation donation) {
+        donation.manageStatus(DonationStatus.COMPLETED);
+        donation.getFunding().addCurrentAmount(donation.getAmount());
     }
 }

@@ -3,23 +3,24 @@ package com.chaeum.api.global.filter;
 import com.chaeum.api.domain.member.repository.MemberRepository;
 import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.exception.ErrorCode;
-import com.chaeum.api.global.response.ErrorResponse;
-import com.chaeum.api.global.utils.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.chaeum.api.global.auth.util.JwtUtil;
+import com.chaeum.api.global.utils.ResponseUtil;
+import com.chaeum.api.global.utils.TokenConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -33,75 +34,69 @@ public class JwtFilter extends OncePerRequestFilter {
         HttpServletResponse response,
         FilterChain filterChain
     ) throws ServletException, IOException {
+
         String accessToken = extractAccessToken(request);
+
         if (!StringUtils.hasText(accessToken)) {
             filterChain.doFilter(request, response);
             return;
         }
-        if (!isValidAccessToken(accessToken, response)) return;
+        if (!validateAccessTokenOrRespond(accessToken, response)) {
+            return;
+        }
 
         String email = jwtUtil.getEmail(accessToken);
-        CustomMemberDetails customMember = findMemberByEmail(email, response);
-        if (customMember == null) return;
+        CustomMemberDetails memberDetails = memberRepository.findByEmail(email)
+            .map(CustomMemberDetails::new)
+            .orElse(null);
 
-        setAuthentication(customMember);
+        if (memberDetails == null) {
+            ResponseUtil.writeError(response, ErrorCode.MEMBER_NOT_FOUND);
+            return;
+        }
+
+        setAuthentication(memberDetails);
         filterChain.doFilter(request, response);
     }
 
     private String extractAccessToken(HttpServletRequest request) {
-        String token = extractFromCookie(request);
-        return token != null ? token : extractFromHeader(request);
+        return extractFromCookie(request).orElseGet(() -> extractFromHeader(request));
     }
 
-    private String extractFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
-        return Arrays.stream(cookies)
-            .filter(cookie -> "AccessToken".equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findFirst()
-            .orElse(null);
+    private Optional<String> extractFromCookie(HttpServletRequest request) {
+        return Optional.ofNullable(request.getCookies())
+            .flatMap(cookies -> Arrays.stream(cookies)
+                .filter(cookie -> TokenConstants.ACCESS_TOKEN_COOKIE.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst());
     }
 
     private String extractFromHeader(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        return (StringUtils.hasText(bearer) && bearer.startsWith("Bearer "))
-            ? bearer.substring(7)
+        String bearer = request.getHeader(TokenConstants.AUTH_HEADER);
+        return (StringUtils.hasText(bearer) && bearer.startsWith(TokenConstants.BEARER_PREFIX))
+            ? bearer.substring(TokenConstants.BEARER_PREFIX.length())
             : null;
     }
 
-    private boolean isValidAccessToken(String accessToken, HttpServletResponse response) throws IOException {
-        if (!jwtUtil.validateToken(accessToken)) {
-            createErrorAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+    private boolean validateAccessTokenOrRespond(String token, HttpServletResponse response) throws IOException {
+        if (!jwtUtil.validateToken(token)) {
+            ResponseUtil.writeError(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;
         }
-        if (jwtUtil.isExpired(accessToken)) {
-            createErrorAPIResponse(response, ErrorCode.EXPIRED_AUTH_TOKEN);
+        if (jwtUtil.isExpired(token)) {
+            ResponseUtil.writeError(response, ErrorCode.EXPIRED_AUTH_TOKEN);
             return false;
         }
-        if (!"access".equals(jwtUtil.getCategory(accessToken))) {
-            createErrorAPIResponse(response, ErrorCode.INVALID_AUTH_TOKEN);
+        if (!TokenConstants.ACCESS_TOKEN_CATEGORY.equals(jwtUtil.getCategory(token))) {
+            ResponseUtil.writeError(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;
         }
         return true;
     }
 
-    private CustomMemberDetails findMemberByEmail(String email, HttpServletResponse response) throws IOException {
-        return memberRepository.findByEmail(email)
-            .map(CustomMemberDetails::new)
-            .orElse(null);
-    }
-
-    private void setAuthentication(CustomMemberDetails member) {
+    private void setAuthentication(CustomMemberDetails memberDetails) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            member, null, member.getAuthorities());
+            memberDetails, null, memberDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-    private void createErrorAPIResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
-        response.setStatus(errorCode.getStatus().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), ErrorResponse.error(errorCode));
     }
 }

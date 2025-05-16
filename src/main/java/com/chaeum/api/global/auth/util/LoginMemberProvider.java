@@ -21,7 +21,7 @@ public class LoginMemberProvider {
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomMemberDetails customMemberDetails) {
-            return customMemberDetails.getMember();
+            return customMemberDetails.member();
         }
         throw ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND);
     }

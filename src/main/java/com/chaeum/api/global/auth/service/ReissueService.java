@@ -31,7 +31,7 @@ public class ReissueService {
         String refreshToken = extractValidRefreshToken(request);
 
         // 2. 사용자 정보 추출
-        Long memberId = member.getMember().getId();
+        Long memberId = member.member().getId();
         String email = jwtUtil.getEmail(refreshToken);
         Role role = Role.valueOf(String.valueOf(jwtUtil.getRole(refreshToken)));
 

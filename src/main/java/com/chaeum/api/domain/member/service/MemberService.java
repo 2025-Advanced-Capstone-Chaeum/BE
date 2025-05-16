@@ -38,6 +38,13 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    @Transactional
+    public void deductPoints(Member member, BigDecimal amount) {
+        member.validatePointInsufficient(amount);
+        member.deductPoints(amount);
+        memberRepository.save(member);
+    }
+
     @Transactional(readOnly = true)
     public MemberMyPageResponse getMemberMyPage() {
         Member member = loginMemberProvider.getCurrentLoginMember();

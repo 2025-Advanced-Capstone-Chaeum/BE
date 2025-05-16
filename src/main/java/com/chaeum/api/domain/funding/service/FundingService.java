@@ -6,8 +6,10 @@ import com.chaeum.api.domain.funding.dto.response.FundingResponse;
 import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
+import com.chaeum.api.domain.funding.entity.RecommendedFunding;
 import com.chaeum.api.domain.funding.event.FundingEvent;
 import com.chaeum.api.domain.funding.repository.FundingRepository;
+import com.chaeum.api.domain.funding.repository.RecommendedFundingRepository;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
@@ -30,6 +32,7 @@ import java.util.List;
 public class FundingService {
 
     private final FundingRepository fundingRepository;
+    private final RecommendedFundingRepository recommendedFundingRepository;
     private final LoginMemberProvider loginMemberProvider;
     private final ApplicationEventPublisher eventPublisher;
     private final FileService fileService;
@@ -44,7 +47,6 @@ public class FundingService {
         eventPublisher.publishEvent(
             FundingEvent.from(savedFunding, member)
         );
-        System.out.println("이벤트 처리 ");
 
         return funding.getId();
     }
@@ -62,7 +64,7 @@ public class FundingService {
         List<Funding> filteredFundings = fundingRepository.findAll().stream()
             .filter(funding -> isStatusMatch(funding, status))
             .filter(funding -> isTitleMatch(funding, title))
-            .filter(funding -> isCursorAfter(funding, cursor))
+            .filter(funding -> isCursorAfterForFunding(funding, cursor))
             .sorted(Comparator
                 .comparing(Funding::getCreatedAt, Comparator.reverseOrder())
                 .thenComparing(Funding::getId, Comparator.reverseOrder())
@@ -75,6 +77,28 @@ public class FundingService {
             .toList();
 
         return IdCursorResult.of(responses, cursor, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public IdCursorResult<FundingResponse> getRecommendedFundings(Long cursor, int limit) {
+        List<RecommendedFunding> filteredRecommendedFundings = recommendedFundingRepository.findAll().stream()
+            .filter(funding -> isCursorAfterForRecommendedFundings(funding, cursor))
+            .sorted(Comparator.comparing(RecommendedFunding::getId))
+            .limit(limit)
+            .toList();
+
+        List<FundingResponse> responses = filteredRecommendedFundings.stream()
+            .map(RecommendedFunding::getFundingId)
+            .map(this::findById)
+            .map(FundingResponse::toDto)
+            .toList();
+
+        return IdCursorResult.of(responses, cursor, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Funding> findAll() {
+        return fundingRepository.findAll();
     }
 
     @Transactional
@@ -114,7 +138,11 @@ public class FundingService {
             || funding.getTitle().toLowerCase().contains(keyword.toLowerCase());
     }
 
-    private boolean isCursorAfter(Funding funding, Long cursor) {
+    private boolean isCursorAfterForFunding(Funding funding, Long cursor) {
+        return cursor == null || funding.getId() > cursor;
+    }
+
+    private boolean isCursorAfterForRecommendedFundings(RecommendedFunding funding, Long cursor) {
         return cursor == null || funding.getId() > cursor;
     }
 

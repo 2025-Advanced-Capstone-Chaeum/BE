@@ -64,6 +64,7 @@ jobs:
           CORS_ALLOW_CREDENTIALS: ${{ secrets.CORS_ALLOW_CREDENTIALS }}
           CORS_MAX_AGE: ${{ secrets.CORS_MAX_AGE }}
           FRONTEND_HOME_URL: ${{ secrets.FRONTEND_HOME_URL }}
+          OCR_API_KEY: ${{ secrets.OCR_API_KEY }}
           SPRINGDOC_API_DOCS_PATH: ${{ secrets.SPRINGDOC_API_DOCS_PATH }}
           SPRINGDOC_SWAGGER_UI_PATH: ${{ secrets.SPRINGDOC_SWAGGER_UI_PATH }}
           SPRINGDOC_PACKAGES_TO_SCAN: ${{ secrets.SPRINGDOC_PACKAGES_TO_SCAN }}

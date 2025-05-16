@@ -21,15 +21,15 @@ public class CustomOAuth2Member implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return oAuth2MemberDto.getAuthorities();
+        return oAuth2MemberDto.authorities();
     }
 
     @Override
     public String getName() {
-        return oAuth2MemberDto.getName();
+        return oAuth2MemberDto.name();
     }
 
     public String getEmail() {
-        return oAuth2MemberDto.getEmail();
+        return oAuth2MemberDto.email();
     }
 }

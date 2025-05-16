@@ -108,6 +108,10 @@ cors:
 frontend:
   home-url: ${FRONTEND_HOME_URL}
 
+ai:
+  server:
+    recommend: ${RECOMMEND_SERVER_ENDPOINT}
+
 internal:
   api:
     key: ${OCR_API_KEY}

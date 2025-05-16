@@ -7,7 +7,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NaverResponse implements OAuth2Response {
 
-    private final Map<String, Object> attribute;
+    private final Map<String, Object> attributes;
+
+    private Map<String, Object> response() {
+        return (Map<String, Object>) attributes.get("response");
+    }
 
     @Override
     public String getProvider() {
@@ -15,26 +19,24 @@ public class NaverResponse implements OAuth2Response {
     }
 
     @Override
-    public String getProviderId() {
-        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
-        return response != null ? response.get("id").toString() : null;
-    }
-
-    @Override
     public String getEmail() {
-        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
-        return response != null ? response.get("email").toString() : null;
+        Map<String, Object> res = response();
+        return res != null ? toStringOrNull(res.get("email")) : null;
     }
 
     @Override
     public String getName() {
-        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
-        return response != null ? response.get("name").toString() : null;
+        Map<String, Object> res = response();
+        return res != null ? toStringOrNull(res.get("name")) : "unknown";
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
-        return response != null ? response.get("profile_image").toString() : null;
+        Map<String, Object> res = response();
+        return res != null ? toStringOrNull(res.get("profile_image")) : null;
+    }
+
+    private String toStringOrNull(Object obj) {
+        return obj != null ? obj.toString() : null;
     }
 }

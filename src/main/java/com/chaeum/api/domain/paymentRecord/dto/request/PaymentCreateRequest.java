@@ -18,7 +18,7 @@ public class PaymentCreateRequest {
     private Long donationId;
 
     @NotNull
-    @Schema(description = "최종 결제 금액", example = "3000")
+    @Schema(description = "최종 결제 금액 (단위: 원)", example = "3000")
     private BigDecimal amount;
 
     @NotNull
@@ -26,13 +26,33 @@ public class PaymentCreateRequest {
     private String transactionId;
 
     @NotNull
-    @Schema(description = "결제 방법", example = "PAYCO")
+    @Schema(
+        description = "결제 수단",
+        example = "KAKAO_PAY",
+        allowableValues = {"PAYCO", "TOSS_PAY", "KAKAO_PAY"}
+    )
     private PaymentMethod paymentMethod;
 
     @NotNull
-    @Schema(description = "결제 상태", example = "PENDING")
+    @Schema(
+        description = "결제 상태",
+        example = "PENDING",
+        allowableValues = {"PENDING", "COMPLETED", "FAILED", "CANCELED"}
+    )
     private PaymentStatus status;
 
     @NotNull
-    private PaymentGatewayInfoRequest paymentGatewayInfoRequest;
+    @Schema(description = "아임포트 결제 고유 ID", example = "imp_448280090638")
+    private String impUid;
+
+    @NotNull
+    @Schema(description = "우리 시스템에서 발급한 주문 번호", example = "donation_20250324_0001")
+    private String merchantUid;
+
+    @NotNull
+    @Schema(description = "PG사 이름 (예: kakaopay, tosspay, payco)", example = "kakaopay")
+    private String gatewayProvider;
+
+    @Schema(description = "결제 실패 사유 (실패 시에만 포함)", example = "잔액 부족", required = false)
+    private String failReason;
 }

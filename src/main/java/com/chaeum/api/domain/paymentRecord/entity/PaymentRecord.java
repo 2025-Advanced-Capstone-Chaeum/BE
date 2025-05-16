@@ -56,21 +56,29 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "transaction_id", length = 255)
     private String transactionId;
 
-    @Embedded
-    private PaymentGatewayInfo gatewayInfo;
+    @Column(name = "imp_uid", length = 255)
+    private String impUid;
 
-    public static PaymentRecord create(
-            Member member,
-            PaymentCreateRequest paymentCreateRequest,
-            PaymentGatewayInfo paymentGatewayInfo
-    ) {
+    @Column(name = "merchant_uid", length = 255)
+    private String merchantUid;
+
+    @Column(name = "pg_provider", length = 100)
+    private String pgProvider;
+
+    @Column(name = "fail_reason")
+    private String failReason;
+
+    public static PaymentRecord create(Member member, PaymentCreateRequest request) {
         return PaymentRecord.builder()
-                .member(member)
-                .amount(paymentCreateRequest.getAmount())
-                .paymentMethod(paymentCreateRequest.getPaymentMethod())
-                .status(paymentCreateRequest.getStatus())
-                .transactionId(paymentCreateRequest.getTransactionId())
-                .gatewayInfo(paymentGatewayInfo)
-                .build();
+            .member(member)
+            .amount(request.getAmount())
+            .paymentMethod(request.getPaymentMethod())
+            .status(request.getStatus())
+            .transactionId(request.getTransactionId())
+            .impUid(request.getImpUid())
+            .merchantUid(request.getMerchantUid())
+            .pgProvider(request.getGatewayProvider())
+            .failReason(request.getFailReason())
+            .build();
     }
 }

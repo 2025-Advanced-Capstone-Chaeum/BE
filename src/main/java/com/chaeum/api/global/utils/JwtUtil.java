@@ -1,18 +1,20 @@
 package com.chaeum.api.global.utils;
 
 import com.chaeum.api.domain.member.entity.Role;
+import com.chaeum.api.global.exception.ChaeumException;
+import com.chaeum.api.global.exception.ErrorCode;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
+import io.jsonwebtoken.UnsupportedJwtException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-@Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
     private final SecretKey secretKey;
@@ -35,29 +37,37 @@ public class JwtUtil {
             .before(new Date(System.currentTimeMillis()));
     }
 
-    // 5. JWT 토큰 생성
     public String createJwt(String category, String email, Role role, Long expiredMs) {
         return Jwts.builder()
-                .claim("category", category)
-                .claim("email", email)
-                .claim("role", role.name())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
+            .claim("category", category)
+            .claim("email", email)
+            .claim("role", role.name())
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + expiredMs))
+            .signWith(secretKey)
+            .compact();
     }
 
-    // 6. 토큰 검증 로직
     public boolean validateToken(String token) {
+        getClaims(token); // 내부에서 예외 발생 시 throw or 성공
+        return true;
+    }
+
+    private Claims getClaims(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (Exception e) {
-            log.warn("JWT 검증 실패: {}", e.getMessage());
-            return false;
+            return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw ChaeumException.from(ErrorCode.EXPIRED_AUTH_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw ChaeumException.from(ErrorCode.UNSUPPORTED_AUTH_TOKEN);
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            throw ChaeumException.from(ErrorCode.INVALID_SIGNATURE_TOKEN);
+        } catch (IllegalArgumentException e) {
+            throw ChaeumException.from(ErrorCode.EMPTY_OR_NULL_TOKEN);
         }
     }
 

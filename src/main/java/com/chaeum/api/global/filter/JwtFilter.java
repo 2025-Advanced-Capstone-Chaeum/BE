@@ -5,7 +5,7 @@ import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.auth.util.JwtUtil;
 import com.chaeum.api.global.utils.ResponseUtil;
-import com.chaeum.api.global.utils.TokenConstants;
+import com.chaeum.api.global.utils.SecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -66,15 +66,15 @@ public class JwtFilter extends OncePerRequestFilter {
     private Optional<String> extractFromCookie(HttpServletRequest request) {
         return Optional.ofNullable(request.getCookies())
             .flatMap(cookies -> Arrays.stream(cookies)
-                .filter(cookie -> TokenConstants.ACCESS_TOKEN_COOKIE_NAME.equals(cookie.getName()))
+                .filter(cookie -> SecurityConstants.ACCESS_TOKEN_COOKIE_NAME.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst());
     }
 
     private String extractFromHeader(HttpServletRequest request) {
-        String bearer = request.getHeader(TokenConstants.AUTH_HEADER);
-        return (StringUtils.hasText(bearer) && bearer.startsWith(TokenConstants.BEARER_PREFIX))
-            ? bearer.substring(TokenConstants.BEARER_PREFIX.length())
+        String bearer = request.getHeader(SecurityConstants.AUTH_HEADER);
+        return (StringUtils.hasText(bearer) && bearer.startsWith(SecurityConstants.BEARER_PREFIX))
+            ? bearer.substring(SecurityConstants.BEARER_PREFIX.length())
             : null;
     }
 
@@ -87,7 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
             ResponseUtil.writeError(response, ErrorCode.EXPIRED_AUTH_TOKEN);
             return false;
         }
-        if (!TokenConstants.ACCESS_TOKEN_CATEGORY.equals(jwtUtil.getCategory(token))) {
+        if (!SecurityConstants.ACCESS_TOKEN_CATEGORY.equals(jwtUtil.getCategory(token))) {
             ResponseUtil.writeError(response, ErrorCode.INVALID_AUTH_TOKEN);
             return false;
         }

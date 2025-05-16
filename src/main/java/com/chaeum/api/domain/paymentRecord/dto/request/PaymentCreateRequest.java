@@ -53,6 +53,6 @@ public class PaymentCreateRequest {
     @Schema(description = "PG사 이름 (예: kakaopay, tosspay, payco)", example = "kakaopay")
     private String gatewayProvider;
 
-    @Schema(description = "결제 실패 사유 (실패 시에만 포함)", example = "잔액 부족", required = false)
+    @Schema(description = "결제 실패 사유 (실패 시에만 포함)", example = "잔액 부족", nullable = true)
     private String failReason;
 }

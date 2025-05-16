@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private Optional<String> extractFromCookie(HttpServletRequest request) {
         return Optional.ofNullable(request.getCookies())
             .flatMap(cookies -> Arrays.stream(cookies)
-                .filter(cookie -> TokenConstants.ACCESS_TOKEN_COOKIE.equals(cookie.getName()))
+                .filter(cookie -> TokenConstants.ACCESS_TOKEN_COOKIE_NAME.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst());
     }

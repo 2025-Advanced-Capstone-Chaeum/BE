@@ -1,4 +1,4 @@
-package com.chaeum.api.global.utils;
+package com.chaeum.api.global.auth.util;
 
 import com.chaeum.api.domain.member.entity.Role;
 import com.chaeum.api.global.exception.ChaeumException;

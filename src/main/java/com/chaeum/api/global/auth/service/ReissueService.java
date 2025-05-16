@@ -7,7 +7,7 @@ import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.properties.JwtProperties;
-import com.chaeum.api.global.utils.JwtUtil;
+import com.chaeum.api.global.auth.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

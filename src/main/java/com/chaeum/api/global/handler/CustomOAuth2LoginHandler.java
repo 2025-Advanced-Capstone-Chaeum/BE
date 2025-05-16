@@ -8,7 +8,7 @@ import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.properties.JwtProperties;
-import com.chaeum.api.global.utils.JwtUtil;
+import com.chaeum.api.global.auth.util.JwtUtil;
 import com.chaeum.api.global.auth.domain.RefreshToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,12 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @Component
 @RequiredArgsConstructor

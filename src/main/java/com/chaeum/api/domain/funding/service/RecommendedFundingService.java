@@ -39,11 +39,11 @@ public class RecommendedFundingService {
         FundingInfoFlaskRequest currentDonatedFundingInfo = mapToFundingInfoFlaskRequest(donatedFunding);
 
         // Flask에 요청할 DTO 조합
-        FundingRecommendFlaskRequest fundingRecommendFlaskRequest =
+        FundingRecommendFlaskRequest request =
             FundingRecommendFlaskRequest.create(allFundingInfos, myFundingInfos, currentDonatedFundingInfo);
 
         // AI 서버에 추천 요청
-        Long[] responseIds = requestRecommendFundingToFlask(fundingRecommendFlaskRequest);
+        Long[] responseIds = requestRecommendFundingToFlask(request);
 
         // 해당 회원의 RecommendedFunding 테이블 전체 삭제
         Member member = loginMemberProvider.getCurrentLoginMember();
@@ -58,9 +58,9 @@ public class RecommendedFundingService {
         recommendedFundingRepository.saveAll(recommendedFundings);
     }
 
-    private Long[] requestRecommendFundingToFlask(FundingRecommendFlaskRequest fundingRecommendFlaskRequest) {
+    private Long[] requestRecommendFundingToFlask(FundingRecommendFlaskRequest request) {
         Long[] recommendedFundingIds = restTemplate.postForObject(
-            recommendServerEndpoint, fundingRecommendFlaskRequest, Long[].class
+            recommendServerEndpoint, request, Long[].class
         );
         return recommendedFundingIds == null ? new Long[0] : recommendedFundingIds;
     }

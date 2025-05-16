@@ -101,7 +101,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomLogoutFilter logoutFilter() {
-        return new CustomLogoutFilter(jwtUtil, refreshTokenRepository);
+        return new CustomLogoutFilter(jwtUtil, memberRepository, refreshTokenRepository);
     }
 
     @Bean

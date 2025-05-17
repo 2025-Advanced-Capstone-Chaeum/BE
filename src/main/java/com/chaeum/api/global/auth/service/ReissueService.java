@@ -45,7 +45,7 @@ public class ReissueService {
         String newRefreshToken = jwtUtil.createJwt(SecurityConstants.REFRESH_TOKEN_CATEGORY, email, role,
             jwtProperties.getRefreshTokenExpiration());
 
-        refreshTokenRepository.save(new RefreshToken(memberId, email, newRefreshToken));
+        refreshTokenRepository.save(new RefreshToken(memberId, newRefreshToken));
 
         response.addHeader(SecurityConstants.AUTH_HEADER, SecurityConstants.BEARER_PREFIX + newAccessToken);
         response.addHeader(SecurityConstants.SET_COOKIE_HEADER, createRefreshCookie(newRefreshToken).toString());

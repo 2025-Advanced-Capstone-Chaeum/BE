@@ -7,6 +7,7 @@ import com.chaeum.api.global.auth.domain.CustomOAuth2Member;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
+import com.chaeum.api.global.properties.FrontendProperties;
 import com.chaeum.api.global.properties.JwtProperties;
 import com.chaeum.api.global.auth.util.JwtUtil;
 import com.chaeum.api.global.auth.domain.RefreshToken;
@@ -15,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -29,14 +29,9 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
 
     private final JwtUtil jwtUtil;
     private final JwtProperties jwtProperties;
+    private final FrontendProperties frontendProperties;
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${frontend.home-url}")
-    private String homeUrl;
-
-    @Value("${spring.jwt.cookie-domain}")
-    private String cookieDomain;
 
     @Override
     public void onAuthenticationSuccess(
@@ -62,7 +57,7 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         addTokenCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, refreshToken,
             jwtProperties.getRefreshTokenExpiration());
 
-        response.sendRedirect(homeUrl);
+        response.sendRedirect(frontendProperties.getHomeUrl());
     }
 
     private String createToken(String category, String email, Role role, long expiration) {
@@ -70,7 +65,7 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
     }
 
     private void saveRefreshToken(Member member, String refreshTokenValue) {
-        RefreshToken refreshToken = new RefreshToken(member.getId(), member.getEmail(), refreshTokenValue);
+        RefreshToken refreshToken = new RefreshToken(member.getId(), refreshTokenValue);
         refreshTokenRepository.save(refreshToken);
     }
 
@@ -81,7 +76,7 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
             .secure(true)
             .httpOnly(true)
             .sameSite("None")
-            .domain(cookieDomain)
+            .domain(jwtProperties.getCookieDomain())
             .build();
 
         response.addHeader(SecurityConstants.SET_COOKIE_HEADER, cookie.toString());

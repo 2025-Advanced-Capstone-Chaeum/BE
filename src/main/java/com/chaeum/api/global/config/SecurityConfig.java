@@ -137,8 +137,8 @@ public class SecurityConfig {
         auth
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(SecurityUrlConstants.PUBLIC_URLS).permitAll()
-//            .anyRequest().permitAll();
-            .anyRequest().authenticated();
+            .anyRequest().permitAll();
+//            .anyRequest().authenticated();
 //         TODO: 개발 편의성을 위해 전체 허용, 운영 시 authenticated()로 변경
     }
 

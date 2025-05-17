@@ -23,9 +23,9 @@ public class ReissueController {
     @Operation(
         summary = "토큰 재발급",
         description = """
-            [모든 Role 사용 가능] Access Token이 만료되면 새로운 토큰을 발급받습니다.
-            기존의 Refresh Token은 삭제되며, 새로운 Access Token 및 Refresh Token을 발급받습니다.
-            두 토큰은 쿠키에 
+            [모든 Role 사용 가능] 만료된 Access Token을 재발급합니다.<br>
+            기존 Refresh Token은 삭제되고, 새로운 Access/Refresh Token이 발급됩니다.<br>
+            두 토큰은 쿠키에 담겨 클라이언트에 반환됩니다.
             """
     )
     @PreAuthorize("hasRole('DONOR')")

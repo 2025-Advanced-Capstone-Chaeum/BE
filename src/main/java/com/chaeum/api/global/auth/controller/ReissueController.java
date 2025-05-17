@@ -1,15 +1,13 @@
 package com.chaeum.api.global.auth.controller;
 
-import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.auth.service.ReissueService;
-import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,11 +31,10 @@ public class ReissueController {
     @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     ApiResponse<Void> reissue(
-            @AuthenticationPrincipal CustomMemberDetails member,
-            HttpServletRequest request,
-            HttpServletResponse response
+        HttpServletRequest request,
+        HttpServletResponse response
     ) {
-        reissueService.reissueAccessToken(member, request, response);
+        reissueService.reissueAccessToken(request, response);
         return ApiResponse.success();
     }
 }

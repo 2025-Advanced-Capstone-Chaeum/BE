@@ -2,8 +2,8 @@ package com.chaeum.api.global.auth.service;
 
 import com.chaeum.api.domain.member.entity.Role;
 import com.chaeum.api.global.auth.domain.RefreshToken;
-import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.properties.JwtProperties;
@@ -25,30 +25,32 @@ public class ReissueService {
 
     private final JwtUtil jwtUtil;
     private final JwtProperties jwtProperties;
+    private final LoginMemberProvider loginMemberProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void reissueAccessToken(
-        CustomMemberDetails member,
         HttpServletRequest request,
         HttpServletResponse response
     ) {
         String refreshToken = extractValidRefreshToken(request);
 
-        Long memberId = member.member().getId();
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         String email = jwtUtil.getEmail(refreshToken);
         Role role = Role.valueOf(String.valueOf(jwtUtil.getRole(refreshToken)));
 
         refreshTokenRepository.deleteById(String.valueOf(memberId));
 
-        String newAccessToken = jwtUtil.createJwt(SecurityConstants.ACCESS_TOKEN_CATEGORY, email, role,
+        String newAccessToken = createToken(SecurityConstants.ACCESS_TOKEN_CATEGORY, email, role,
             jwtProperties.getAccessTokenExpiration());
-        String newRefreshToken = jwtUtil.createJwt(SecurityConstants.REFRESH_TOKEN_CATEGORY, email, role,
+        String newRefreshToken = createToken(SecurityConstants.REFRESH_TOKEN_CATEGORY, email, role,
             jwtProperties.getRefreshTokenExpiration());
 
         refreshTokenRepository.save(new RefreshToken(memberId, newRefreshToken));
 
-        response.addHeader(SecurityConstants.AUTH_HEADER, SecurityConstants.BEARER_PREFIX + newAccessToken);
-        response.addHeader(SecurityConstants.SET_COOKIE_HEADER, createRefreshCookie(newRefreshToken).toString());
+        addTokenCookie(response, SecurityConstants.ACCESS_TOKEN_COOKIE_NAME, newAccessToken,
+            jwtProperties.getAccessTokenExpiration());
+        addTokenCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, newRefreshToken,
+            jwtProperties.getRefreshTokenExpiration());
     }
 
     private String extractValidRefreshToken(HttpServletRequest request) {
@@ -72,14 +74,20 @@ public class ReissueService {
         return refreshToken;
     }
 
-    private ResponseCookie createRefreshCookie(String value) {
-        return ResponseCookie.from(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, value)
+    private void addTokenCookie(HttpServletResponse response, String name, String value, long maxAgeMillis) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+            .maxAge(maxAgeMillis / 1000)
             .path("/")
-            .sameSite("None")
-            .httpOnly(true)
             .secure(true)
+            .httpOnly(true)
+            .sameSite("None")
             .domain(jwtProperties.getCookieDomain())
-            .maxAge(jwtProperties.getRefreshTokenExpiration())
             .build();
+
+        response.addHeader(SecurityConstants.SET_COOKIE_HEADER, cookie.toString());
+    }
+
+    private String createToken(String category, String email, Role role, long expirationMillis) {
+        return jwtUtil.createJwt(category, email, role, expirationMillis);
     }
 }

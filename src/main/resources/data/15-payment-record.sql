@@ -1,7 +1,7 @@
 -- [PAYMENT 더미 데이터]
-TRUNCATE TABLE payment RESTART IDENTITY CASCADE;
+TRUNCATE TABLE payment_record RESTART IDENTITY CASCADE;
 
-INSERT INTO payment (payment_id, member_id, amount, payment_method, status,
+INSERT INTO payment_record (payment_record_id, member_id, amount, payment_method, status,
                      imp_uid, merchant_uid, pg_provider, fail_reason,
                      created_at, updated_at)
 VALUES

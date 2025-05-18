@@ -2,6 +2,7 @@ package com.chaeum.api.domain.paymentRecord.service;
 
 import com.chaeum.api.domain.donation.entity.Donation;
 import com.chaeum.api.domain.donation.service.DonationService;
+import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
@@ -31,9 +32,10 @@ import java.util.List;
 public class PaymentRecordService {
 
     private final IamportClient iamportClient;
+    private final MemberService memberService;
+    private final FundingService fundingService;
     private final DonationService donationService;
     private final LoginMemberProvider loginMemberProvider;
-    private final MemberService memberService;
     private final PaymentRecordRepository paymentRecordRepository;
 
     @Transactional
@@ -42,11 +44,12 @@ public class PaymentRecordService {
         Donation donation = donationService.findById(request.getDonationId());
 
         validateIamportPayment(request.getImpUid(), request.getAmount(), donation);
-        memberService.deductPoints(member, donation.getAmount());
+        memberService.deductPoints(member, request.getPoints());
 
         PaymentRecord payment = PaymentRecord.create(member, request);
         paymentRecordRepository.save(payment);
 
+        payment.updateStatus(PaymentStatus.COMPLETED);
         donationService.completeDonation(donation);
 
         return payment.getId();
@@ -78,14 +81,20 @@ public class PaymentRecordService {
         return paymentId;
     }
 
-    private void validateIamportPayment(String impUid, BigDecimal expectedAmount, Donation donation)
-        throws IamportResponseException, IOException {
-        Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
-        if (payment == null) {
-            donationService.failDonation(donation, ErrorCode.PAYMENT_VERIFY_FAILED);
-        }
-        if (isAmountMismatch(payment.getAmount(), expectedAmount)) {
-            donationService.failDonation(donation, ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+    private void validateIamportPayment(String impUid, BigDecimal expectedAmount, Donation donation) {
+        try {
+            Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
+            if (payment == null) {
+                donationService.failDonation(donation);
+                throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
+            }
+            if (isAmountMismatch(payment.getAmount(), expectedAmount)) {
+                donationService.failDonation(donation);
+                throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+            }
+        } catch (IamportResponseException | IOException e) {
+            donationService.failDonation(donation);
+            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
         }
     }
 

@@ -2,7 +2,6 @@ package com.chaeum.api.domain.paymentRecord.service;
 
 import com.chaeum.api.domain.donation.entity.Donation;
 import com.chaeum.api.domain.donation.service.DonationService;
-import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
@@ -33,7 +32,6 @@ public class PaymentRecordService {
 
     private final IamportClient iamportClient;
     private final MemberService memberService;
-    private final FundingService fundingService;
     private final DonationService donationService;
     private final LoginMemberProvider loginMemberProvider;
     private final PaymentRecordRepository paymentRecordRepository;

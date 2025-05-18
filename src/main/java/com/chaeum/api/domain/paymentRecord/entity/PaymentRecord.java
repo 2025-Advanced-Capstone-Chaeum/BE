@@ -81,4 +81,8 @@ public class PaymentRecord extends BaseEntity {
             .failReason(request.getFailReason())
             .build();
     }
+
+    public void updateStatus(PaymentStatus status) {
+        this.status = status;
+    }
 }

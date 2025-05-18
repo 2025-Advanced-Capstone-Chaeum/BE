@@ -111,9 +111,8 @@ public class DonationService {
     }
 
     @Transactional
-    public void failDonation(Donation donation, ErrorCode code) {
+    public void failDonation(Donation donation) {
         donation.manageStatus(DonationStatus.FAILED);
-        throw ChaeumException.from(code);
     }
 
     @Transactional

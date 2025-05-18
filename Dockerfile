@@ -23,4 +23,4 @@ COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8081
 
 # ENTRYPOINT
-ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-Dserver.port=8081", "-jar", "app.jar"]

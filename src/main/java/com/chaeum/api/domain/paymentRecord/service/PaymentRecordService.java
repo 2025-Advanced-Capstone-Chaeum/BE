@@ -31,9 +31,9 @@ import java.util.List;
 public class PaymentRecordService {
 
     private final IamportClient iamportClient;
+    private final MemberService memberService;
     private final DonationService donationService;
     private final LoginMemberProvider loginMemberProvider;
-    private final MemberService memberService;
     private final PaymentRecordRepository paymentRecordRepository;
 
     @Transactional
@@ -42,11 +42,12 @@ public class PaymentRecordService {
         Donation donation = donationService.findById(request.getDonationId());
 
         validateIamportPayment(request.getImpUid(), request.getAmount(), donation);
-        memberService.deductPoints(member, donation.getAmount());
+        memberService.deductPoints(member, request.getPoints());
 
         PaymentRecord payment = PaymentRecord.create(member, request);
         paymentRecordRepository.save(payment);
 
+        payment.updateStatus(PaymentStatus.COMPLETED);
         donationService.completeDonation(donation);
 
         return payment.getId();
@@ -78,14 +79,20 @@ public class PaymentRecordService {
         return paymentId;
     }
 
-    private void validateIamportPayment(String impUid, BigDecimal expectedAmount, Donation donation)
-        throws IamportResponseException, IOException {
-        Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
-        if (payment == null) {
-            donationService.failDonation(donation, ErrorCode.PAYMENT_VERIFY_FAILED);
-        }
-        if (isAmountMismatch(payment.getAmount(), expectedAmount)) {
-            donationService.failDonation(donation, ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+    private void validateIamportPayment(String impUid, BigDecimal expectedAmount, Donation donation) {
+        try {
+            Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
+            if (payment == null) {
+                donationService.failDonation(donation);
+                throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
+            }
+            if (isAmountMismatch(payment.getAmount(), expectedAmount)) {
+                donationService.failDonation(donation);
+                throw ChaeumException.from(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+            }
+        } catch (IamportResponseException | IOException e) {
+            donationService.failDonation(donation);
+            throw ChaeumException.from(ErrorCode.PAYMENT_VERIFY_FAILED);
         }
     }
 

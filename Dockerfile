@@ -20,7 +20,7 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # 애플리케이션이 사용하는 포트 노출
-EXPOSE 8080
+EXPOSE 8081
 
 # ENTRYPOINT
-ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-Dserver.port=8081", "-jar", "app.jar"]

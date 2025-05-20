@@ -38,7 +38,7 @@ public class PaymentRecordController {
     @PreAuthorize("hasAnyRole('DONOR', 'ADMIN')")
     @PostMapping("")
     public ApiResponse<Long> save(
-            @Valid @RequestBody PaymentCreateRequest paymentCreateRequest
+        @Valid @RequestBody PaymentCreateRequest paymentCreateRequest
     ) throws IamportResponseException, IOException {
         Long id = paymentRecordService.save(paymentCreateRequest);
         return ApiResponse.success(id);
@@ -48,26 +48,26 @@ public class PaymentRecordController {
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/{paymentId}")
     public ApiResponse<PaymentResponse> getPayment(
-            @PathVariable(name = "paymentId") Long paymentId
+        @PathVariable(name = "paymentId") Long paymentId
     ) {
         PaymentResponse paymentResponse = paymentRecordService.getPayment(paymentId);
         return ApiResponse.success(paymentResponse);
     }
 
     @Operation(
-            summary = "조건별 결제 조회",
-            description = """
-                    [모든 Role 가능] 결제 수단, 상태, 시작날짜, 끝날짜를 기준으로 결제 내역을 조회합니다.<br>
-                    조건을 입력하지 않으면 전체 결제를 조회합니다. 날짜는 ISO 형식(예: 2024-03-01)으로 입력하세요.
-                    """
+        summary = "조건별 결제 조회",
+        description = """
+            [모든 Role 가능] 결제 수단, 상태, 시작날짜, 끝날짜를 기준으로 결제 내역을 조회합니다.<br>
+            조건을 입력하지 않으면 전체 결제를 조회합니다. 날짜는 ISO 형식(예: 2024-03-01)으로 입력하세요.
+            """
     )
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/condition")
     public ApiResponse<List<PaymentResponse>> getPaymentsByCondition(
-            @RequestParam(required = false) PaymentMethod method,
-            @RequestParam(required = false) PaymentStatus status,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+        @RequestParam(required = false) PaymentMethod method,
+        @RequestParam(required = false) PaymentStatus status,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         List<PaymentResponse> payments = paymentRecordService.getPaymentsByCondition(method, status, from, to);
         return ApiResponse.success(payments);
@@ -77,7 +77,7 @@ public class PaymentRecordController {
     @PreAuthorize("hasAnyRole('DONOR', 'ADMIN')")
     @DeleteMapping("/{paymentId}")
     public ApiResponse<Long> delete(
-        @PathVariable(name = "paymentId") Long paymentId){
+        @PathVariable(name = "paymentId") Long paymentId) {
         Long id = paymentRecordService.delete(paymentId);
         return ApiResponse.success(id);
     }

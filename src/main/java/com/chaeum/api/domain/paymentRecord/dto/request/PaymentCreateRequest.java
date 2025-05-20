@@ -18,8 +18,12 @@ public class PaymentCreateRequest {
     private Long donationId;
 
     @NotNull
-    @Schema(description = "최종 결제 금액 (단위: 원)", example = "3000")
+    @Schema(description = "최종 결제 금액 (단위: 원)", example = "1000")
     private BigDecimal amount;
+
+    @NotNull
+    @Schema(description = "사용할 포인트", example = "0")
+    private BigDecimal points;
 
     @NotNull
     @Schema(description = "트랜잭션 Id", example = "14219299348")
@@ -42,17 +46,24 @@ public class PaymentCreateRequest {
     private PaymentStatus status;
 
     @NotNull
-    @Schema(description = "아임포트 결제 고유 ID", example = "imp_448280090638")
+    @Schema(description = "아임포트 결제 고유 ID", example = "imp_961458855243")
     private String impUid;
 
     @NotNull
-    @Schema(description = "우리 시스템에서 발급한 주문 번호", example = "donation_20250324_0001")
+    @Schema(description = "우리 시스템에서 발급한 주문 번호", example = "donation_1747389457724_6")
     private String merchantUid;
 
     @NotNull
     @Schema(description = "PG사 이름 (예: kakaopay, tosspay, payco)", example = "kakaopay")
     private String gatewayProvider;
 
-    @Schema(description = "결제 실패 사유 (실패 시에만 포함)", example = "잔액 부족", nullable = true)
+    @Schema(
+        description = """
+            결제 실패 사유입니다. 결제가 실패한 경우에만 포함됩니다.<br>
+            예시: 잔액 부족, 카드 한도 초과, 사용자 취소, PG사 오류 등
+            """,
+        example = "잔액 부족",
+        nullable = true
+    )
     private String failReason;
 }

@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.getNestedMap;
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrNull;
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrDefault;
+
 @RequiredArgsConstructor
 public class KakaoResponse implements OAuth2Response {
 
@@ -16,34 +20,21 @@ public class KakaoResponse implements OAuth2Response {
 
     @Override
     public String getEmail() {
-        Map<String, Object> account = extractMapByKey(kakaoAccountMap, "kakao_account");
+        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
         return toStringOrDefault(account.get("email"), "no_email");
     }
 
     @Override
     public String getName() {
-        Map<String, Object> account = extractMapByKey(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = extractMapByKey(account, "profile");
+        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = getNestedMap(account, "profile");
         return toStringOrDefault(profile.get("nickname"), "unknown");
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> account = extractMapByKey(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = extractMapByKey(account, "profile");
+        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = getNestedMap(account, "profile");
         return toStringOrNull(profile.get("profile_image_url"));
-    }
-
-    private Map<String, Object> extractMapByKey(Map<String, Object> source, String key) {
-        Object value = source.get(key);
-        return value instanceof Map ? (Map<String, Object>) value : Map.of();
-    }
-
-    private String toStringOrDefault(Object obj, String defaultValue) {
-        return obj != null ? obj.toString() : defaultValue;
-    }
-
-    private String toStringOrNull(Object obj) {
-        return obj != null ? obj.toString() : null;
     }
 }

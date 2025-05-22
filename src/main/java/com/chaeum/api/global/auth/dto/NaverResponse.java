@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.getNestedMap;
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrNull;
+import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrDefault;
+
 @RequiredArgsConstructor
 public class NaverResponse implements OAuth2Response {
 
     private final Map<String, Object> naverAccountMap;
-
-    private Map<String, Object> response() {
-        return (Map<String, Object>) naverAccountMap.get("response");
-    }
 
     @Override
     public String getProvider() {
@@ -20,23 +20,19 @@ public class NaverResponse implements OAuth2Response {
 
     @Override
     public String getEmail() {
-        Map<String, Object> res = response();
-        return res != null ? toStringOrNull(res.get("email")) : null;
+        Map<String, Object> response = getNestedMap(naverAccountMap, "response");
+        return toStringOrNull(response.get("email"));
     }
 
     @Override
     public String getName() {
-        Map<String, Object> res = response();
-        return res != null ? toStringOrNull(res.get("name")) : "unknown";
+        Map<String, Object> response = getNestedMap(naverAccountMap, "response");
+        return toStringOrDefault(response.get("name"), "unknown");
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> res = response();
-        return res != null ? toStringOrNull(res.get("profile_image")) : null;
-    }
-
-    private String toStringOrNull(Object obj) {
-        return obj != null ? obj.toString() : null;
+        Map<String, Object> response = getNestedMap(naverAccountMap, "response");
+        return toStringOrNull(response.get("profile_image"));
     }
 }

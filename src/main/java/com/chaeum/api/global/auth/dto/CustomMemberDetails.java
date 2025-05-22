@@ -24,7 +24,7 @@ public record CustomMemberDetails(Member member) implements UserDetails {
 
     @Override
     public String getPassword() {
-        return ""; // 소셜 로그인 사용, 비밀번호 불필요
+        return "";
     }
 
     @Override

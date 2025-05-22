@@ -7,10 +7,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NaverResponse implements OAuth2Response {
 
-    private final Map<String, Object> attributes;
+    private final Map<String, Object> naverAccountMap;
 
     private Map<String, Object> response() {
-        return (Map<String, Object>) attributes.get("response");
+        return (Map<String, Object>) naverAccountMap.get("response");
     }
 
     @Override

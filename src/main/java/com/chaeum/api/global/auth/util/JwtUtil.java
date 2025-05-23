@@ -7,6 +7,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +21,14 @@ public class JwtUtil {
 
     private final SecretKey secretKey;
 
-    public String createJwt(String category, String email, Role role, Long expiredMs) {
+    public String createJwt(String category, String email, Long memberId, Role role, long expiryMs) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + expiredMs);
+        Date expiry = new Date(now.getTime() + expiryMs);
 
         return Jwts.builder()
             .claim("category", category)
             .claim("email", email)
+            .claim("memberId", memberId)
             .claim("role", role.name())
             .issuedAt(now)
             .expiration(expiry)
@@ -33,31 +36,39 @@ public class JwtUtil {
             .compact();
     }
 
-    public String getEmail(String token) {
-        return parseClaims(token).get("email", String.class);
-    }
-
-    public String getCategory(String token) {
-        return parseClaims(token).get("category", String.class);
-    }
-
-    public Role getRole(String token) {
-        String roleValue = parseClaims(token).get("role", String.class);
-        return Role.valueOf(roleValue);
+    public boolean isValid(String token) {
+        try {
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public boolean isExpired(String token) {
-        return parseClaims(token)
-            .getExpiration()
-            .before(new Date());
+        return getClaims(token).getExpiration().before(new Date());
     }
 
-    public boolean validateToken(String token) {
-        parseClaims(token);
-        return true;
+    public String getEmail(String token) {
+        return getClaims(token).get("email", String.class);
     }
 
-    private Claims parseClaims(String token) {
+    public Long getMemberId(String token) {
+        return getClaims(token).get("memberId", Long.class);
+    }
+
+    public Role getRole(String token) {
+        return Role.valueOf(getClaims(token).get("role", String.class));
+    }
+
+    public String getCategory(String token) {
+        return getClaims(token).get("category", String.class);
+    }
+
+    private Claims getClaims(String token) {
         try {
             return Jwts.parser()
                 .verifyWith(secretKey)
@@ -66,12 +77,10 @@ public class JwtUtil {
                 .getPayload();
         } catch (ExpiredJwtException e) {
             throw ChaeumException.from(ErrorCode.EXPIRED_AUTH_TOKEN);
-        } catch (io.jsonwebtoken.security.SignatureException e) {
-            throw ChaeumException.from(ErrorCode.INVALID_SIGNATURE_TOKEN);
-        } catch (IllegalArgumentException e) {
-            throw ChaeumException.from(ErrorCode.EMPTY_OR_NULL_TOKEN);
-        } catch (JwtException e) {
+        } catch (UnsupportedJwtException e) {
             throw ChaeumException.from(ErrorCode.UNSUPPORTED_AUTH_TOKEN);
+        } catch (MalformedJwtException | IllegalArgumentException e) {
+            throw ChaeumException.from(ErrorCode.INVALID_AUTH_TOKEN);
         }
     }
 }

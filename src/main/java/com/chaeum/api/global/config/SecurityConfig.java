@@ -1,9 +1,10 @@
 package com.chaeum.api.global.config;
 
-import com.chaeum.api.domain.member.repository.MemberRepository;
-import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.auth.service.CustomOAuth2MemberService;
+import com.chaeum.api.global.auth.service.ReissueService;
 import com.chaeum.api.global.auth.util.SecurityUrlConstants;
+import com.chaeum.api.global.auth.util.TokenValidator;
 import com.chaeum.api.global.filter.CustomEntryPoint;
 import com.chaeum.api.global.filter.CustomLogoutFilter;
 import com.chaeum.api.global.filter.InternalApiKeyFilter;
@@ -47,10 +48,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
+    private final MemberService memberService;
     private final CorsProperties corsProperties;
+    private final TokenValidator tokenValidator;
+    private final ReissueService reissueService;
     private final CustomEntryPoint customEntryPoint;
-    private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final CustomOAuth2LoginHandler customOAuth2LoginHandler;
     private final CustomOAuth2MemberService customOAuth2MemberService;
 
@@ -91,7 +93,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtFilter jwtFilter() {
-        return new JwtFilter(jwtUtil, memberRepository);
+        return new JwtFilter(jwtUtil, memberService, tokenValidator);
     }
 
     @Bean
@@ -101,7 +103,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomLogoutFilter logoutFilter() {
-        return new CustomLogoutFilter(jwtUtil, memberRepository, refreshTokenRepository);
+        return new CustomLogoutFilter(jwtUtil, memberService, reissueService, tokenValidator);
     }
 
     @Bean

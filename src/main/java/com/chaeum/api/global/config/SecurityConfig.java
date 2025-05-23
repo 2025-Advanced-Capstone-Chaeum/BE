@@ -1,15 +1,18 @@
 package com.chaeum.api.global.config;
 
-import com.chaeum.api.domain.member.repository.MemberRepository;
-import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.auth.service.CustomOAuth2MemberService;
+import com.chaeum.api.global.auth.service.ReissueService;
+import com.chaeum.api.global.auth.util.SecurityUrlConstants;
+import com.chaeum.api.global.auth.util.TokenValidator;
 import com.chaeum.api.global.filter.CustomEntryPoint;
 import com.chaeum.api.global.filter.CustomLogoutFilter;
 import com.chaeum.api.global.filter.InternalApiKeyFilter;
 import com.chaeum.api.global.filter.JwtFilter;
 import com.chaeum.api.global.handler.CustomOAuth2LoginHandler;
 import com.chaeum.api.global.properties.CorsProperties;
-import com.chaeum.api.global.utils.JwtUtil;
+import com.chaeum.api.global.auth.util.JwtUtil;
+import com.chaeum.api.global.properties.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +22,25 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.*;
-import org.springframework.security.oauth2.client.endpoint.*;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.cors.*;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -35,57 +49,31 @@ import org.springframework.web.cors.*;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final CustomOAuth2MemberService customOAuth2MemberService;
-    private final CustomOAuth2LoginHandler customOAuth2LoginHandler;
-    private final CustomEntryPoint customEntryPoint;
+    private final JwtProperties jwtProperties;
+    private final MemberService memberService;
     private final CorsProperties corsProperties;
-
-    private static final String[] PUBLIC_URLS = {
-            "/actuator/health",
-            "/oauth2/**",
-            "/login/oauth2/**",
-            "/reissue",
-            "/v3/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/chaeum/docs/**",
-            "/chaeum/swagger-ui/**",
-            "/error",
-            "/favicon.ico",
-            "/"
-    };
+    private final TokenValidator tokenValidator;
+    private final ReissueService reissueService;
+    private final CustomEntryPoint customEntryPoint;
+    private final CustomOAuth2LoginHandler customOAuth2LoginHandler;
+    private final CustomOAuth2MemberService customOAuth2MemberService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 경로별 접근 제어
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(PUBLIC_URLS).permitAll()
-                        .anyRequest().authenticated())
+            .authorizeHttpRequests(this::configureAuthorization)
+            .exceptionHandling(this::configureExceptionHandling)
+            .oauth2Login(this::configureOAuth2Login)
 
-                // 예외 처리
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(customEntryPoint))
-
-                // OAuth2 로그인 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2MemberService))
-                        .successHandler(customOAuth2LoginHandler)
-                        .tokenEndpoint(token -> token.accessTokenResponseClient(authorizationCodeTokenResponseClient())))
-
-                // 커스텀 필터 적용
-                .addFilterBefore(internalApiKeyFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(logoutFilter(), LogoutFilter.class);
+            .addFilterBefore(internalApiKeyFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(logoutFilter(), LogoutFilter.class);
 
         return http.build();
     }
@@ -107,7 +95,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtFilter jwtFilter() {
-        return new JwtFilter(jwtUtil, memberRepository);
+        return new JwtFilter(jwtUtil, memberService, tokenValidator);
     }
 
     @Bean
@@ -117,7 +105,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomLogoutFilter logoutFilter() {
-        return new CustomLogoutFilter(jwtUtil, refreshTokenRepository);
+        return new CustomLogoutFilter(jwtUtil, jwtProperties, memberService, reissueService, tokenValidator);
     }
 
     @Bean
@@ -136,14 +124,36 @@ public class SecurityConfig {
     @Bean
     public OAuth2AuthorizedClientProvider authorizedClientProvider() {
         return OAuth2AuthorizedClientProviderBuilder.builder()
-                .authorizationCode()
-                .refreshToken()
-                .clientCredentials()
-                .build();
+            .authorizationCode()
+            .refreshToken()
+            .clientCredentials()
+            .build();
     }
 
     @Bean
-    public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
+    public OAuth2AuthorizedClientService authorizedClientService(
+        ClientRegistrationRepository clientRegistrationRepository) {
         return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+    }
+
+    private void configureAuthorization(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(SecurityUrlConstants.PUBLIC_URLS).permitAll()
+            .anyRequest().permitAll();
+//            .anyRequest().authenticated();
+//         TODO: 개발 편의성을 위해 전체 허용, 운영 시 authenticated()로 변경
+    }
+
+    private void configureExceptionHandling(ExceptionHandlingConfigurer<HttpSecurity> exceptionHandling) {
+        exceptionHandling.authenticationEntryPoint(customEntryPoint);
+    }
+
+    private void configureOAuth2Login(OAuth2LoginConfigurer<HttpSecurity> oauth2) {
+        oauth2
+            .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2MemberService))
+            .successHandler(customOAuth2LoginHandler)
+            .tokenEndpoint(token -> token.accessTokenResponseClient(authorizationCodeTokenResponseClient()));
     }
 }

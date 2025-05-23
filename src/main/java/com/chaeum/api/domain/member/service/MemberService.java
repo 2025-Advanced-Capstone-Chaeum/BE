@@ -100,4 +100,9 @@ public class MemberService {
         return memberRepository.findById(memberId)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND));
+    }
 }

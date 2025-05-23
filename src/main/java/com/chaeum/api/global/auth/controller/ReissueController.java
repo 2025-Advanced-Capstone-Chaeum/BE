@@ -1,15 +1,13 @@
 package com.chaeum.api.global.auth.controller;
 
-import com.chaeum.api.global.auth.dto.CustomMemberDetails;
 import com.chaeum.api.global.auth.service.ReissueService;
-import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +20,21 @@ public class ReissueController {
 
     private final ReissueService reissueService;
 
-    @PostMapping
-    @Operation(summary = "토큰 재발급", description = "access token이 만료되면 새로운 토큰을 발급받습니다.")
+    @Operation(
+        summary = "토큰 재발급",
+        description = """
+            [모든 Role 사용 가능] 만료된 Access Token을 재발급합니다.<br>
+            기존 Refresh Token은 삭제되고, 새로운 Access/Refresh Token이 발급됩니다.<br>
+            두 토큰은 쿠키에 담겨 클라이언트에 반환됩니다.
+            """
+    )
+    @PreAuthorize("hasRole('DONOR')")
+    @PostMapping("")
     ApiResponse<Void> reissue(
-            @AuthenticationPrincipal CustomMemberDetails member,
-            HttpServletRequest request,
-            HttpServletResponse response
+        HttpServletRequest request,
+        HttpServletResponse response
     ) {
-        reissueService.reissueAccessToken(member, request, response);
+        reissueService.reissueAccessToken(request, response);
         return ApiResponse.success();
     }
 }

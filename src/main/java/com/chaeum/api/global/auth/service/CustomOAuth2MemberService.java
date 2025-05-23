@@ -32,33 +32,38 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        OAuth2Response oAuth2Response = extractOAuth2Response(userRequest, oAuth2User);
+        Member member = upsertOAuth2Member(oAuth2Response);
+        OAuth2MemberDto oAuth2MemberDto = OAuth2MemberDto.create(member);
+        return new CustomOAuth2Member(oAuth2MemberDto, oAuth2User.getAttributes());
+    }
 
-        OAuth2Response oAuth2Response = switch (registrationId) {
+    private OAuth2Response extractOAuth2Response(OAuth2UserRequest request, OAuth2User oAuth2User) {
+        String provider = request.getClientRegistration().getRegistrationId();
+        return switch (provider) {
             case "naver" -> new NaverResponse(oAuth2User.getAttributes());
             case "kakao" -> new KakaoResponse(oAuth2User.getAttributes());
             default -> throw ChaeumException.from(ErrorCode.UNSUPPORTED_OAUTH2_PROVIDER);
         };
-
-        Member member = memberRepository.findByEmail(oAuth2Response.getEmail())
-            .map(existingMember -> updateMember(existingMember, oAuth2Response.getName()))
-            .orElseGet(() -> joinMember(oAuth2Response));
-
-        OAuth2MemberDto oAuth2MemberDto = new OAuth2MemberDto(member.getEmail(), member.getName(),
-            member.getProfileImage());
-        return new CustomOAuth2Member(oAuth2MemberDto, memberRepository);
     }
 
-    private Member joinMember(OAuth2Response oAuth2Response) {
-        Member member = memberRepository.save(createMemberForm(oAuth2Response));
+    private Member upsertOAuth2Member(OAuth2Response response) {
+        return memberRepository.findByEmail(response.getEmail())
+            .map(existing -> updateMember(existing, response.getName()))
+            .orElseGet(() -> createMember(response));
+    }
+
+    private Member createMember(OAuth2Response oAuth2Response) {
+        Member member = memberRepository.save(buildMember(oAuth2Response));
         initNewMember(member);
         return member;
     }
 
-    private Member createMemberForm(OAuth2Response oAuth2Response) {
+    private Member buildMember(OAuth2Response oAuth2Response) {
         return Member.builder()
             .email(oAuth2Response.getEmail())
             .name(oAuth2Response.getName())
+            .profileImage(oAuth2Response.getProfileImage())
             .role(Role.DONOR)
             .points(BigDecimal.ZERO)
             .isBeneficiary(false)
@@ -66,16 +71,14 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
             .build();
     }
 
+    private Member updateMember(Member member, String newName) {
+        member.setName(member.getName() == null ? newName : member.getName());
+        member.setRole(member.getRole() == null ? Role.DONOR : member.getRole());
+        return member;
+    }
+
     private void initNewMember(Member member) {
         catService.registerCatForMember(member);
         inventoryService.registerDefaultInteractionItems(member);
-    }
-
-    private Member updateMember(Member member, String newName) {
-        member.setName(newName);
-        if (member.getRole() == null) {
-            member.setRole(Role.DONOR);
-        }
-        return memberRepository.save(member);
     }
 }

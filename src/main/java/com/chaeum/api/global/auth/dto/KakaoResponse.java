@@ -1,13 +1,15 @@
 package com.chaeum.api.global.auth.dto;
 
+import com.chaeum.api.global.utils.CustomMapUtil;
+import com.chaeum.api.global.utils.CustomStringUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class KakaoResponse implements OAuth2Response{
+public class KakaoResponse implements OAuth2Response {
 
-    private final Map<String, Object> attribute;
+    private final Map<String, Object> kakaoAccountMap;
 
     @Override
     public String getProvider() {
@@ -15,40 +17,22 @@ public class KakaoResponse implements OAuth2Response{
     }
 
     @Override
-    public String getProviderId() {
-        return attribute.get("id").toString();
-    }
-
-    @Override
     public String getEmail() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
-        if (kakaoAccount != null && kakaoAccount.containsKey("email")) {
-            return kakaoAccount.get("email").toString();
-        }
-        return "no_email";  // 이메일이 없는 경우 기본값 설정
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        return CustomStringUtil.toStringOrDefault(account.get("email"), "no_email");
     }
 
     @Override
     public String getName() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
-        if (kakaoAccount != null) {
-            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-            if (profile != null && profile.containsKey("nickname")) {
-                return profile.get("nickname").toString();
-            }
-        }
-        return "unknown";  // 기본값 설정
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = CustomMapUtil.getNestedMap(account, "profile");
+        return CustomStringUtil.toStringOrDefault(profile.get("nickname"), "unknown");
     }
 
     @Override
-    public String getProfileImage(){
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
-        if (kakaoAccount != null) {
-            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-            if (profile != null && profile.containsKey("profile_image_url")) {
-                return profile.get("profile_image_url").toString();
-            }
-        }
-        return null; // 프로필 이미지가 없을 경우 null 반환
+    public String getProfileImage() {
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = CustomMapUtil.getNestedMap(account, "profile");
+        return CustomStringUtil.toStringOrNull(profile.get("profile_image_url"));
     }
 }

@@ -12,17 +12,10 @@ public class RefreshToken {
 
     @Id
     private Long memberId;
-    private String memberEmail;
     private String refreshToken;
 
-    public RefreshToken(Long memberId, String memberEmail, String refreshToken) {
+    public RefreshToken(Long memberId, String refreshToken) {
         this.memberId = memberId;
-        this.memberEmail = memberEmail;
         this.refreshToken = refreshToken;
-    }
-
-    // 토큰 갱신
-    public void updateToken(String newToken) {
-        this.refreshToken = newToken;
     }
 }

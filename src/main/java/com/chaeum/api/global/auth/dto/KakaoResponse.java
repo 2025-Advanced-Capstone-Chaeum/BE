@@ -1,12 +1,9 @@
 package com.chaeum.api.global.auth.dto;
 
+import com.chaeum.api.global.auth.util.OAuth2ResponseUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
-
-import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.getNestedMap;
-import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrNull;
-import static com.chaeum.api.global.auth.util.OAuth2ResponseUtil.toStringOrDefault;
 
 @RequiredArgsConstructor
 public class KakaoResponse implements OAuth2Response {
@@ -20,21 +17,21 @@ public class KakaoResponse implements OAuth2Response {
 
     @Override
     public String getEmail() {
-        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
-        return toStringOrDefault(account.get("email"), "no_email");
+        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        return OAuth2ResponseUtil.toStringOrDefault(account.get("email"), "no_email");
     }
 
     @Override
     public String getName() {
-        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = getNestedMap(account, "profile");
-        return toStringOrDefault(profile.get("nickname"), "unknown");
+        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = OAuth2ResponseUtil.getNestedMap(account, "profile");
+        return OAuth2ResponseUtil.toStringOrDefault(profile.get("nickname"), "unknown");
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> account = getNestedMap(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = getNestedMap(account, "profile");
-        return toStringOrNull(profile.get("profile_image_url"));
+        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = OAuth2ResponseUtil.getNestedMap(account, "profile");
+        return OAuth2ResponseUtil.toStringOrNull(profile.get("profile_image_url"));
     }
 }

@@ -12,6 +12,7 @@ import com.chaeum.api.global.filter.JwtFilter;
 import com.chaeum.api.global.handler.CustomOAuth2LoginHandler;
 import com.chaeum.api.global.properties.CorsProperties;
 import com.chaeum.api.global.auth.util.JwtUtil;
+import com.chaeum.api.global.properties.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
+    private final JwtProperties jwtProperties;
     private final MemberService memberService;
     private final CorsProperties corsProperties;
     private final TokenValidator tokenValidator;
@@ -103,7 +105,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomLogoutFilter logoutFilter() {
-        return new CustomLogoutFilter(jwtUtil, memberService, reissueService, tokenValidator);
+        return new CustomLogoutFilter(jwtUtil, jwtProperties, memberService, reissueService, tokenValidator);
     }
 
     @Bean

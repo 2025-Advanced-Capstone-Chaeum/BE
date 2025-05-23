@@ -40,10 +40,10 @@ public class ReissueService {
 
         refreshTokenRepository.save(new RefreshToken(memberId, newRefreshToken));
 
-        addTokenCookie(response, SecurityConstants.ACCESS_TOKEN_COOKIE_NAME, newAccessToken,
-            jwtProperties.getAccessTokenExpiration());
-        addTokenCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, newRefreshToken,
-            jwtProperties.getRefreshTokenExpiration());
+        CookieUtil.addCookie(response, SecurityConstants.ACCESS_TOKEN_COOKIE_NAME, newAccessToken,
+            jwtProperties.getAccessTokenExpiration(), jwtProperties.getCookieDomain());
+        CookieUtil.addCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, newRefreshToken,
+            jwtProperties.getRefreshTokenExpiration(), jwtProperties.getCookieDomain());
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
@@ -51,17 +51,6 @@ public class ReissueService {
             .orElseThrow(() -> ChaeumException.from(ErrorCode.TOKEN_NOT_FOUND));
     }
 
-    private void addTokenCookie(HttpServletResponse response, String name, String value, long maxAgeMillis) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
-            .maxAge(maxAgeMillis / 1000)
-            .path("/")
-            .secure(true)
-            .httpOnly(true)
-            .sameSite("None")
-            .domain(jwtProperties.getCookieDomain())
-            .build();
-        response.addHeader(SecurityConstants.SET_COOKIE_HEADER, cookie.toString());
-    }
 
     public void deleteById(Long memberId) {
         refreshTokenRepository.deleteById(String.valueOf(memberId));

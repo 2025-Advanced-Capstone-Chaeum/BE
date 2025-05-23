@@ -7,13 +7,13 @@ import com.chaeum.api.global.auth.util.TokenValidator;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.auth.util.JwtUtil;
+import com.chaeum.api.global.properties.JwtProperties;
 import com.chaeum.api.global.utils.ResponseUtil;
 import com.chaeum.api.global.utils.SecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import org.springframework.web.filter.GenericFilterBean;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JwtUtil jwtUtil;
+    private final JwtProperties jwtProperties;
     private final MemberService memberService;
     private final ReissueService reissueService;
     private final TokenValidator tokenValidator;
@@ -44,11 +45,11 @@ public class CustomLogoutFilter extends GenericFilterBean {
         tokenValidator.validateRefreshToken(refreshToken);
 
         String email = jwtUtil.getEmail(refreshToken);
-        Long memberId = memberService.findByEmail(email)
-            .getId();
+        Long memberId = memberService.findByEmail(email).getId();
 
         reissueService.deleteById(memberId);
-        removeRefreshTokenCookie(httpResponse);
+        CookieUtil.deleteCookie(httpResponse, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME,
+            jwtProperties.getCookieDomain());
         ResponseUtil.writeSuccess(httpResponse);
     }
 
@@ -60,14 +61,5 @@ public class CustomLogoutFilter extends GenericFilterBean {
     private String extractRefreshToken(HttpServletRequest request) {
         return CookieUtil.getValue(request, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
-    }
-
-    private void removeRefreshTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
     }
 }

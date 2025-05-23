@@ -5,6 +5,7 @@ import com.chaeum.api.domain.member.service.MemberService;
 import com.chaeum.api.global.auth.domain.CustomOAuth2Member;
 import com.chaeum.api.global.auth.domain.RefreshToken;
 import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.global.auth.util.CookieUtil;
 import com.chaeum.api.global.auth.util.TokenProvider;
 import com.chaeum.api.global.properties.FrontendProperties;
 import com.chaeum.api.global.properties.JwtProperties;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -42,23 +42,11 @@ public class CustomOAuth2LoginHandler extends SimpleUrlAuthenticationSuccessHand
         String refreshToken = tokenProvider.generateRefreshToken(member);
         refreshTokenRepository.save(new RefreshToken(member.getId(), refreshToken));
 
-        addCookie(response, SecurityConstants.ACCESS_TOKEN_COOKIE_NAME, accessToken,
-            jwtProperties.getAccessTokenExpiration());
-        addCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, refreshToken,
-            jwtProperties.getRefreshTokenExpiration());
+        CookieUtil.addCookie(response, SecurityConstants.ACCESS_TOKEN_COOKIE_NAME, accessToken,
+            jwtProperties.getAccessTokenExpiration(), jwtProperties.getCookieDomain());
+        CookieUtil.addCookie(response, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, refreshToken,
+            jwtProperties.getRefreshTokenExpiration(), jwtProperties.getCookieDomain());
 
         response.sendRedirect(frontendProperties.getHomeUrl());
-    }
-
-    private void addCookie(HttpServletResponse response, String name, String value, long maxAgeMillis) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
-            .maxAge(maxAgeMillis / 1000)
-            .path("/")
-            .secure(true)
-            .httpOnly(true)
-            .sameSite("None")
-            .domain(jwtProperties.getCookieDomain())
-            .build();
-        response.addHeader(SecurityConstants.SET_COOKIE_HEADER, cookie.toString());
     }
 }

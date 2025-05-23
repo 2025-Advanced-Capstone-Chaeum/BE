@@ -101,7 +101,13 @@ jobs:
 
       # 최신 이미지를 컨테이너화하여 실행
       - name: docker run new container
-        run: sudo docker run --name spring --network app_chaeum-network --rm -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-chaeum
+        run: |
+          sudo docker run --name spring \
+            --network app_chaeum-network \
+            --rm -d \
+            -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
+            -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-chaeum
 
       # 미사용 이미지 정리
       - name: delete old docker image

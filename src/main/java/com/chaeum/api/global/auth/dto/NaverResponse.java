@@ -1,6 +1,7 @@
 package com.chaeum.api.global.auth.dto;
 
-import com.chaeum.api.global.auth.util.OAuth2ResponseUtil;
+import com.chaeum.api.global.utils.CustomMapUtil;
+import com.chaeum.api.global.utils.CustomStringUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -17,19 +18,19 @@ public class NaverResponse implements OAuth2Response {
 
     @Override
     public String getEmail() {
-        Map<String, Object> response = OAuth2ResponseUtil.getNestedMap(naverAccountMap, "response");
-        return OAuth2ResponseUtil.toStringOrNull(response.get("email"));
+        Map<String, Object> response = CustomMapUtil.getNestedMap(naverAccountMap, "response");
+        return CustomStringUtil.toStringOrNull(response.get("email"));
     }
 
     @Override
     public String getName() {
-        Map<String, Object> response = OAuth2ResponseUtil.getNestedMap(naverAccountMap, "response");
-        return OAuth2ResponseUtil.toStringOrDefault(response.get("name"), "unknown");
+        Map<String, Object> response = CustomMapUtil.getNestedMap(naverAccountMap, "response");
+        return CustomStringUtil.toStringOrDefault(response.get("name"), "unknown");
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> response = OAuth2ResponseUtil.getNestedMap(naverAccountMap, "response");
-        return OAuth2ResponseUtil.toStringOrNull(response.get("profile_image"));
+        Map<String, Object> response = CustomMapUtil.getNestedMap(naverAccountMap, "response");
+        return CustomStringUtil.toStringOrNull(response.get("profile_image"));
     }
 }

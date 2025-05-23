@@ -1,6 +1,7 @@
 package com.chaeum.api.global.auth.dto;
 
-import com.chaeum.api.global.auth.util.OAuth2ResponseUtil;
+import com.chaeum.api.global.utils.CustomMapUtil;
+import com.chaeum.api.global.utils.CustomStringUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -17,21 +18,21 @@ public class KakaoResponse implements OAuth2Response {
 
     @Override
     public String getEmail() {
-        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
-        return OAuth2ResponseUtil.toStringOrDefault(account.get("email"), "no_email");
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        return CustomStringUtil.toStringOrDefault(account.get("email"), "no_email");
     }
 
     @Override
     public String getName() {
-        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = OAuth2ResponseUtil.getNestedMap(account, "profile");
-        return OAuth2ResponseUtil.toStringOrDefault(profile.get("nickname"), "unknown");
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = CustomMapUtil.getNestedMap(account, "profile");
+        return CustomStringUtil.toStringOrDefault(profile.get("nickname"), "unknown");
     }
 
     @Override
     public String getProfileImage() {
-        Map<String, Object> account = OAuth2ResponseUtil.getNestedMap(kakaoAccountMap, "kakao_account");
-        Map<String, Object> profile = OAuth2ResponseUtil.getNestedMap(account, "profile");
-        return OAuth2ResponseUtil.toStringOrNull(profile.get("profile_image_url"));
+        Map<String, Object> account = CustomMapUtil.getNestedMap(kakaoAccountMap, "kakao_account");
+        Map<String, Object> profile = CustomMapUtil.getNestedMap(account, "profile");
+        return CustomStringUtil.toStringOrNull(profile.get("profile_image_url"));
     }
 }

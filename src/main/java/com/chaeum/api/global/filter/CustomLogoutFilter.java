@@ -1,7 +1,9 @@
 package com.chaeum.api.global.filter;
 
-import com.chaeum.api.domain.member.repository.MemberRepository;
-import com.chaeum.api.global.auth.repository.RefreshTokenRepository;
+import com.chaeum.api.domain.member.service.MemberService;
+import com.chaeum.api.global.auth.service.ReissueService;
+import com.chaeum.api.global.auth.util.CookieUtil;
+import com.chaeum.api.global.auth.util.TokenValidator;
 import com.chaeum.api.global.exception.ChaeumException;
 import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.auth.util.JwtUtil;
@@ -15,7 +17,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -23,8 +24,9 @@ import org.springframework.web.filter.GenericFilterBean;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JwtUtil jwtUtil;
-    private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberService memberService;
+    private final ReissueService reissueService;
+    private final TokenValidator tokenValidator;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
@@ -39,15 +41,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         String refreshToken = extractRefreshToken(httpRequest);
-        if (!isValidRefreshToken(refreshToken, httpResponse)) return;
+        tokenValidator.validateRefreshToken(refreshToken);
 
         String email = jwtUtil.getEmail(refreshToken);
-        Long memberId = memberRepository.findByEmail(email)
-            .orElseThrow(() -> ChaeumException.from(ErrorCode.MEMBER_NOT_FOUND))
+        Long memberId = memberService.findByEmail(email)
             .getId();
 
-        refreshTokenRepository.deleteById(String.valueOf(memberId));
-
+        reissueService.deleteById(memberId);
         removeRefreshTokenCookie(httpResponse);
         ResponseUtil.writeSuccess(httpResponse);
     }
@@ -58,41 +58,16 @@ public class CustomLogoutFilter extends GenericFilterBean {
     }
 
     private String extractRefreshToken(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            throw ChaeumException.from(ErrorCode.NOT_FOUND_REFRESH_TOKEN);
-        }
-
-        return Arrays.stream(request.getCookies())
-            .filter(cookie -> SecurityConstants.REFRESH_TOKEN_COOKIE_NAME.equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findFirst()
+        return CookieUtil.getValue(request, SecurityConstants.REFRESH_TOKEN_COOKIE_NAME)
             .orElseThrow(() -> ChaeumException.from(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
-    }
-
-    private boolean isValidRefreshToken(String token, HttpServletResponse response) throws IOException {
-        if (!jwtUtil.validateToken(token)) {
-            ResponseUtil.writeError(response, ErrorCode.INVALID_REFRESH_TOKEN);
-            return false;
-        }
-        if (jwtUtil.isExpired(token)) {
-            ResponseUtil.writeError(response, ErrorCode.EXPIRED_REFRESH_TOKEN);
-            return false;
-        }
-        if (!SecurityConstants.REFRESH_TOKEN_CATEGORY.equals(jwtUtil.getCategory(token))) {
-            ResponseUtil.writeError(response, ErrorCode.INVALID_REFRESH_TOKEN);
-            return false;
-        }
-        if (refreshTokenRepository.findById(jwtUtil.getEmail(token)).isEmpty()) {
-            ResponseUtil.writeError(response, ErrorCode.INVALID_REFRESH_TOKEN);
-            return false;
-        }
-        return true;
     }
 
     private void removeRefreshTokenCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 }

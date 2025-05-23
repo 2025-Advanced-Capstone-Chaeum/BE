@@ -72,8 +72,8 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
     }
 
     private Member updateMember(Member member, String newName) {
-        member.setName(newName);
-        member.setRole(member.getRole() != null ? member.getRole() : Role.DONOR);
+        member.setName(member.getName() == null ? newName : member.getName());
+        member.setRole(member.getRole() == null ? Role.DONOR : member.getRole());
         return member;
     }
 

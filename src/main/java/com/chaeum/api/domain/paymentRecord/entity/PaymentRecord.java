@@ -4,7 +4,6 @@ import com.chaeum.api.domain.member.entity.Member;
 import com.chaeum.api.domain.paymentRecord.dto.request.PaymentCreateRequest;
 import com.chaeum.api.global.entity.BaseEntity;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -80,5 +79,9 @@ public class PaymentRecord extends BaseEntity {
             .pgProvider(request.getGatewayProvider())
             .failReason(request.getFailReason())
             .build();
+    }
+
+    public void updateStatus(PaymentStatus status) {
+        this.status = status;
     }
 }

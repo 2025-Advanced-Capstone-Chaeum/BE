@@ -27,14 +27,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
         throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         if (!isLogoutRequest(httpRequest)) {
-            chain.doFilter(request, response);
+            filterChain.doFilter(request, response);
             return;
         }
 

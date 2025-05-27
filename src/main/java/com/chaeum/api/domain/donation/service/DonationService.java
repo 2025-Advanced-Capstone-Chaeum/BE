@@ -129,5 +129,6 @@ public class DonationService {
     public void completeDonation(Donation donation) {
         donation.manageStatus(DonationStatus.COMPLETED);
         donation.getFunding().addCurrentAmount(donation.getAmount());
+        fundingService.checkAndCompleteFundingIfNeeded(donation.getFunding());
     }
 }

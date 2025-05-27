@@ -122,6 +122,14 @@ public class FundingService {
             .toList();
     }
 
+    @Transactional
+    public void checkAndCompleteFundingIfNeeded(Funding funding) {
+        if (funding.getCurrentAmount().compareTo(funding.getGoalAmount()) >= 0 &&
+            funding.getStatus() == FundingStatus.ONGOING) {
+            funding.markAsCompleted();
+        }
+    }
+
     @Scheduled(fixedRate = 60 * 1000) // 1분마다 실행
     @Transactional
     public void updateFundingStatusAutomatically() {

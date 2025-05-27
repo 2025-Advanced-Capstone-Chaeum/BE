@@ -32,7 +32,8 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @Operation(summary = "펀딩 후기 등록", description = "[RECIPIENT 이상 가능]")
-    @PreAuthorize("hasRole('RECIPIENT')")
+//    @PreAuthorize("hasRole('RECIPIENT')")
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping("")
     public ApiResponse<Long> save(
         @RequestParam(name = "fundingId") Long fundingId,
@@ -64,7 +65,8 @@ public class ReviewController {
     }
 
     @Operation(summary = "펀딩 후기 변경", description = "[RECIPIENT 이상 가능]")
-    @PreAuthorize("hasRole('RECIPIENT')")
+//    @PreAuthorize("hasRole('RECIPIENT')")
+    @PreAuthorize("hasRole('DONOR')")
     @PatchMapping("")
     public ApiResponse<Long> update(
         @RequestParam(name = "fundingId") Long fundingId,
@@ -75,7 +77,8 @@ public class ReviewController {
     }
 
     @Operation(summary = "펀딩 후기 삭제", description = "[ADMIN 이상 가능]")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('DONOR')")
     @DeleteMapping("/{reviewId}")
     public ApiResponse<Long> delete(
         @PathVariable(name = "reviewId") Long reviewId

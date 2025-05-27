@@ -122,8 +122,6 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     org.springframework.security.oauth2: DEBUG
-    org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor: DEBUG
-    com.chaeum: DEBUG
 
 springdoc:
   api-docs:

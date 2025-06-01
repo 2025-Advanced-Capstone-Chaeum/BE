@@ -40,13 +40,13 @@ Chaeum은 **기부의 새로운 패러다임을 제시하는 플랫폼**입니�
 ## 📂 프로젝트 구조
 ```plaintext
 chaeum-api
- ├── .github/                     # GitHub 관련 설정
- ├── .gradle/                     # Gradle 빌드 관련 파일
- ├── .idea/                       # IntelliJ 프로젝트 설정 파일
- ├── build/                       # 빌드된 파일
- ├── docs/                        # 문서에 사용되는 자료
- ├── gradle/                      # Gradle 래퍼 관련 파일
- ├── out/                         # 컴파일된 클래스 파일
+ ├── .github/                        # GitHub 관련 설정
+ ├── .gradle/                        # Gradle 빌드 관련 파일
+ ├── .idea/                          # IntelliJ 프로젝트 설정 파일
+ ├── build/                          # 빌드된 파일
+ ├── docs/                           # 문서에 사용되는 자료
+ ├── gradle/                         # Gradle 래퍼 관련 파일
+ ├── out/                            # 컴파일된 클래스 파일
  ├── src/
  │   ├── main/
  │   │   ├── java/com/chaeum/api/
@@ -58,21 +58,21 @@ chaeum-api
  │   │   │   │   ├── service/        # 비즈니스 로직 처리
  │   │   │   ├── global/             # 공통 모듈 및 전역 설정
  │   │   │   │   ├── auth/           # JWT 인증/인가 관련 로직
- │   │   │   │   ├── config/          # 스프링 설정 클래스
+ │   │   │   │   ├── config/         # 스프링 설정 클래스
  │   │   │   │   ├── entity/         # 공통 엔티티 클래스
  │   │   │   │   ├── exception/      # 전역 예외 처리 클래스
- │   │   │   │   ├── file/            # 파일 처리
- │   │   │   │   ├── filter/          # 인증/로깅 등 서블릿 필터
+ │   │   │   │   ├── file/           # 파일 처리
+ │   │   │   │   ├── filter/         # 인증/로깅 등 서블릿 필터
  │   │   │   │   ├── handler/        # 전역 예외 핸들러
  │   │   │   │   ├── pagination/     # 페이지네이션 처리
  │   │   │   │   ├── properties/     # 커스텀 application.yml 설정 매핑
  │   │   │   │   ├── response/       # 표준 API 응답 포맷 클래스
  │   │   │   │   ├── utils/          # 공통 유틸리티 클래스
- │   │   │   ├── ChaeumApiApplication.java     # 메인 애플리케이션 실행 파일
+ │   │   │   ├── ChaeumApiApplication.java   # 메인 애플리케이션 실행 파일
  │   │   ├── resources/
  │   │   │   ├── static/             # 정적 리소스
  │   │   │   ├── templates/          # 템플릿 파일
- │   │   │   ├── application.yml.template       # 환경 설정 템플릿
+ │   │   │   ├── application.yml.template    # 환경 설정 템플릿
  ├── .gitattributes
  ├── .gitignore
  ├── build.gradle

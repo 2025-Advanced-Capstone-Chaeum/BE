@@ -120,6 +120,7 @@ public class InventoryService {
     public void useInteractionItem(Long inventoryId) {
         Inventory inventory = findByInventoryId(inventoryId);
         inventory.getItem().validateCategory(ItemCategory.INTERACTION);
+        inventory.removeQuantity();
         BigInteger exp = ExpConstants.INTERACTION;
         catService.addExperience(exp);
         memberMissionService.increaseProgressByType(MissionType.CAT_INTERACTION);

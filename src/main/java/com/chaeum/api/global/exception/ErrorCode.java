@@ -32,6 +32,7 @@ public enum ErrorCode {
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
     ALREADY_ATTENDED_TODAY(HttpStatus.BAD_REQUEST, "이미 오늘 출석을 완료했습니다."),
     ALREADY_HAS_TITLE(HttpStatus.BAD_REQUEST, "이미 보유한 칭호입니다."),
+    END_DATE_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST, "펀딩 종료일은 현재로부터 최대 30일 이내여야 합니다."),
 
     // 401: UNAUTHORIZED (인증 실패)
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

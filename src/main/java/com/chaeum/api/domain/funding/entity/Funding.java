@@ -22,6 +22,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -134,6 +135,19 @@ public class Funding extends BaseEntity {
     public void validateStatusCompleted() {
         if (this.status != FundingStatus.COMPLETED) {
             throw ChaeumException.from(ErrorCode.FUNDING_IS_NOT_COMPLETED);
+        }
+    }
+
+    public void validateEndDateWithin30Days() {
+        if (this.endDate == null) {
+            throw ChaeumException.from(ErrorCode.INVALID_DATE);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        long daysBetween = ChronoUnit.DAYS.between(now.toLocalDate(), this.endDate.toLocalDate());
+
+        if (daysBetween > 30) {
+            throw ChaeumException.from(ErrorCode.END_DATE_EXCEEDS_LIMIT);
         }
     }
 

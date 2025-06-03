@@ -15,6 +15,8 @@ public class ReviewSummaryResponse implements CreatedAtProvider {
 
     private Long id;
 
+    private Long fundingId;
+
     private String title;
 
     private ExternalFileResponse reviewImage;
@@ -29,6 +31,7 @@ public class ReviewSummaryResponse implements CreatedAtProvider {
 
         return ReviewSummaryResponse.builder()
             .id(review.getId())
+            .fundingId(review.getFunding().getId())
             .title(review.getTitle())
             .reviewImage(imageDto)
             .createdAt(review.getCreatedAt())

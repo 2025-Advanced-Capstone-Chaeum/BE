@@ -42,6 +42,7 @@ public class FundingService {
         Member member = loginMemberProvider.getCurrentLoginMember();
         List<UploadedFile> files = fileService.getUploadedFilesByUrls(fundingCreateRequest.getImageUrls());
         Funding funding = Funding.toEntity(fundingCreateRequest, files, member);
+        funding.validateEndDateWithin30Days();
         Funding savedFunding = fundingRepository.save(funding);
 
         eventPublisher.publishEvent(
@@ -106,6 +107,7 @@ public class FundingService {
         Funding funding = findById(fundingId);
         List<UploadedFile> files = fileService.getUploadedFilesByUrls(fundingUpdateRequest.getImageUrls());
         funding.update(files, fundingUpdateRequest);
+        funding.validateEndDateWithin30Days();
         return funding.getId();
     }
 

@@ -18,7 +18,7 @@ public class FundingResponse implements IdProvider {
 
     private Long id;
 
-    private Long memberId;
+    private String name;
 
     private String title;
 
@@ -44,10 +44,9 @@ public class FundingResponse implements IdProvider {
 
     public static FundingResponse toDto(Funding funding) {
         List<UploadedFile> files = funding.getFundingImages();
-        Long memberId = funding.getMember().getId();
         return FundingResponse.builder()
             .id(funding.getId())
-            .memberId(memberId)
+            .name(funding.getMember().getName())
             .title(funding.getTitle())
             .content(funding.getContent())
             .fundingImages(ExternalFileResponse.toListDto(files))

@@ -48,7 +48,7 @@ public class PaymentRecordService {
         paymentRecordRepository.save(payment);
 
         payment.updateStatus(PaymentStatus.COMPLETED);
-        donationService.completeDonation(donation);
+        donationService.updateDonation(donation);
 
         return payment.getId();
     }

@@ -17,6 +17,7 @@ import com.chaeum.api.global.exception.ErrorCode;
 import com.chaeum.api.global.file.entity.UploadedFile;
 import com.chaeum.api.global.file.service.FileService;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -126,9 +127,9 @@ public class FundingService {
 
     @Transactional
     public void checkAndCompleteFundingIfNeeded(Funding funding) {
-        if (funding.getCurrentAmount().compareTo(funding.getGoalAmount()) >= 0 &&
-            funding.getStatus() == FundingStatus.ONGOING) {
-            funding.markAsCompleted();
+        if (funding.getCurrentAmount().compareTo(funding.getGoalAmount()) >= 0) {
+            int exceedAmount = funding.getGoalAmount().compareTo(funding.getCurrentAmount());
+            funding.getMember().addPoints(BigDecimal.valueOf(exceedAmount));
         }
     }
 

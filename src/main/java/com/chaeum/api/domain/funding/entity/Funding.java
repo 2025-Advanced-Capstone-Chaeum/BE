@@ -113,11 +113,19 @@ public class Funding extends BaseEntity {
         if (this.status == FundingStatus.ONGOING) {
             this.status = FundingStatus.COMPLETED;
         }
+        this.currentAmount = this.goalAmount;
     }
 
     public void addCurrentAmount(BigDecimal amount) {
-        validateAmount(amount);
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw ChaeumException.from(ErrorCode.INVALID_DONATION_AMOUNT);
+        }
+
         this.currentAmount = this.currentAmount.add(amount);
+
+        if (this.currentAmount.compareTo(this.goalAmount) >= 0) {
+            markAsCompleted();
+        }
     }
 
     public void markReviewed() {
@@ -148,13 +156,6 @@ public class Funding extends BaseEntity {
 
         if (daysBetween > 30) {
             throw ChaeumException.from(ErrorCode.END_DATE_EXCEEDS_LIMIT);
-        }
-    }
-
-    private void validateAmount(BigDecimal amount) {
-        BigDecimal newTotal = this.currentAmount.add(amount);
-        if (newTotal.compareTo(this.goalAmount) > 0) {
-            throw ChaeumException.from(ErrorCode.DONATION_AMOUNT_EXCEEDS_GOAL);
         }
     }
 }

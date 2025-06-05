@@ -27,6 +27,7 @@ public enum ErrorCode {
     INVALID_SELF_FRIENDSHIP(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청을 보낼 수 없습니다."),
     INVALID_FRIENDSHIP_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 해당 변경이 불가능합니다."),
     INVALID_FRIENDSHIP_ACTION(HttpStatus.BAD_REQUEST, "현재 친구 상태에서는 이 요청을 처리할 수 없습니다."),
+    INVALID_DONATION_AMOUNT(HttpStatus.BAD_REQUEST, "기부 금액은 0보다 커야 합니다."),
     GOAL_AMOUNT_NOT_REACHED(HttpStatus.BAD_REQUEST, "목표 기부 금액을 넘어서지 못했습니다."),
     FUNDING_IS_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "펀딩이 종료되지 않았습니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),

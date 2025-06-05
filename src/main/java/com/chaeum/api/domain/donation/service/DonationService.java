@@ -126,8 +126,7 @@ public class DonationService {
     }
 
     @Transactional
-    public void completeDonation(Donation donation) {
-        donation.manageStatus(DonationStatus.COMPLETED);
+    public void updateDonation(Donation donation) {
         donation.getFunding().addCurrentAmount(donation.getAmount());
         fundingService.checkAndCompleteFundingIfNeeded(donation.getFunding());
     }

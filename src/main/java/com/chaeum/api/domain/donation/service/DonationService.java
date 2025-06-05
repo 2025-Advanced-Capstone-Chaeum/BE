@@ -127,7 +127,8 @@ public class DonationService {
 
     @Transactional
     public void updateDonation(Donation donation) {
-        donation.getFunding().addCurrentAmount(donation.getAmount());
-        fundingService.checkAndCompleteFundingIfNeeded(donation.getFunding());
+        Funding funding = fundingService.findById(donation.getFunding().getId());
+        funding.addCurrentAmount(donation.getAmount());
+        fundingService.checkGoalAmountAndGivePoints(funding);
     }
 }

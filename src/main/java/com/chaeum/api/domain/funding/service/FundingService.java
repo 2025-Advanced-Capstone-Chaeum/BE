@@ -126,7 +126,7 @@ public class FundingService {
     }
 
     @Transactional
-    public void checkAndCompleteFundingIfNeeded(Funding funding) {
+    public void checkGoalAmountAndGivePoints(Funding funding) {
         if (funding.getCurrentAmount().compareTo(funding.getGoalAmount()) >= 0) {
             int exceedAmount = funding.getGoalAmount().compareTo(funding.getCurrentAmount());
             funding.getMember().addPoints(BigDecimal.valueOf(exceedAmount));

@@ -3,6 +3,7 @@ package com.chaeum.api.domain.funding.controller;
 import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
 import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.funding.dto.response.FundingResponse;
+import com.chaeum.api.domain.funding.dto.response.RecommendedFundingResponse;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
 import com.chaeum.api.domain.funding.service.FundingService;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
@@ -76,11 +77,11 @@ public class FundingController {
     )
     @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/recommend")
-    public ApiResponse<IdCursorResult<FundingResponse>> getRecommendedFundings(
+    public ApiResponse<IdCursorResult<RecommendedFundingResponse>> getRecommendedFundings(
         @RequestParam(name = "cursor", required = false) Long cursor,
         @RequestParam(name = "limit", defaultValue = "3") int limit
     ) {
-        IdCursorResult<FundingResponse> fundings = fundingService.getRecommendedFundings(cursor, limit);
+        IdCursorResult<RecommendedFundingResponse> fundings = fundingService.getRecommendedFundings(cursor, limit);
         return ApiResponse.success(fundings);
     }
 

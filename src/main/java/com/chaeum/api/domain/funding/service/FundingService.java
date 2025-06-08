@@ -4,6 +4,7 @@ import com.chaeum.api.domain.funding.dto.request.FundingCreateRequest;
 import com.chaeum.api.domain.funding.dto.request.FundingUpdateRequest;
 import com.chaeum.api.domain.funding.dto.response.FundingResponse;
 import com.chaeum.api.domain.funding.dto.response.FundingSummaryResponse;
+import com.chaeum.api.domain.funding.dto.response.RecommendedFundingResponse;
 import com.chaeum.api.domain.funding.entity.Funding;
 import com.chaeum.api.domain.funding.entity.FundingStatus;
 import com.chaeum.api.domain.funding.entity.RecommendedFunding;
@@ -18,6 +19,9 @@ import com.chaeum.api.global.file.entity.UploadedFile;
 import com.chaeum.api.global.file.service.FileService;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -64,35 +68,45 @@ public class FundingService {
         FundingStatus status, String title, Long cursor, int limit
     ) {
         List<Funding> filteredFundings = fundingRepository.findAll().stream()
+            .distinct()
             .filter(funding -> isStatusMatch(funding, status))
             .filter(funding -> isTitleMatch(funding, title))
             .filter(funding -> isCursorAfterForFunding(funding, cursor))
-            .sorted(Comparator
-                .comparing(Funding::getCreatedAt, Comparator.reverseOrder())
-                .thenComparing(Funding::getId, Comparator.reverseOrder())
-            )
+            .sorted(Comparator.comparing(Funding::getId, Comparator.reverseOrder()))
             .limit(limit)
             .toList();
 
         List<FundingResponse> responses = filteredFundings.stream()
             .map(FundingResponse::toDto)
+            .distinct()
             .toList();
 
         return IdCursorResult.of(responses, cursor, limit);
     }
 
     @Transactional(readOnly = true)
-    public IdCursorResult<FundingResponse> getRecommendedFundings(Long cursor, int limit) {
+    public IdCursorResult<RecommendedFundingResponse> getRecommendedFundings(Long cursor, int limit) {
         List<RecommendedFunding> filteredRecommendedFundings = recommendedFundingRepository.findAll().stream()
+            .distinct()
             .filter(funding -> isCursorAfterForRecommendedFundings(funding, cursor))
             .sorted(Comparator.comparing(RecommendedFunding::getId))
             .limit(limit)
             .toList();
 
-        List<FundingResponse> responses = filteredRecommendedFundings.stream()
+        List<Long> fundingIds = filteredRecommendedFundings.stream()
             .map(RecommendedFunding::getFundingId)
-            .map(this::findById)
-            .map(FundingResponse::toDto)
+            .toList();
+
+        List<Funding> fundings = fundingRepository.findAllById(fundingIds);
+        Map<Long, Funding> fundingMap = fundings.stream()
+            .collect(Collectors.toMap(Funding::getId, Function.identity()));
+
+        List<RecommendedFundingResponse> responses = filteredRecommendedFundings.stream()
+            .map(recommendedFunding -> {
+                Funding funding = fundingMap.get(recommendedFunding.getFundingId());
+                return RecommendedFundingResponse.toDto(recommendedFunding, funding);
+            })
+            .distinct()
             .toList();
 
         return IdCursorResult.of(responses, cursor, limit);
@@ -150,7 +164,7 @@ public class FundingService {
     }
 
     private boolean isCursorAfterForFunding(Funding funding, Long cursor) {
-        return cursor == null || funding.getId() > cursor;
+        return cursor == null || funding.getId() < cursor;
     }
 
     private boolean isCursorAfterForRecommendedFundings(RecommendedFunding funding, Long cursor) {

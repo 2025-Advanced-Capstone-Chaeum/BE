@@ -19,6 +19,7 @@ import com.chaeum.api.global.auth.util.LoginMemberProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
@@ -102,7 +103,9 @@ public class DonationRewardService {
             );
 
             // 이미 소유한 아이템 제외
-            Set<Long> ownedItemIds = inventoryService.findItemIdsByMemberId(member.getId());
+            Set<Long> ownedItemIds = Optional.ofNullable(
+                inventoryService.findItemIdsByMemberId(member.getId())
+            ).orElse(Collections.emptySet());
             List<Item> filtered = candidateItems.stream()
                 .filter(item -> !ownedItemIds.contains(item.getId()))
                 .toList();

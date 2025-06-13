@@ -20,6 +20,7 @@ import com.chaeum.api.global.file.service.FileService;
 import com.chaeum.api.global.pagination.cursorResult.IdCursorResult;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +87,10 @@ public class FundingService {
 
     @Transactional(readOnly = true)
     public IdCursorResult<RecommendedFundingResponse> getRecommendedFundings(Long cursor, int limit) {
+        Long memberId = loginMemberProvider.getCurrentLoginMemberId();
         List<RecommendedFunding> filteredRecommendedFundings = recommendedFundingRepository.findAll().stream()
             .distinct()
+            .filter(funding -> Objects.equals(funding.getMember().getId(), memberId))
             .filter(funding -> isCursorAfterForRecommendedFundings(funding, cursor))
             .sorted(Comparator.comparing(RecommendedFunding::getId))
             .limit(limit)
